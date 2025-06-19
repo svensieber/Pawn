@@ -266,14 +266,28 @@ function PawnHookTooltips()
 	local OldSetHyperlink = ItemRefTooltip.SetHyperlink
 	ItemRefTooltip.SetHyperlink = function(link)
 		-- Make sure we have a valid link
-		if not link then return end
+		if not link or type(link) ~= "string" then 
+			if OldSetHyperlink then
+				OldSetHyperlink(link)
+			end
+			return 
+		end
 		
-		-- Call original function
-		OldSetHyperlink(link)
+		-- Call original function with error handling
+		local success, err = pcall(OldSetHyperlink, link)
+		if not success then
+			PawnDebugLog("SetHyperlink error: " .. tostring(err))
+			return
+		end
 		
-		-- Add our info
-		if PawnCommon and PawnCommon.Debug then
-			PawnUpdateTooltipWithItemLink("ItemRefTooltip", link)
+		-- Add our info only for item links
+		if PawnCommon and PawnCommon.Debug and string.find(link, "^item:") then
+			-- Delay slightly to let tooltip populate
+			local frame = CreateFrame("Frame")
+			frame:SetScript("OnUpdate", function()
+				this:SetScript("OnUpdate", nil)
+				PawnUpdateTooltipWithItemLink("ItemRefTooltip", link)
+			end)
 		end
 	end
 	
@@ -310,14 +324,9 @@ function PawnGetItemData(ItemLink)
 		itemId = tonumber(itemId)
 		if itemId then
 			-- Request item info from server
-			-- Use a hidden tooltip to query item info
-			if not PawnHiddenTooltip then
-				PawnHiddenTooltip = CreateFrame("GameTooltip", "PawnHiddenTooltip", UIParent, "GameTooltipTemplate")
-				PawnHiddenTooltip:SetOwner(UIParent, "ANCHOR_NONE")
-			end
-			PawnHiddenTooltip:SetHyperlink(ItemLink)
-			PawnHiddenTooltip:Hide()
-			PawnDebugLog("Requested item info from server for ID: " .. itemId)
+			-- In Vanilla, we can't always use SetHyperlink directly
+			-- Just log that we need to wait for the item to cache
+			PawnDebugLog("Item not in cache, ID: " .. itemId .. " - hover again to load")
 		end
 		return 
 	end
@@ -427,8 +436,20 @@ function PawnUpdateTooltipWithItemLink(TooltipName, ItemLink)
 	-- Ensure PawnCommon exists
 	if not PawnCommon then return end
 	
+	-- Validate ItemLink
+	if not ItemLink or type(ItemLink) ~= "string" then 
+		PawnDebugLog("Invalid ItemLink: " .. tostring(ItemLink))
+		return 
+	end
+	
+	-- Check if it's actually an item link
+	if not string.find(ItemLink, "^item:") then
+		PawnDebugLog("Not an item link: " .. ItemLink)
+		return
+	end
+	
 	-- Always show debug info if debug is on, regardless of ShowUpgradesOnTooltips
-	if not ItemLink or (not PawnCommon.ShowUpgradesOnTooltips and not PawnCommon.Debug) then return end
+	if not PawnCommon.ShowUpgradesOnTooltips and not PawnCommon.Debug then return end
 	
 	local Tooltip = getglobal(TooltipName)
 	if not Tooltip then 
@@ -436,10 +457,16 @@ function PawnUpdateTooltipWithItemLink(TooltipName, ItemLink)
 		return 
 	end
 	
+	-- Make sure tooltip is visible
+	if not Tooltip:IsVisible() then
+		PawnDebugLog("Tooltip not visible: " .. TooltipName)
+		return
+	end
+	
 	-- Get item data
 	local Item = PawnGetItemData(ItemLink)
 	if not Item then 
-		PawnDebugLog("No item data for: " .. tostring(ItemLink))
+		-- Don't spam for items not in cache
 		return 
 	end
 	
