@@ -194,16 +194,19 @@ end
 ------------------------------------------------------------
 
 function PawnHookTooltips()
-	-- Hook main tooltip
+	-- Debug message
+	PawnDebugLog("Installing tooltip hooks...")
+	
+	-- Hook main tooltip - Vanilla style (no self parameter)
 	local OldSetBagItem = GameTooltip.SetBagItem
-	GameTooltip.SetBagItem = function(self, bag, slot)
-		OldSetBagItem(self, bag, slot)
+	GameTooltip.SetBagItem = function(bag, slot)
+		OldSetBagItem(bag, slot)
 		PawnUpdateTooltip("GameTooltip", bag, slot)
 	end
 	
 	local OldSetInventoryItem = GameTooltip.SetInventoryItem
-	GameTooltip.SetInventoryItem = function(self, unit, slot)
-		OldSetInventoryItem(self, unit, slot)
+	GameTooltip.SetInventoryItem = function(unit, slot)
+		OldSetInventoryItem(unit, slot)
 		if unit == "player" then
 			PawnUpdateTooltip("GameTooltip", nil, nil, slot)
 		end
@@ -211,10 +214,24 @@ function PawnHookTooltips()
 	
 	-- Hook item ref tooltip (links in chat)
 	local OldSetHyperlink = ItemRefTooltip.SetHyperlink
-	ItemRefTooltip.SetHyperlink = function(self, link)
-		OldSetHyperlink(self, link)
+	ItemRefTooltip.SetHyperlink = function(link)
+		OldSetHyperlink(link)
 		PawnUpdateTooltipWithItemLink("ItemRefTooltip", link)
 	end
+	
+	-- Additional hooks for other tooltip types
+	local OldSetLootItem = GameTooltip.SetLootItem
+	if OldSetLootItem then
+		GameTooltip.SetLootItem = function(slot)
+			OldSetLootItem(slot)
+			local link = GetLootSlotLink(slot)
+			if link then
+				PawnUpdateTooltipWithItemLink("GameTooltip", link)
+			end
+		end
+	end
+	
+	PawnDebugLog("Tooltip hooks installed")
 end
 
 ------------------------------------------------------------
@@ -324,21 +341,36 @@ function PawnUpdateTooltip(TooltipName, Bag, Slot, InventorySlot)
 end
 
 function PawnUpdateTooltipWithItemLink(TooltipName, ItemLink)
-	if not ItemLink or not PawnCommon.ShowUpgradesOnTooltips then return end
+	-- Ensure PawnCommon exists
+	if not PawnCommon then return end
+	
+	-- Always show debug info if debug is on, regardless of ShowUpgradesOnTooltips
+	if not ItemLink or (not PawnCommon.ShowUpgradesOnTooltips and not PawnCommon.Debug) then return end
 	
 	local Tooltip = getglobal(TooltipName)
-	if not Tooltip then return end
+	if not Tooltip then 
+		PawnDebugLog("Tooltip not found: " .. tostring(TooltipName))
+		return 
+	end
 	
 	-- Get item data
 	local Item = PawnGetItemData(ItemLink)
-	if not Item then return end
+	if not Item then 
+		PawnDebugLog("No item data for: " .. tostring(ItemLink))
+		return 
+	end
 	
-	-- Add debug info for now
-	if PawnCommon.Debug then
+	-- Add debug info
+	if PawnCommon and PawnCommon.Debug then
 		Tooltip:AddLine(" ")
 		Tooltip:AddLine(VgerCore.Color.Blue .. "Pawn debug:", 1, 1, 1)
-		Tooltip:AddLine("Item level: " .. tostring(Item.Level), 1, 1, 1)
-		Tooltip:AddLine("Equip slot: " .. tostring(Item.EquipLoc), 1, 1, 1)
+		Tooltip:AddLine("Item: " .. tostring(Item.Name), 1, 1, 1)
+		Tooltip:AddLine("Level: " .. tostring(Item.Level), 1, 1, 1)
+		Tooltip:AddLine("Slot: " .. tostring(Item.EquipLoc), 1, 1, 1)
+		Tooltip:AddLine("Rarity: " .. tostring(Item.Rarity), 1, 1, 1)
+		
+		-- Debug message to console
+		PawnDebugLog("Updated tooltip for: " .. tostring(Item.Name))
 	end
 	
 	-- Update tooltip display
