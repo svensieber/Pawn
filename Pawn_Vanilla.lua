@@ -203,57 +203,52 @@ function PawnHookTooltips()
 		return
 	end
 	
-	-- Simpler approach: Just use OnUpdate to check what's under the mouse
-	-- This avoids all hook conflicts
-	local TooltipUpdateFrame = CreateFrame("Frame", "PawnTooltipUpdateFrame")
-	local lastUpdate = 0
+	-- Alternative approach: Read item info directly from tooltip
+	-- This works even when GetContainerItemLink returns just the name
 	
-	TooltipUpdateFrame:SetScript("OnUpdate", function()
-		-- Throttle updates
-		this.elapsed = (this.elapsed or 0) + arg1
-		if this.elapsed < 0.2 then return end
-		this.elapsed = 0
-		
-		-- Only proceed if tooltip is visible and debug is on
-		if not GameTooltip:IsVisible() then return end
+	-- Hook the tooltip's OnShow to add our info
+	GameTooltip:HookScript("OnShow", function()
 		if not PawnCommon or not PawnCommon.Debug then return end
+		if this.PawnInfoAdded then return end
 		
-		-- Check if we already added info
-		if GameTooltip.PawnInfoAdded then return end
+		-- Get the first line of the tooltip (item name)
+		local itemName = getglobal(this:GetName().."TextLeft1")
+		if not itemName then return end
 		
-		-- Get what's under the mouse
-		local focus = GetMouseFocus()
-		if not focus or not focus.GetName then return end
+		local name = itemName:GetText()
+		if not name or name == "" then return end
 		
-		local name = focus:GetName()
-		if not name then return end
+		-- Try to find the item ID from tooltip scanning
+		local itemLink = PawnGetItemLinkFromTooltip(this)
 		
-		local itemLink = nil
-		
-		-- Check if it's a container item
-		if string.find(name, "ContainerFrame") then
-			local _, _, container, slot = string.find(name, "ContainerFrame(%d+)Item(%d+)")
-			if container and slot then
-				container = tonumber(container) - 1  -- Container frames are 1-indexed, bags are 0-indexed
-				slot = tonumber(slot)
-				itemLink = GetContainerItemLink(container, slot)
+		if itemLink and string.find(itemLink, "^|c%x+|Hitem:") then
+			PawnDebugLog("Got item link from tooltip: " .. itemLink)
+			-- Add our debug info
+			this:AddLine(" ")
+			this:AddLine(VgerCore.Color.Blue .. "Pawn debug:", 1, 1, 1)
+			
+			-- Get item data
+			local Item = PawnGetItemData(itemLink)
+			if Item then
+				this:AddLine("Item: " .. tostring(Item.Name), 1, 1, 1)
+				this:AddLine("Level: " .. tostring(Item.Level), 1, 1, 1)
+				this:AddLine("Slot: " .. tostring(Item.EquipLoc), 1, 1, 1)
+				this:AddLine("Rarity: " .. tostring(Item.Rarity), 1, 1, 1)
+			else
+				this:AddLine("Item not in cache - hover again", 1, 0.5, 0.5)
 			end
-		-- Check if it's an inventory item
-		elseif string.find(name, "Character") and string.find(name, "Slot") then
-			local _, _, slotName = string.find(name, "Character(.+)Slot")
-			if slotName then
-				local slotId = GetInventorySlotInfo(slotName .. "Slot")
-				if slotId then
-					itemLink = GetInventoryItemLink("player", slotId)
-				end
-			end
-		end
-		
-		-- If we found an item, add our info
-		if itemLink then
-			PawnDebugLog("Found item under mouse: " .. tostring(itemLink))
-			PawnUpdateTooltipWithItemLink("GameTooltip", itemLink)
-			GameTooltip.PawnInfoAdded = true
+			
+			this:Show()
+			this.PawnInfoAdded = true
+		else
+			-- Fallback: Show basic info
+			PawnDebugLog("No proper item link, showing basic info for: " .. name)
+			this:AddLine(" ")
+			this:AddLine(VgerCore.Color.Blue .. "Pawn debug:", 1, 1, 1)
+			this:AddLine("Name: " .. name, 1, 1, 1)
+			this:AddLine("(Full item data not available)", 1, 0.5, 0.5)
+			this:Show()
+			this.PawnInfoAdded = true
 		end
 	end)
 	
@@ -297,6 +292,52 @@ end
 ------------------------------------------------------------
 -- Basic item functions
 ------------------------------------------------------------
+
+-- Try to extract item link from tooltip
+function PawnGetItemLinkFromTooltip(tooltip)
+	-- In Vanilla, we need to scan the tooltip for the item
+	-- First, check if the tooltip has an associated item
+	
+	-- Try to get from current mouse focus
+	local focus = GetMouseFocus()
+	if focus and focus.GetName then
+		local name = focus:GetName()
+		if name then
+			-- For container items
+			if string.find(name, "ContainerFrame") then
+				local _, _, container, slot = string.find(name, "ContainerFrame(%d+)Item(%d+)")
+				if container and slot then
+					container = tonumber(container) - 1
+					slot = tonumber(slot)
+					-- Use GetContainerItemInfo to get item ID
+					local _, _, _, _, _, _, link = GetContainerItemInfo(container, slot)
+					if link and string.find(tostring(link), "^|c%x+|Hitem:") then
+						return link
+					end
+					-- Try alternative method
+					local texture, count, locked, quality, readable, lootable, link2 = GetContainerItemInfo(container, slot)
+					if link2 and string.find(tostring(link2), "^|c%x+|Hitem:") then
+						return link2
+					end
+				end
+			-- For inventory items
+			elseif string.find(name, "Character") and string.find(name, "Slot") then
+				local _, _, slotName = string.find(name, "Character(.+)Slot")
+				if slotName then
+					local slotId = GetInventorySlotInfo(slotName .. "Slot")
+					if slotId then
+						local link = GetInventoryItemLink("player", slotId)
+						if link and string.find(tostring(link), "^|c%x+|Hitem:") then
+							return link
+						end
+					end
+				end
+			end
+		end
+	end
+	
+	return nil
+end
 
 function PawnGetItemData(ItemLink)
 	if not ItemLink then 
