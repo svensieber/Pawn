@@ -200,13 +200,23 @@ function PawnHookTooltips()
 	-- Hook main tooltip - Vanilla style (no self parameter)
 	local OldSetBagItem = GameTooltip.SetBagItem
 	GameTooltip.SetBagItem = function(bag, slot)
-		OldSetBagItem(bag, slot)
+		-- Call original function first
+		local success, err = pcall(OldSetBagItem, bag, slot)
+		if not success then
+			PawnDebugLog("SetBagItem error: " .. tostring(err))
+			return
+		end
+		-- Then add our info
 		PawnUpdateTooltip("GameTooltip", bag, slot)
 	end
 	
 	local OldSetInventoryItem = GameTooltip.SetInventoryItem
 	GameTooltip.SetInventoryItem = function(unit, slot)
-		OldSetInventoryItem(unit, slot)
+		local success, err = pcall(OldSetInventoryItem, unit, slot)
+		if not success then
+			PawnDebugLog("SetInventoryItem error: " .. tostring(err))
+			return
+		end
 		if unit == "player" then
 			PawnUpdateTooltip("GameTooltip", nil, nil, slot)
 		end
@@ -326,17 +336,27 @@ end
 ------------------------------------------------------------
 
 function PawnUpdateTooltip(TooltipName, Bag, Slot, InventorySlot)
-	if not PawnCommon.ShowUpgradesOnTooltips then return end
+	-- Ensure PawnCommon exists
+	if not PawnCommon then return end
+	if not PawnCommon.ShowUpgradesOnTooltips and not PawnCommon.Debug then return end
 	
 	local ItemLink
 	if Bag and Slot then
-		ItemLink = GetContainerItemLink(Bag, Slot)
+		-- Validate parameters for Vanilla
+		if type(Bag) == "number" and type(Slot) == "number" then
+			ItemLink = GetContainerItemLink(Bag, Slot)
+		else
+			PawnDebugLog("Invalid bag/slot parameters: " .. tostring(Bag) .. "/" .. tostring(Slot))
+			return
+		end
 	elseif InventorySlot then
 		ItemLink = GetInventoryItemLink("player", InventorySlot)
 	end
 	
 	if ItemLink then
 		PawnUpdateTooltipWithItemLink(TooltipName, ItemLink)
+	else
+		PawnDebugLog("No item link found for tooltip update")
 	end
 end
 
