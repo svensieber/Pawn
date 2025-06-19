@@ -1,0 +1,99 @@
+-- Pawn Vanilla Test File
+-- Temporary file for early testing in Turtle WoW
+
+function Pawn_OnLoad()
+    DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn Vanilla geladen!|r")
+    
+    -- Test compatibility layer
+    if PawnCompatDebug then
+        PawnCompatDebug("Test: Compatibility layer active")
+    end
+    
+    -- Test Lua 5.0 features
+    local testTable = {1, 2, 3, 4, 5}
+    local tableLen = table.getn(testTable)
+    DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Table length test = " .. tableLen .. "|r")
+    
+    -- Test WoW 1.12.1 API
+    if GetItemInfo then
+        DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: GetItemInfo exists|r")
+    end
+    
+    if C_Item and C_Item.GetItemInfo then
+        DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: C_Item compatibility layer active|r")
+    end
+end
+
+function Pawn_OnEvent(event)
+    if event == "PLAYER_LOGIN" then
+        DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Player login erkannt|r")
+        Pawn_OnLoad()
+    elseif event == "VARIABLES_LOADED" then
+        DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Variables loaded|r")
+    end
+end
+
+-- Frame erstellen
+local frame = CreateFrame("Frame", "PawnTestFrame")
+frame:RegisterEvent("PLAYER_LOGIN")
+frame:RegisterEvent("VARIABLES_LOADED")
+frame:RegisterEvent("ADDON_LOADED")
+frame:SetScript("OnEvent", Pawn_OnEvent)
+
+-- Error logging
+PawnErrorLog = {}
+
+-- Hook error handler
+local oldError = geterrorhandler()
+seterrorhandler(function(msg)
+    table.insert(PawnErrorLog, {
+        time = date("%H:%M:%S"),
+        error = msg
+    })
+    if oldError then oldError(msg) end
+end)
+
+-- Debug-Modus aktivieren für Errors
+SLASH_PAWNDEBUG1 = "/pawndebug"
+SlashCmdList["PAWNDEBUG"] = function()
+    -- Force script errors to show
+    SetCVar("scriptErrors", 1)
+    DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Script errors enabled|r")
+    
+    -- Trigger a test error to see if BugSack catches it
+    DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Triggering test error...|r")
+    local testfunc = function()
+        error("Pawn Test Error for BugSack")
+    end
+    pcall(testfunc)
+end
+
+-- Export errors command
+SLASH_PAWNERRORS1 = "/pawnerrors"
+SlashCmdList["PAWNERRORS"] = function()
+    DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6=== Pawn Error Log (" .. table.getn(PawnErrorLog) .. " errors) ===|r")
+    for i, err in ipairs(PawnErrorLog) do
+        DEFAULT_CHAT_FRAME:AddMessage(err.time .. ": " .. err.error)
+    end
+end
+
+-- Test slash command
+SLASH_PAWNTEST1 = "/pawntest"
+SlashCmdList["PAWNTEST"] = function(msg)
+    DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn Test: " .. (msg or "no message") .. "|r")
+    
+    -- Test item info
+    local testItemID = 19019  -- Thunderfury
+    local name, link = GetItemInfo(testItemID)
+    if name then
+        DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Item test: " .. name .. "|r")
+    else
+        DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Item test: Item not in cache|r")
+    end
+    
+    -- Test C_Item compatibility
+    if C_Item and C_Item.GetItemInfoInstant then
+        local itemID, class, subclass, equipSlot = C_Item.GetItemInfoInstant(testItemID)
+        DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6C_Item test: " .. tostring(class) .. "/" .. tostring(subclass) .. "|r")
+    end
+end

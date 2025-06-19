@@ -1,2 +1,6 @@
 # VSCode's Lua extension tries to add an annoying settings file to the repo
 /.vscode/settings.json
+/docs/
+/.idea/
+.DS_Store
+CLAUDE.md
