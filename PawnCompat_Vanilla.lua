@@ -249,7 +249,7 @@ if not BreakUpLargeNumbers then
         local len = string.len(str)
         
         for i = 1, len do
-            if (len - i) % 3 == 0 and i ~= 1 then
+            if mod(len - i, 3) == 0 and i ~= 1 then
                 result = result .. ","
             end
             result = result .. string.sub(str, i, i)
