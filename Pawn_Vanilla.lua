@@ -64,12 +64,14 @@ local PawnEventFrame = CreateFrame("Frame", "PawnEventFrame")
 -- Main event handler
 ------------------------------------------------------------
 
-function PawnOnEvent(self, Event)
-	-- In Lua 5.0, event arguments are in the arg table
-	local arg1, arg2, arg3, arg4 = arg and arg[1], arg and arg[2], arg and arg[3], arg and arg[4]
+function PawnOnEvent(Event)
+	-- In Lua 5.0, event arguments are in the global arg table
 	
-	if Event == "ADDON_LOADED" and arg1 == "Pawn" then
-		PawnInitialize()
+	if Event == "ADDON_LOADED" then
+		-- In Vanilla, arg1 contains the addon name
+		if arg1 == "Pawn" then
+			PawnInitialize()
+		end
 	elseif Event == "PLAYER_LOGIN" then
 		PawnPlayerLogin()
 	elseif Event == "UNIT_INVENTORY_CHANGED" and arg1 == "player" then
@@ -84,6 +86,11 @@ function PawnOnEvent(self, Event)
 		PawnOnPlayerLevelUp(arg1, arg2)
 	elseif Event == "CHAT_MSG_LOOT" then
 		PawnOnChatMsgLoot(arg1)
+	elseif Event == "VARIABLES_LOADED" then
+		-- Alternative initialization point
+		if not PawnInitialized then
+			PawnInitialize()
+		end
 	end
 end
 
@@ -91,12 +98,17 @@ end
 PawnEventFrame:SetScript("OnEvent", PawnOnEvent)
 PawnEventFrame:RegisterEvent("ADDON_LOADED")
 PawnEventFrame:RegisterEvent("PLAYER_LOGIN")
+PawnEventFrame:RegisterEvent("VARIABLES_LOADED")
 
 ------------------------------------------------------------
 -- Initialization
 ------------------------------------------------------------
 
 function PawnInitialize()
+	-- Prevent double initialization
+	if PawnInitialized then return end
+	PawnInitialized = true
+	
 	-- Load saved variables
 	if not PawnCommon then PawnCommon = {} end
 	if not PawnOptions then PawnOptions = {} end
@@ -116,6 +128,11 @@ function PawnInitialize()
 	PawnHookTooltips()
 	
 	PawnDebugLog("Pawn initialized")
+	
+	-- Debug message
+	if DEFAULT_CHAT_FRAME then
+		DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Initialization complete, /pawn registered|r")
+	end
 end
 
 function PawnPlayerLogin()

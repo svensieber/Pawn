@@ -120,4 +120,36 @@ SlashCmdList["PAWNTEST"] = function(msg)
         local testPattern = PawnGameConstant("test %s pattern")
         DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Core function test: " .. testPattern .. "|r")
     end
+    
+    -- Test if Pawn_Vanilla.lua loaded
+    if PawnInitialize then
+        DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6PawnInitialize function exists|r")
+    else
+        DEFAULT_CHAT_FRAME:AddMessage("|cffff0000PawnInitialize NOT found!|r")
+    end
+    
+    -- Test slash commands
+    if SlashCmdList["PAWN"] then
+        DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6/pawn command is registered|r")
+    else
+        DEFAULT_CHAT_FRAME:AddMessage("|cffff0000/pawn command NOT registered!|r")
+    end
+end
+
+-- Additional debug command
+SLASH_PAWNCHECK1 = "/pawncheck"
+SlashCmdList["PAWNCHECK"] = function()
+    DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6=== Pawn Status Check ===|r")
+    DEFAULT_CHAT_FRAME:AddMessage("PawnEventFrame: " .. tostring(PawnEventFrame))
+    DEFAULT_CHAT_FRAME:AddMessage("PawnInitialize: " .. tostring(PawnInitialize))
+    DEFAULT_CHAT_FRAME:AddMessage("PawnCommand: " .. tostring(PawnCommand))
+    DEFAULT_CHAT_FRAME:AddMessage("SLASH_PAWN1: " .. tostring(SLASH_PAWN1))
+    DEFAULT_CHAT_FRAME:AddMessage("SlashCmdList.PAWN: " .. tostring(SlashCmdList["PAWN"]))
+    
+    -- Check if ADDON_LOADED fired
+    if PawnCommon then
+        DEFAULT_CHAT_FRAME:AddMessage("PawnCommon exists (addon loaded)")
+    else
+        DEFAULT_CHAT_FRAME:AddMessage("PawnCommon is nil (addon NOT loaded)")
+    end
 end
