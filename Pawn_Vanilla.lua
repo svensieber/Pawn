@@ -400,3 +400,26 @@ end
 
 -- Debug message
 PawnDebugLog("Pawn_Vanilla.lua loaded")
+
+-- Direct initialization for Vanilla
+-- In Vanilla, sometimes ADDON_LOADED doesn't fire properly
+-- So we initialize directly when the file loads
+if not PawnInitialized then
+	-- Delay initialization slightly to ensure all files are loaded
+	local InitFrame = CreateFrame("Frame")
+	InitFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+	InitFrame:SetScript("OnEvent", function()
+		if not PawnInitialized then
+			DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Starting initialization...|r")
+			PawnInitialize()
+		end
+		this:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	end)
+	
+	-- Also try immediate initialization
+	-- This works if we're already in-game (reload)
+	if UnitName("player") and UnitName("player") ~= "Unknown Entity" then
+		DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Direct initialization (reload detected)|r")
+		PawnInitialize()
+	end
+end
