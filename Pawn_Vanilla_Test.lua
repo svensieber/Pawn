@@ -101,4 +101,23 @@ SlashCmdList["PAWNTEST"] = function(msg)
         local itemID, class, subclass, equipSlot = C_Item.GetItemInfoInstant(testItemID)
         DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6C_Item test: " .. tostring(class) .. "/" .. tostring(subclass) .. "|r")
     end
+    
+    -- Test VgerCore
+    if VgerCore then
+        DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6VgerCore loaded! Version: " .. tostring(VgerCore.Version) .. "|r")
+        VgerCore.Message(VgerCore.Color.Green .. "VgerCore color test" .. VgerCore.Color.Reset)
+        DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6VgerCore.IsClassic = " .. tostring(VgerCore.IsClassic) .. "|r")
+        DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6VgerCore.IsTurtle = " .. tostring(VgerCore.IsTurtle) .. "|r")
+    else
+        DEFAULT_CHAT_FRAME:AddMessage("|cffff0000VgerCore NOT loaded!|r")
+    end
+    
+    -- Test Core
+    if PawnClassic then
+        DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6PawnClassic = " .. tostring(PawnClassic) .. "|r")
+    end
+    if PawnGameConstant then
+        local testPattern = PawnGameConstant("test %s pattern")
+        DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Core function test: " .. testPattern .. "|r")
+    end
 end

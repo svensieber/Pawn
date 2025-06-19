@@ -8,4 +8,6 @@
 ## SavedVariablesPerCharacter: PawnOptions, PawnClassicScaleProviderOptions
 
 PawnCompat_Vanilla.lua
+VgerCore\VgerCore_Vanilla.lua
+Core_Vanilla.lua
 Pawn_Vanilla_Test.lua
