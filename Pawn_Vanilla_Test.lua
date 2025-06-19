@@ -153,3 +153,61 @@ SlashCmdList["PAWNCHECK"] = function()
         DEFAULT_CHAT_FRAME:AddMessage("PawnCommon is nil (addon NOT loaded)")
     end
 end
+
+-- Debug tooltip hooks
+SLASH_PAWNHOOKS1 = "/pawnhooks"
+SlashCmdList["PAWNHOOKS"] = function()
+    DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6=== Tooltip Hook Analysis ===|r")
+    
+    -- Check GameTooltip.SetBagItem
+    local setBagItem = GameTooltip.SetBagItem
+    DEFAULT_CHAT_FRAME:AddMessage("GameTooltip.SetBagItem: " .. tostring(setBagItem))
+    
+    -- Try to find what addon hooked it
+    if setBagItem then
+        local info = debug.getinfo(setBagItem, "S")
+        if info then
+            DEFAULT_CHAT_FRAME:AddMessage("  Source: " .. (info.source or "unknown"))
+            DEFAULT_CHAT_FRAME:AddMessage("  Line: " .. (info.linedefined or "?"))
+        end
+    end
+    
+    -- Check for known addon conflicts
+    local addons = {
+        "ChronoboonTimers",
+        "pfUI", 
+        "ElvUI",
+        "Bagnon",
+        "ArkInventory",
+        "ItemRack",
+        "CharacterStatsClassic",
+        "GearScore"
+    }
+    
+    DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Checking for known addon conflicts:|r")
+    for _, addon in ipairs(addons) do
+        if IsAddOnLoaded(addon) then
+            DEFAULT_CHAT_FRAME:AddMessage("  |cffff0000" .. addon .. " is loaded|r")
+        end
+    end
+end
+
+-- Disable problematic hooks temporarily
+SLASH_PAWNDISABLEHOOKS1 = "/pawndisablehooks"
+SlashCmdList["PAWNDISABLEHOOKS"] = function()
+    if PawnHooksDisabled then
+        DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn hooks already disabled|r")
+        return
+    end
+    
+    -- Restore original functions if we saved them
+    if PawnOriginalSetBagItem then
+        GameTooltip.SetBagItem = PawnOriginalSetBagItem
+    end
+    if PawnOriginalSetInventoryItem then
+        GameTooltip.SetInventoryItem = PawnOriginalSetInventoryItem
+    end
+    
+    PawnHooksDisabled = true
+    DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn tooltip hooks disabled - reload UI to re-enable|r")
+end

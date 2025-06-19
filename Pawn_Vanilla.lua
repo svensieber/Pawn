@@ -197,9 +197,19 @@ function PawnHookTooltips()
 	-- Debug message
 	PawnDebugLog("Installing tooltip hooks...")
 	
+	-- Check if hooks are disabled
+	if PawnHooksDisabled then
+		PawnDebugLog("Tooltip hooks disabled by user")
+		return
+	end
+	
 	-- For Vanilla, we need a different approach
 	-- We'll store the last item shown in tooltips
 	PawnLastTooltipItem = {}
+	
+	-- Save original functions
+	PawnOriginalSetBagItem = PawnOriginalSetBagItem or GameTooltip.SetBagItem
+	PawnOriginalSetInventoryItem = PawnOriginalSetInventoryItem or GameTooltip.SetInventoryItem
 	
 	-- Hook the basic tooltip functions but store the info for later
 	local OldSetBagItem = GameTooltip.SetBagItem
