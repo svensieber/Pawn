@@ -30,6 +30,11 @@ function Pawn_OnEvent(event)
         Pawn_OnLoad()
     elseif event == "VARIABLES_LOADED" then
         DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Variables loaded|r")
+    elseif event == "ADDON_LOADED" then
+        local addon = arg1  -- In Lua 5.0, arg1 contains the addon name
+        if addon == "Pawn" then
+            DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Addon loaded event fired|r")
+        end
     end
 end
 

@@ -3,6 +3,7 @@
 ## Version: 2.11.6
 ## Notes: Pawn helps you compare items and find upgrades.
 ## Author: Vger
+## Dependencies: pfUI
 ## SavedVariables: PawnCommon, PawnErrorLog
 ## SavedVariablesPerCharacter: PawnOptions, PawnClassicScaleProviderOptions
 
