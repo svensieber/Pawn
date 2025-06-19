@@ -4,10 +4,19 @@
 ## Notes: Pawn helps you compare items and find upgrades.
 ## Author: Vger
 ## Dependencies: pfUI
-## SavedVariables: PawnCommon, PawnErrorLog
-## SavedVariablesPerCharacter: PawnOptions, PawnClassicScaleProviderOptions
+## SavedVariables: PawnCommon, PawnErrorLog, PawnClassicScaleProviderOptions
+## SavedVariablesPerCharacter: PawnOptions
 
 PawnCompat_Vanilla.lua
 VgerCore\VgerCore_Vanilla.lua
 Core_Vanilla.lua
+Localization.lua
+UIStrings.lua
+TooltipParsing_Vanilla.lua
+GemsClassic.lua
+ScaleTemplates_Vanilla.lua
+Pawn_Vanilla.lua
+PawnUI_Vanilla.lua
+PawnUI_Vanilla.xml
+ClassicHawsJon.lua
 Pawn_Vanilla_Test.lua
