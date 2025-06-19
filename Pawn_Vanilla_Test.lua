@@ -163,14 +163,8 @@ SlashCmdList["PAWNHOOKS"] = function()
     local setBagItem = GameTooltip.SetBagItem
     DEFAULT_CHAT_FRAME:AddMessage("GameTooltip.SetBagItem: " .. tostring(setBagItem))
     
-    -- Try to find what addon hooked it
-    if setBagItem then
-        local info = debug.getinfo(setBagItem, "S")
-        if info then
-            DEFAULT_CHAT_FRAME:AddMessage("  Source: " .. (info.source or "unknown"))
-            DEFAULT_CHAT_FRAME:AddMessage("  Line: " .. (info.linedefined or "?"))
-        end
-    end
+    -- In Vanilla, debug.getinfo doesn't exist
+    -- We can't trace the source of hooks easily
     
     -- Check for known addon conflicts
     local addons = {

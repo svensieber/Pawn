@@ -203,64 +203,74 @@ function PawnHookTooltips()
 		return
 	end
 	
-	-- For Vanilla, we need a different approach
-	-- We'll store the last item shown in tooltips
-	PawnLastTooltipItem = {}
+	-- Simpler approach: Just use OnUpdate to check what's under the mouse
+	-- This avoids all hook conflicts
+	local TooltipUpdateFrame = CreateFrame("Frame", "PawnTooltipUpdateFrame")
+	local lastUpdate = 0
 	
-	-- Save original functions
-	PawnOriginalSetBagItem = PawnOriginalSetBagItem or GameTooltip.SetBagItem
-	PawnOriginalSetInventoryItem = PawnOriginalSetInventoryItem or GameTooltip.SetInventoryItem
-	
-	-- Hook the basic tooltip functions but store the info for later
-	local OldSetBagItem = GameTooltip.SetBagItem
-	GameTooltip.SetBagItem = function(bag, slot)
-		OldSetBagItem(bag, slot)
-		-- Store info for OnShow handler
-		PawnLastTooltipItem.bag = bag
-		PawnLastTooltipItem.slot = slot
-		PawnLastTooltipItem.type = "bag"
-	end
-	
-	local OldSetInventoryItem = GameTooltip.SetInventoryItem  
-	GameTooltip.SetInventoryItem = function(unit, slot)
-		OldSetInventoryItem(unit, slot)
-		if unit == "player" then
-			PawnLastTooltipItem.invslot = slot
-			PawnLastTooltipItem.type = "inventory"
-		end
-	end
-	
-	local OldSetHyperlink = ItemRefTooltip.SetHyperlink
-	ItemRefTooltip.SetHyperlink = function(link)
-		OldSetHyperlink(link)
-		-- Directly update for hyperlinks
-		PawnUpdateTooltipWithItemLink("ItemRefTooltip", link)
-	end
-	
-	-- Hook OnShow to add our info after tooltip is populated
-	local OldOnShow = GameTooltip:GetScript("OnShow")
-	GameTooltip:SetScript("OnShow", function()
-		if OldOnShow then OldOnShow() end
+	TooltipUpdateFrame:SetScript("OnUpdate", function()
+		-- Throttle updates
+		this.elapsed = (this.elapsed or 0) + arg1
+		if this.elapsed < 0.2 then return end
+		this.elapsed = 0
 		
-		if PawnLastTooltipItem.type and PawnCommon and (PawnCommon.Debug or PawnCommon.ShowUpgradesOnTooltips) then
-			local itemLink
-			
-			if PawnLastTooltipItem.type == "bag" and PawnLastTooltipItem.bag and PawnLastTooltipItem.slot then
-				itemLink = GetContainerItemLink(PawnLastTooltipItem.bag, PawnLastTooltipItem.slot)
-			elseif PawnLastTooltipItem.type == "inventory" and PawnLastTooltipItem.invslot then
-				itemLink = GetInventoryItemLink("player", PawnLastTooltipItem.invslot)
+		-- Only proceed if tooltip is visible and debug is on
+		if not GameTooltip:IsVisible() then return end
+		if not PawnCommon or not PawnCommon.Debug then return end
+		
+		-- Check if we already added info
+		if GameTooltip.PawnInfoAdded then return end
+		
+		-- Get what's under the mouse
+		local focus = GetMouseFocus()
+		if not focus or not focus.GetName then return end
+		
+		local name = focus:GetName()
+		if not name then return end
+		
+		local itemLink = nil
+		
+		-- Check if it's a container item
+		if string.find(name, "ContainerFrame") then
+			local _, _, container, slot = string.find(name, "ContainerFrame(%d+)Item(%d+)")
+			if container and slot then
+				container = tonumber(container) - 1  -- Container frames are 1-indexed, bags are 0-indexed
+				slot = tonumber(slot)
+				itemLink = GetContainerItemLink(container, slot)
 			end
-			
-			if itemLink then
-				PawnUpdateTooltipWithItemLink("GameTooltip", itemLink)
+		-- Check if it's an inventory item
+		elseif string.find(name, "Character") and string.find(name, "Slot") then
+			local _, _, slotName = string.find(name, "Character(.+)Slot")
+			if slotName then
+				local slotId = GetInventorySlotInfo(slotName .. "Slot")
+				if slotId then
+					itemLink = GetInventoryItemLink("player", slotId)
+				end
 			end
-			
-			-- Clear the stored info
-			PawnLastTooltipItem = {}
+		end
+		
+		-- If we found an item, add our info
+		if itemLink then
+			PawnUpdateTooltipWithItemLink("GameTooltip", itemLink)
+			GameTooltip.PawnInfoAdded = true
 		end
 	end)
 	
-	PawnDebugLog("Tooltip hooks installed")
+	-- Clear flag when tooltip hides
+	GameTooltip:HookScript("OnHide", function()
+		this.PawnInfoAdded = nil
+	end)
+	
+	-- For item links in chat
+	local OldSetHyperlink = ItemRefTooltip.SetHyperlink
+	ItemRefTooltip.SetHyperlink = function(link)
+		OldSetHyperlink(link)
+		if PawnCommon and PawnCommon.Debug then
+			PawnUpdateTooltipWithItemLink("ItemRefTooltip", link)
+		end
+	end
+	
+	PawnDebugLog("Tooltip hooks installed (OnUpdate method)")
 end
 
 ------------------------------------------------------------
