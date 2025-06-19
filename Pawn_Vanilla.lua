@@ -251,6 +251,7 @@ function PawnHookTooltips()
 		
 		-- If we found an item, add our info
 		if itemLink then
+			PawnDebugLog("Found item under mouse: " .. tostring(itemLink))
 			PawnUpdateTooltipWithItemLink("GameTooltip", itemLink)
 			GameTooltip.PawnInfoAdded = true
 		end
@@ -278,17 +279,39 @@ end
 ------------------------------------------------------------
 
 function PawnGetItemData(ItemLink)
-	if not ItemLink then return end
+	if not ItemLink then 
+		PawnDebugLog("PawnGetItemData: No ItemLink provided")
+		return 
+	end
+	
+	PawnDebugLog("PawnGetItemData called for: " .. tostring(ItemLink))
 	
 	-- Check cache first
 	local CachedItem = PawnItemCache[ItemLink]
 	if CachedItem then
+		PawnDebugLog("Found in cache: " .. tostring(CachedItem.Name))
 		return CachedItem
 	end
 	
 	-- Get basic item info from Vanilla API
 	local ItemName, _, ItemRarity, ItemLevel, _, _, _, _, EquipLoc, ItemTexture = GetItemInfo(ItemLink)
-	if not ItemName then return end
+	if not ItemName then 
+		PawnDebugLog("GetItemInfo returned nil for: " .. tostring(ItemLink))
+		-- In Vanilla, items need to be cached by the client
+		-- Try to query server
+		-- Lua 5.0 doesn't have string.match, use string.find
+		local _, _, itemId = string.find(ItemLink, "item:(%d+)")
+		itemId = tonumber(itemId)
+		if itemId then
+			-- Request item info from server
+			GameTooltip:SetHyperlink(ItemLink)
+			GameTooltip:Hide()
+			PawnDebugLog("Requested item info from server for ID: " .. itemId)
+		end
+		return 
+	end
+	
+	PawnDebugLog("Got item info: " .. tostring(ItemName) .. " Level: " .. tostring(ItemLevel))
 	
 	-- Create item data structure
 	local Item = {
