@@ -159,6 +159,12 @@ end
 ------------------------------------------------------------
 
 function PawnCommand(Command)
+	-- Make sure PawnCommon exists
+	if not PawnCommon then
+		PawnCommon = {}
+		PawnFillMissingDefaults(PawnCommon, PawnCommonDefault)
+	end
+	
 	if not Command or Command == "" or Command == "help" or Command == "?" then
 		PawnShowHelp()
 	elseif Command == "debug on" or Command == "debug" then
@@ -358,8 +364,21 @@ function PawnFillMissingDefaults(Table, Defaults)
 end
 
 function PawnDebugLog(Message)
+	-- Safe debug logging
 	if PawnCommon and PawnCommon.Debug then
 		VgerCore.Message(VgerCore.Color.Grey .. "[Pawn] " .. tostring(Message))
+	end
+end
+
+-- Ensure PawnOptions exists for other functions
+function PawnEnsureOptions()
+	if not PawnCommon then
+		PawnCommon = {}
+		PawnFillMissingDefaults(PawnCommon, PawnCommonDefault)
+	end
+	if not PawnOptions then
+		PawnOptions = {}
+		PawnFillMissingDefaults(PawnOptions, PawnOptionsDefault)
 	end
 end
 
