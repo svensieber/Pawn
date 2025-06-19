@@ -265,7 +265,13 @@ function PawnHookTooltips()
 	-- For item links in chat
 	local OldSetHyperlink = ItemRefTooltip.SetHyperlink
 	ItemRefTooltip.SetHyperlink = function(link)
+		-- Make sure we have a valid link
+		if not link then return end
+		
+		-- Call original function
 		OldSetHyperlink(link)
+		
+		-- Add our info
 		if PawnCommon and PawnCommon.Debug then
 			PawnUpdateTooltipWithItemLink("ItemRefTooltip", link)
 		end
@@ -304,8 +310,13 @@ function PawnGetItemData(ItemLink)
 		itemId = tonumber(itemId)
 		if itemId then
 			-- Request item info from server
-			GameTooltip:SetHyperlink(ItemLink)
-			GameTooltip:Hide()
+			-- Use a hidden tooltip to query item info
+			if not PawnHiddenTooltip then
+				PawnHiddenTooltip = CreateFrame("GameTooltip", "PawnHiddenTooltip", UIParent, "GameTooltipTemplate")
+				PawnHiddenTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+			end
+			PawnHiddenTooltip:SetHyperlink(ItemLink)
+			PawnHiddenTooltip:Hide()
 			PawnDebugLog("Requested item info from server for ID: " .. itemId)
 		end
 		return 
