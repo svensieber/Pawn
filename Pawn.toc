@@ -10,13 +10,13 @@
 PawnCompat_Vanilla.lua
 VgerCore\VgerCore_Vanilla.lua
 Core_Vanilla.lua
-Localization.lua
-UIStrings.lua
+Localization_Vanilla.lua
+UIStrings_Vanilla.lua
 TooltipParsing_Vanilla.lua
 GemsClassic.lua
 ScaleTemplates_Vanilla.lua
 Pawn_Vanilla.lua
 PawnUI_Vanilla.lua
 PawnUI_Vanilla.xml
-ClassicHawsJon.lua
+ClassicHawsJon_Vanilla.lua
 Pawn_Vanilla_Test.lua
