@@ -446,32 +446,55 @@ function PawnHookTooltips()
 						local upgradeText = ""
 						local r, g, b = 0.8, 0.8, 0.8 -- Default gray
 						
-						if bestEquippedScore > 0 then
-							upgradePercent = ((score - bestEquippedScore) / bestEquippedScore) * 100
-							
-							if upgradePercent > 0.5 then
-								-- Upgrade
-								upgradeText = string.format(" |cff00ff00↑ +%.1f%%|r", upgradePercent)
+						-- Check if we have an equipped item in this slot
+						local hasEquippedItem = false
+						if compareSlots then
+							for _, slotId in pairs(compareSlots) do
+								if PawnEquippedItems[slotId] then
+									hasEquippedItem = true
+									break
+								end
+							end
+						end
+						
+						if hasEquippedItem then
+							-- We have an equipped item, compare scores
+							if bestEquippedScore > 0 then
+								-- Both items have scores, calculate percentage
+								upgradePercent = ((score - bestEquippedScore) / bestEquippedScore) * 100
+								
+								if upgradePercent > 0.5 then
+									-- Upgrade
+									upgradeText = string.format(" |cff00ff00↑ +%.1f%%|r", upgradePercent)
+									if string.find(scaleName, "Classic:") then
+										r, g, b = 0.2, 1, 0.2 -- Bright green for classic
+									else
+										r, g, b = 0.5, 1, 0.5 -- Light green
+									end
+								elseif upgradePercent < -0.5 then
+									-- Downgrade
+									upgradeText = string.format(" |cffff0000↓ %.1f%%|r", upgradePercent)
+									if string.find(scaleName, "Classic:") then
+										r, g, b = 1, 0.2, 0.2 -- Bright red for classic
+									else
+										r, g, b = 1, 0.5, 0.5 -- Light red
+									end
+								else
+									-- Sidegrade (very close)
+									upgradeText = " |cffffff00≈|r"
+									if string.find(scaleName, "Classic:") then
+										r, g, b = 1, 1, 0.5 -- Yellow for classic
+									else
+										r, g, b = 0.8, 0.8, 0.5 -- Dim yellow
+									end
+								end
+							else
+								-- Equipped item has no score (0), new item is better
+								upgradeText = " |cff00ff00↑ NEW|r"
 								if string.find(scaleName, "Classic:") then
 									r, g, b = 0.2, 1, 0.2 -- Bright green for classic
 								else
 									r, g, b = 0.5, 1, 0.5 -- Light green
-								end
-							elseif upgradePercent < -0.5 then
-								-- Downgrade
-								upgradeText = string.format(" |cffff0000↓ %.1f%%|r", upgradePercent)
-								if string.find(scaleName, "Classic:") then
-									r, g, b = 1, 0.2, 0.2 -- Bright red for classic
-								else
-									r, g, b = 1, 0.5, 0.5 -- Light red
-								end
-							else
-								-- Sidegrade (very close)
-								upgradeText = " |cffffff00≈|r"
-								if string.find(scaleName, "Classic:") then
-									r, g, b = 1, 1, 0.5 -- Yellow for classic
-								else
-									r, g, b = 0.8, 0.8, 0.5 -- Dim yellow
 								end
 							end
 						else
@@ -1327,6 +1350,7 @@ function PawnInitializeClassicScales()
 		SpellPower = 0.6,
 		SpellCritPercent = 8,
 		Mp5 = 3,
+		Armor = 0.005,  -- Minimal value so armor-only items get scored
 	}
 	
 	-- Paladin Ret
@@ -1340,6 +1364,7 @@ function PawnInitializeClassicScales()
 		HitPercent = 20,
 		SpellPower = 0.3,
 		DPS = 3,
+		Armor = 0.01,  -- Small value so armor-only items get scored
 		MinDamage = 0,  -- Don't double-count with DPS
 		MaxDamage = 0,  -- Don't double-count with DPS
 	}
