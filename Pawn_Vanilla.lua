@@ -296,6 +296,9 @@ function PawnHookTooltips()
 		if string.find(name, "^Login:") or 
 		   string.find(name, "^This Session:") or
 		   string.find(name, "^Now:") or
+		   string.find(name, "^Level %d+") or  -- Character/NPC names
+		   string.find(name, "^Rank %d+") or   -- PvP ranks
+		   string.find(name, "%(Player%)") or  -- Player tooltips
 		   this:NumLines() < 3 then
 			this.PawnProcessing = nil
 			return
@@ -339,8 +342,9 @@ function PawnHookTooltips()
 			end
 		end -- End of debug block
 		
-		-- Calculate and show scores (ALWAYS, not just in debug mode)
-		if itemInfo.parsedStats then
+		-- Calculate and show scores ONLY for equipment items
+		if itemInfo.parsedStats and itemInfo.equipLoc and not itemInfo.isConsumable and not itemInfo.isQuestItem then
+				-- Only show scores for items that can be equipped (not consumables or quest items)
 				
 				-- Calculate scores for all scales
 				this:AddLine(" ", 1, 1, 1)
@@ -766,6 +770,21 @@ function PawnExtractTooltipInfo(tooltip)
 				
 				-- Temporary: collect all lines
 				table.insert(allLines, {text = text, color = string.format("%.2f,%.2f,%.2f", r, g, b), side = "left"})
+				
+				-- Check for consumables and non-equipment items
+				if string.find(text, "^Use:") then
+					-- This is a consumable/usable item, not equipment
+					info.isConsumable = true
+				elseif string.find(text, "^Conjured") then
+					-- Mage water/food
+					info.isConsumable = true
+				elseif string.find(text, "^Quest Item") then
+					-- Quest items
+					info.isQuestItem = true
+				elseif string.find(text, "^Consumable") then
+					-- Explicitly marked as consumable
+					info.isConsumable = true
+				end
 				
 				-- Check for equipment slot indicators
 				if text == "Two-Hand" then
