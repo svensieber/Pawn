@@ -218,38 +218,37 @@ function PawnHookTooltips()
 		local name = itemName:GetText()
 		if not name or name == "" then return end
 		
-		-- Try to find the item ID from tooltip scanning
-		local itemLink = PawnGetItemLinkFromTooltip(this)
+		-- Extract basic info from tooltip
+		local itemInfo = PawnExtractTooltipInfo(this)
 		
+		-- Always add debug info
+		this:AddLine(" ")
+		this:AddLine(VgerCore.Color.Blue .. "Pawn debug:", 1, 1, 1)
+		this:AddLine("Name: " .. name, 1, 1, 1)
+		
+		-- Show extracted info
+		if itemInfo.level then
+			this:AddLine("Level: " .. itemInfo.level, 1, 1, 1)
+		end
+		if itemInfo.type then
+			this:AddLine("Type: " .. itemInfo.type, 1, 1, 1)
+		end
+		if itemInfo.stats and table.getn(itemInfo.stats) > 0 then
+			this:AddLine("Stats found: " .. table.getn(itemInfo.stats), 1, 1, 1)
+		end
+		
+		-- Try to get item link for more info
+		local itemLink = PawnGetItemLinkFromTooltip(this)
 		if itemLink and string.find(itemLink, "^|c%x+|Hitem:") then
-			PawnDebugLog("Got item link from tooltip: " .. itemLink)
-			-- Add our debug info
-			this:AddLine(" ")
-			this:AddLine(VgerCore.Color.Blue .. "Pawn debug:", 1, 1, 1)
-			
-			-- Get item data
 			local Item = PawnGetItemData(itemLink)
 			if Item then
-				this:AddLine("Item: " .. tostring(Item.Name), 1, 1, 1)
-				this:AddLine("Level: " .. tostring(Item.Level), 1, 1, 1)
-				this:AddLine("Slot: " .. tostring(Item.EquipLoc), 1, 1, 1)
 				this:AddLine("Rarity: " .. tostring(Item.Rarity), 1, 1, 1)
-			else
-				this:AddLine("Item not in cache - hover again", 1, 0.5, 0.5)
+				this:AddLine("Equip: " .. tostring(Item.EquipLoc), 1, 1, 1)
 			end
-			
-			this:Show()
-			this.PawnInfoAdded = true
-		else
-			-- Fallback: Show basic info
-			PawnDebugLog("No proper item link, showing basic info for: " .. name)
-			this:AddLine(" ")
-			this:AddLine(VgerCore.Color.Blue .. "Pawn debug:", 1, 1, 1)
-			this:AddLine("Name: " .. name, 1, 1, 1)
-			this:AddLine("(Full item data not available)", 1, 0.5, 0.5)
-			this:Show()
-			this.PawnInfoAdded = true
 		end
+		
+		this:Show()
+		this.PawnInfoAdded = true
 	end)
 	
 	-- Clear flag when tooltip hides
@@ -303,21 +302,48 @@ function PawnGetItemLinkFromTooltip(tooltip)
 	if focus and focus.GetName then
 		local name = focus:GetName()
 		if name then
+			PawnDebugLog("Mouse focus: " .. name)
+			
 			-- For container items
 			if string.find(name, "ContainerFrame") then
 				local _, _, container, slot = string.find(name, "ContainerFrame(%d+)Item(%d+)")
 				if container and slot then
 					container = tonumber(container) - 1
 					slot = tonumber(slot)
-					-- Use GetContainerItemInfo to get item ID
-					local _, _, _, _, _, _, link = GetContainerItemInfo(container, slot)
+					
+					-- Try multiple methods to get the link
+					-- Method 1: Direct GetContainerItemLink
+					local link = GetContainerItemLink(container, slot)
+					PawnDebugLog("GetContainerItemLink returned: " .. tostring(link))
+					
+					-- Method 2: Create link from item ID if we have it
+					if (not link or link == "" or not string.find(tostring(link), "^|c%x+|Hitem:")) and focus.hasItem then
+						-- Try to get item ID from the button
+						local itemId = nil
+						
+						-- Check if there's an item texture
+						local texture = GetContainerItemInfo(container, slot)
+						if texture then
+							-- In Vanilla, we might need to scan for the item
+							-- Create a temporary tooltip to scan
+							if not PawnScanTooltip then
+								PawnScanTooltip = CreateFrame("GameTooltip", "PawnScanTooltip", UIParent, "GameTooltipTemplate")
+							end
+							PawnScanTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+							PawnScanTooltip:ClearLines()
+							PawnScanTooltip:SetBagItem(container, slot)
+							
+							-- Try to extract item link from hidden tooltip
+							local scanLink = PawnScanTooltipForLink()
+							if scanLink then
+								PawnDebugLog("Got link from scan: " .. scanLink)
+								return scanLink
+							end
+						end
+					end
+					
 					if link and string.find(tostring(link), "^|c%x+|Hitem:") then
 						return link
-					end
-					-- Try alternative method
-					local texture, count, locked, quality, readable, lootable, link2 = GetContainerItemInfo(container, slot)
-					if link2 and string.find(tostring(link2), "^|c%x+|Hitem:") then
-						return link2
 					end
 				end
 			-- For inventory items
@@ -327,6 +353,7 @@ function PawnGetItemLinkFromTooltip(tooltip)
 					local slotId = GetInventorySlotInfo(slotName .. "Slot")
 					if slotId then
 						local link = GetInventoryItemLink("player", slotId)
+						PawnDebugLog("GetInventoryItemLink returned: " .. tostring(link))
 						if link and string.find(tostring(link), "^|c%x+|Hitem:") then
 							return link
 						end
@@ -337,6 +364,69 @@ function PawnGetItemLinkFromTooltip(tooltip)
 	end
 	
 	return nil
+end
+
+-- Scan a hidden tooltip for item link
+function PawnScanTooltipForLink()
+	if not PawnScanTooltip then return nil end
+	
+	-- In Vanilla, item links might be in tooltip text
+	-- This is a workaround since GetContainerItemLink doesn't always work
+	
+	-- For now, return nil - proper tooltip scanning would be complex
+	return nil
+end
+
+-- Extract basic info from visible tooltip
+function PawnExtractTooltipInfo(tooltip)
+	local info = {
+		stats = {}
+	}
+	
+	-- Scan all tooltip lines
+	local numLines = tooltip:NumLines()
+	for i = 2, numLines do  -- Start at 2 to skip item name
+		local leftText = getglobal(tooltip:GetName().."TextLeft"..i)
+		local rightText = getglobal(tooltip:GetName().."TextRight"..i)
+		
+		if leftText then
+			local text = leftText:GetText()
+			if text then
+				-- Check for item level (e.g. "Item Level 55")
+				local _, _, level = string.find(text, "Item Level (%d+)")
+				if level then
+					info.level = tonumber(level)
+				end
+				
+				-- Check for item type (e.g. "Two-Hand Sword")
+				-- Usually in grey text
+				local r, g, b = leftText:GetTextColor()
+				if r > 0.6 and g > 0.6 and b > 0.6 and r < 0.7 and g < 0.7 and b < 0.7 then
+					-- Grey text, might be item type
+					if not string.find(text, "Level") and not string.find(text, "Durability") then
+						info.type = text
+					end
+				end
+				
+				-- Check for stats (green text)
+				if r < 0.2 and g > 0.8 and b < 0.2 then
+					-- Green text, probably a stat
+					table.insert(info.stats, text)
+				end
+			end
+		end
+		
+		-- Check right side text (often has values)
+		if rightText then
+			local text = rightText:GetText()
+			if text then
+				-- Right text often contains damage/armor values
+				PawnDebugLog("Right text line " .. i .. ": " .. text)
+			end
+		end
+	end
+	
+	return info
 end
 
 function PawnGetItemData(ItemLink)
