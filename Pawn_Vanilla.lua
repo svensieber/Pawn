@@ -189,6 +189,11 @@ function PawnCommand(Command)
 	elseif Command == "init" then
 		PawnInitializeScaleProviders()
 		VgerCore.Message("Scale providers reinitialized.")
+	elseif Command == "scan" then
+		PawnScanEquippedItems()
+		VgerCore.Message("Equipped items rescanned.")
+	elseif Command == "equipped" then
+		PawnShowEquippedScores()
 	else
 		PawnShowHelp()
 	end
@@ -202,6 +207,8 @@ function PawnShowHelp()
 	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "backup" .. VgerCore.Color.Blue .. " - Show scale backup string")
 	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "scales" .. VgerCore.Color.Blue .. " - Show all scales")
 	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "init" .. VgerCore.Color.Blue .. " - Reinitialize scale providers")
+	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "scan" .. VgerCore.Color.Blue .. " - Rescan equipped items")
+	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "equipped" .. VgerCore.Color.Blue .. " - Show equipped item scores")
 	VgerCore.Message(" ")
 end
 
@@ -1387,6 +1394,12 @@ end
 function PawnScanEquippedItems()
 	PawnDebugLog("Scanning equipped items...")
 	
+	-- Ensure PawnCommon exists
+	if not PawnCommon or not PawnCommon.Scales then
+		PawnDebugLog("Cannot scan equipped items - scales not initialized")
+		return
+	end
+	
 	-- Clear old data
 	PawnEquippedItems = {}
 	PawnEquippedScores = {}
@@ -1436,12 +1449,15 @@ function PawnScanEquippedItems()
 				if itemInfo and itemInfo.parsedStats then
 					-- Calculate scores for all scales
 					PawnEquippedScores[slotId] = {}
+					local scoresFound = 0
 					for scaleName, _ in pairs(PawnCommon.Scales or {}) do
 						local score = PawnCalculateItemScore(itemInfo.parsedStats, scaleName)
 						if score and score > 0 then
 							PawnEquippedScores[slotId][scaleName] = score
+							scoresFound = scoresFound + 1
 						end
 					end
+					PawnDebugLog("Slot " .. slotId .. " scores calculated: " .. scoresFound)
 				end
 				
 				tooltip:Hide()
@@ -1511,6 +1527,44 @@ function PawnShowScales()
 		VgerCore.Message("|cffff0000No scales found!|r")
 	else
 		VgerCore.Message("Total scales: " .. count)
+	end
+	VgerCore.Message(" ")
+end
+
+function PawnShowEquippedScores()
+	VgerCore.Message(" ")
+	VgerCore.Message(VgerCore.Color.Blue .. "Equipped item scores:")
+	
+	local count = 0
+	for slotId, scores in pairs(PawnEquippedScores) do
+		local itemLink = PawnEquippedItems[slotId]
+		if itemLink then
+			count = count + 1
+			local _, itemName = string.find(itemLink, "%[(.+)%]")
+			if itemName then
+				VgerCore.Message(VgerCore.Color.Green .. "Slot " .. slotId .. ": " .. itemName)
+			else
+				VgerCore.Message(VgerCore.Color.Green .. "Slot " .. slotId .. ": " .. tostring(itemLink))
+			end
+			
+			local scaleCount = 0
+			for scaleName, score in pairs(scores) do
+				scaleCount = scaleCount + 1
+				if scaleCount <= 3 then -- Show first 3 scales
+					VgerCore.Message("  " .. scaleName .. ": " .. string.format("%.1f", score))
+				end
+			end
+			if scaleCount > 3 then
+				VgerCore.Message("  ... and " .. (scaleCount - 3) .. " more scales")
+			end
+		end
+	end
+	
+	if count == 0 then
+		VgerCore.Message("|cffff0000No equipped items found!|r")
+		VgerCore.Message("Try /pawn scan first")
+	else
+		VgerCore.Message("Total equipped items: " .. count)
 	end
 	VgerCore.Message(" ")
 end
