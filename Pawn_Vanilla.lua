@@ -136,6 +136,8 @@ function PawnInitialize()
 end
 
 function PawnPlayerLogin()
+	PawnDebugLog("PawnPlayerLogin called")
+	
 	-- Register additional events after login
 	PawnEventFrame:RegisterEvent("UNIT_INVENTORY_CHANGED")
 	PawnEventFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
@@ -1004,12 +1006,12 @@ function PawnShowScales()
 	
 	-- Ensure PawnCommon exists
 	if not PawnCommon then
-		VgerCore.Message(VgerCore.Color.Red .. "PawnCommon does not exist!")
+		VgerCore.Message("|cffff0000PawnCommon does not exist!|r")
 		return
 	end
 	
 	if not PawnCommon.Scales then
-		VgerCore.Message(VgerCore.Color.Red .. "PawnCommon.Scales does not exist!")
+		VgerCore.Message("|cffff0000PawnCommon.Scales does not exist!|r")
 		return
 	end
 	
@@ -1031,7 +1033,7 @@ function PawnShowScales()
 	end
 	
 	if count == 0 then
-		VgerCore.Message(VgerCore.Color.Red .. "No scales found!")
+		VgerCore.Message("|cffff0000No scales found!|r")
 	else
 		VgerCore.Message("Total scales: " .. count)
 	end
@@ -1061,5 +1063,7 @@ if not PawnInitialized then
 	if UnitName("player") and UnitName("player") ~= "Unknown Entity" then
 		DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Direct initialization (reload detected)|r")
 		PawnInitialize()
+		-- Also initialize scales directly for reloads
+		PawnInitializeScaleProviders()
 	end
 end
