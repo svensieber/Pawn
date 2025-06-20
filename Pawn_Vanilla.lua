@@ -175,6 +175,11 @@ function PawnCommand(Command)
 		VgerCore.Message("Pawn debugging disabled.")
 	elseif Command == "backup" then
 		PawnShowBackup()
+	elseif Command == "scales" then
+		PawnShowScales()
+	elseif Command == "init" then
+		PawnInitializeScaleProviders()
+		VgerCore.Message("Scale providers reinitialized.")
 	else
 		PawnShowHelp()
 	end
@@ -186,6 +191,8 @@ function PawnShowHelp()
 	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "help" .. VgerCore.Color.Blue .. " - Show this help")
 	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "debug on/off" .. VgerCore.Color.Blue .. " - Enable/disable debug mode")
 	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "backup" .. VgerCore.Color.Blue .. " - Show scale backup string")
+	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "scales" .. VgerCore.Color.Blue .. " - Show all scales")
+	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "init" .. VgerCore.Color.Blue .. " - Reinitialize scale providers")
 	VgerCore.Message(" ")
 end
 
@@ -988,6 +995,46 @@ function PawnShowBackup()
 	VgerCore.Message(" ")
 	VgerCore.Message(VgerCore.Color.Blue .. "Pawn scale backup:")
 	VgerCore.Message("(Backup functionality will be implemented)")
+	VgerCore.Message(" ")
+end
+
+function PawnShowScales()
+	VgerCore.Message(" ")
+	VgerCore.Message(VgerCore.Color.Blue .. "Current Pawn scales:")
+	
+	-- Ensure PawnCommon exists
+	if not PawnCommon then
+		VgerCore.Message(VgerCore.Color.Red .. "PawnCommon does not exist!")
+		return
+	end
+	
+	if not PawnCommon.Scales then
+		VgerCore.Message(VgerCore.Color.Red .. "PawnCommon.Scales does not exist!")
+		return
+	end
+	
+	local count = 0
+	for scaleName, scale in pairs(PawnCommon.Scales) do
+		count = count + 1
+		VgerCore.Message(VgerCore.Color.Green .. scaleName .. ":")
+		-- Show first few stats
+		local statCount = 0
+		for stat, value in pairs(scale) do
+			statCount = statCount + 1
+			if statCount <= 5 then
+				VgerCore.Message("  " .. stat .. " = " .. value)
+			end
+		end
+		if statCount > 5 then
+			VgerCore.Message("  ... and " .. (statCount - 5) .. " more stats")
+		end
+	end
+	
+	if count == 0 then
+		VgerCore.Message(VgerCore.Color.Red .. "No scales found!")
+	else
+		VgerCore.Message("Total scales: " .. count)
+	end
 	VgerCore.Message(" ")
 end
 
