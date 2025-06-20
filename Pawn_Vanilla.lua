@@ -240,7 +240,7 @@ function PawnHookTooltips()
 	
 	-- Hook the tooltip's OnShow to add our info
 	GameTooltip:HookScript("OnShow", function()
-		if not PawnCommon or not PawnCommon.Debug then return end
+		if not PawnCommon then return end
 		if this.PawnInfoAdded then return end
 		
 		-- CRITICAL: Prevent recursion - don't process if we're showing our own tooltip
@@ -272,27 +272,29 @@ function PawnHookTooltips()
 		-- Extract basic info from tooltip
 		local itemInfo = PawnExtractTooltipInfo(this)
 		
-		-- Always add debug info
-		this:AddLine(" ")
-		this:AddLine(VgerCore.Color.Blue .. "Pawn debug:", 1, 1, 1)
-		this:AddLine("Name: " .. name, 1, 1, 1)
-		
-		-- Show number of lines in tooltip
-		local numLines = this:NumLines()
-		this:AddLine("Tooltip lines: " .. numLines, 1, 1, 1)
-		
-		-- Show extracted info
-		if itemInfo.level then
-			this:AddLine("Level: " .. itemInfo.level, 1, 1, 1)
-		end
-		if itemInfo.type then
-			this:AddLine("Type: " .. itemInfo.type, 1, 1, 1)
-		end
-		if itemInfo.stats and table.getn(itemInfo.stats) > 0 then
-			this:AddLine("Stats found: " .. table.getn(itemInfo.stats), 1, 1, 1)
-			-- Show all stats (Debug only anyway)
-			for i = 1, table.getn(itemInfo.stats) do
-				this:AddLine("  " .. itemInfo.stats[i], 0.8, 0.8, 0.8)
+		-- Show debug info if debug mode is enabled
+		if PawnCommon.Debug then
+			this:AddLine(" ")
+			this:AddLine(VgerCore.Color.Blue .. "Pawn debug:", 1, 1, 1)
+			this:AddLine("Name: " .. name, 1, 1, 1)
+			
+			-- Show number of lines in tooltip
+			local numLines = this:NumLines()
+			this:AddLine("Tooltip lines: " .. numLines, 1, 1, 1)
+			
+			-- Show extracted info
+			if itemInfo.level then
+				this:AddLine("Level: " .. itemInfo.level, 1, 1, 1)
+			end
+			if itemInfo.type then
+				this:AddLine("Type: " .. itemInfo.type, 1, 1, 1)
+			end
+			if itemInfo.stats and table.getn(itemInfo.stats) > 0 then
+				this:AddLine("Stats found: " .. table.getn(itemInfo.stats), 1, 1, 1)
+				-- Show all stats (Debug only anyway)
+				for i = 1, table.getn(itemInfo.stats) do
+					this:AddLine("  " .. itemInfo.stats[i], 0.8, 0.8, 0.8)
+				end
 			end
 			
 			-- Show parsed stats
@@ -302,6 +304,11 @@ function PawnHookTooltips()
 				for stat, value in pairs(itemInfo.parsedStats) do
 					this:AddLine("  " .. stat .. ": " .. value, 0.5, 0.8, 1)
 				end
+			end
+		end -- End of debug block
+		
+		-- Calculate and show scores (ALWAYS, not just in debug mode)
+		if itemInfo.parsedStats then
 				
 				-- Calculate scores for all scales
 				this:AddLine(" ", 1, 1, 1)
@@ -463,21 +470,20 @@ function PawnHookTooltips()
 					end
 				end
 				
-				if not scoresCalculated then
-					this:AddLine("  No scores calculated", 0.5, 0.5, 0.5)
-				end
+			if not scoresCalculated then
+				this:AddLine("  No scores calculated", 0.5, 0.5, 0.5)
 			end
-		else
-			this:AddLine("No stats found - check chat for details", 1, 0.5, 0.5)
 		end
 		
-		-- Try to get item link for more info
-		local itemLink = PawnGetItemLinkFromTooltip(this)
-		if itemLink and string.find(itemLink, "^|c%x+|Hitem:") then
-			local Item = PawnGetItemData(itemLink)
-			if Item then
-				this:AddLine("Rarity: " .. tostring(Item.Rarity), 1, 1, 1)
-				this:AddLine("Equip: " .. tostring(Item.EquipLoc), 1, 1, 1)
+		-- Debug: Try to get item link for more info
+		if PawnCommon.Debug then
+			local itemLink = PawnGetItemLinkFromTooltip(this)
+			if itemLink and string.find(itemLink, "^|c%x+|Hitem:") then
+				local Item = PawnGetItemData(itemLink)
+				if Item then
+					this:AddLine("Rarity: " .. tostring(Item.Rarity), 1, 1, 1)
+					this:AddLine("Equip: " .. tostring(Item.EquipLoc), 1, 1, 1)
+				end
 			end
 		end
 		
@@ -511,7 +517,7 @@ function PawnHookTooltips()
 		end
 		
 		-- Add our info only for item links
-		if PawnCommon and PawnCommon.Debug and string.find(link, "^item:") then
+		if PawnCommon and string.find(link, "^item:") then
 			-- Delay slightly to let tooltip populate
 			local frame = CreateFrame("Frame")
 			frame:SetScript("OnUpdate", function()
