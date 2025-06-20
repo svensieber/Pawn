@@ -399,7 +399,7 @@ function PawnHookTooltips()
 					
 					if showScale then
 						local score = PawnCalculateItemScore(itemInfo.parsedStats, scaleName)
-						if score and score > 0 then
+						if score and score >= 0 then  -- Include items with 0 score for comparison
 							scoresCalculated = true
 							
 							-- Debug which scale is being shown
@@ -489,12 +489,23 @@ function PawnHookTooltips()
 									end
 								end
 							else
-								-- Equipped item has no score (0), new item is better
-								upgradeText = " |cff00ff00↑ NEW|r"
-								if string.find(scaleName, "Classic:") then
-									r, g, b = 0.2, 1, 0.2 -- Bright green for classic
+								-- Equipped item has no score (0)
+								if score > 0 then
+									-- New item is better than 0
+									upgradeText = " |cff00ff00↑ NEW|r"
+									if string.find(scaleName, "Classic:") then
+										r, g, b = 0.2, 1, 0.2 -- Bright green for classic
+									else
+										r, g, b = 0.5, 1, 0.5 -- Light green
+									end
 								else
-									r, g, b = 0.5, 1, 0.5 -- Light green
+									-- Both items have 0 score
+									upgradeText = " |cffffff00≈ 0|r"
+									if string.find(scaleName, "Classic:") then
+										r, g, b = 0.8, 0.8, 0.5 -- Dim yellow for classic
+									else
+										r, g, b = 0.6, 0.6, 0.4 -- Even dimmer yellow
+									end
 								end
 							end
 						else
@@ -1350,7 +1361,6 @@ function PawnInitializeClassicScales()
 		SpellPower = 0.6,
 		SpellCritPercent = 8,
 		Mp5 = 3,
-		Armor = 0.005,  -- Minimal value so armor-only items get scored
 	}
 	
 	-- Paladin Ret
@@ -1364,7 +1374,6 @@ function PawnInitializeClassicScales()
 		HitPercent = 20,
 		SpellPower = 0.3,
 		DPS = 3,
-		Armor = 0.01,  -- Small value so armor-only items get scored
 		MinDamage = 0,  -- Don't double-count with DPS
 		MaxDamage = 0,  -- Don't double-count with DPS
 	}
