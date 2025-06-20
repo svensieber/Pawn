@@ -461,11 +461,16 @@ function PawnExtractTooltipInfo(tooltip)
 					-- White text with numbers (armor, damage, etc)
 					elseif r > 0.9 and g > 0.9 and b > 0.9 then
 						if string.find(text, "%d") and not string.find(text, "Item Level") then
-							isStat = true
-							-- Check if it's a damage line with speed (e.g. "38 - 58 Damage Speed 3.60")
-							if string.find(text, "Damage") and string.find(text, "Speed") then
-								-- This line contains both damage and speed, might want to split later
-								PawnDebugLog("Found damage+speed line: " .. text)
+							-- Skip standalone speed lines - they shouldn't appear for non-weapons
+							if string.find(text, "^Speed %d") then
+								PawnDebugLog("Skipping standalone speed: " .. text)
+							else
+								isStat = true
+								-- Check if it's a damage line with speed (e.g. "38 - 58 Damage Speed 3.60")
+								if string.find(text, "Damage") and string.find(text, "Speed") then
+									-- This line contains both damage and speed, might want to split later
+									PawnDebugLog("Found damage+speed line: " .. text)
+								end
 							end
 						end
 					-- Yellow text (rare stats)
@@ -492,11 +497,10 @@ function PawnExtractTooltipInfo(tooltip)
 				PawnDebugLog("Line " .. i .. " (R): " .. text .. " [Color: " .. string.format("%.2f,%.2f,%.2f", r, g, b) .. "]")
 				
 				-- Right side often has weapon speed and other values
-				if string.find(text, "Speed %d") then
-					-- Only add speed for weapons, not shields
-					-- We'll check item type later, for now add it
-					table.insert(info.stats, text)
-					PawnDebugLog("Found stat (right): " .. text)
+				-- But Speed shouldn't appear for armor/shields
+				-- Skip speed entirely here - it should be in the damage line for weapons
+				if string.find(text, "Speed") then
+					PawnDebugLog("Skipping speed on right side: " .. text)
 				end
 			end
 		end
