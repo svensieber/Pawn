@@ -387,7 +387,8 @@ function PawnHookTooltips()
 					end
 				end
 				
-				this:AddLine("Pawn scores:", 1, 1, 0)
+				this:AddLine(" ")  -- Empty line for spacing
+				this:AddLine("Pawn scores:", 1, 0.8, 0)
 				
 				local scoresCalculated = false
 				
@@ -542,8 +543,37 @@ function PawnHookTooltips()
 							end
 						end
 						
-						-- Format: "ScaleName: 123.4 ↑ +15.2%"
-						local scoreLine = scaleName .. ": " .. string.format("%.1f", score) .. upgradeText
+						-- Format scale name for display
+						local displayName = scaleName
+						-- Remove "Classic:" prefix
+						if string.find(displayName, "Classic:") then
+							displayName = string.sub(displayName, 9) -- Remove "Classic:" (8 chars + 1)
+						end
+						-- Add spaces before capital letters (except first)
+						-- PaladinRet -> Paladin Ret
+						displayName = string.gsub(displayName, "(%l)(%u)", "%1 %2")
+						
+						-- Special replacements for common abbreviations
+						displayName = string.gsub(displayName, "DPS", "DPS")
+						displayName = string.gsub(displayName, "Ret$", "Retribution")
+						displayName = string.gsub(displayName, "Prot$", "Protection")
+						displayName = string.gsub(displayName, "Resto$", "Restoration")
+						displayName = string.gsub(displayName, "Ele$", "Elemental")
+						displayName = string.gsub(displayName, "Enh$", "Enhancement")
+						
+						-- Fix spacing issues after replacements
+						displayName = string.gsub(displayName, "Feral DPS", "Feral (DPS)")
+						displayName = string.gsub(displayName, "Feral Tank", "Feral (Tank)")
+						displayName = string.gsub(displayName, "Warrior DPS", "Warrior (DPS)")
+						displayName = string.gsub(displayName, "Warrior Tank", "Warrior (Tank)")
+						displayName = string.gsub(displayName, "Beast Mastery", "Beast Mastery")
+						displayName = string.gsub(displayName, "Marks Man", "Marksmanship") -- Fix MarksMan
+						displayName = string.gsub(displayName, "Frost Mage", "Frost")
+						displayName = string.gsub(displayName, "Fire Mage", "Fire")
+						displayName = string.gsub(displayName, "Arcane Mage", "Arcane")
+						
+						-- Format: "Paladin Retribution: 123.4 +15.2%"
+						local scoreLine = displayName .. ": " .. string.format("%.1f", score) .. upgradeText
 						
 						-- Debug: Show equipped score if exists
 						if PawnCommon.Debug and bestEquippedScore > 0 then
