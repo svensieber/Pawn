@@ -1879,6 +1879,21 @@ InitFrame:SetScript("OnEvent", function()
 		-- Always run player login (which scans equipment)
 		PawnPlayerLogin()
 		
+		-- Schedule a delayed scan to ensure items are loaded
+		if event == "PLAYER_ENTERING_WORLD" then
+			-- Delay scan by 2 seconds after entering world
+			local DelayFrame = CreateFrame("Frame")
+			local elapsed = 0
+			DelayFrame:SetScript("OnUpdate", function()
+				elapsed = elapsed + arg1 -- arg1 is time since last update in Vanilla
+				if elapsed >= 2 then
+					DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Running delayed equipment scan...|r")
+					PawnScanEquippedItems()
+					this:SetScript("OnUpdate", nil) -- Stop the timer
+				end
+			end)
+		end
+		
 		-- Unregister after handling
 		if event == "PLAYER_ENTERING_WORLD" then
 			this:UnregisterEvent("PLAYER_ENTERING_WORLD")
@@ -1894,6 +1909,18 @@ if UnitName("player") and UnitName("player") ~= "Unknown Entity" then
 	end
 	-- Always run player login for equipment scan
 	PawnPlayerLogin()
+	
+	-- Also schedule a delayed scan for reloads
+	local ReloadDelayFrame = CreateFrame("Frame")
+	local reloadElapsed = 0
+	ReloadDelayFrame:SetScript("OnUpdate", function()
+		reloadElapsed = reloadElapsed + arg1
+		if reloadElapsed >= 1 then -- 1 second delay for reloads
+			DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Running delayed equipment scan (reload)...|r")
+			PawnScanEquippedItems()
+			this:SetScript("OnUpdate", nil)
+		end
+	end)
 else
 	DEFAULT_CHAT_FRAME:AddMessage("|cffffff00Pawn: Waiting for player data...|r")
 end
