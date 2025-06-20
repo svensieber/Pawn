@@ -1028,6 +1028,14 @@ end
 function PawnInitializeClassicScales()
 	PawnDebugLog("Initializing Classic scales...")
 	
+	-- Ensure PawnCommon.Scales exists
+	if not PawnCommon then
+		PawnCommon = {}
+	end
+	if not PawnCommon.Scales then
+		PawnCommon.Scales = {}
+	end
+	
 	-- Classic scales for different classes/specs
 	-- These are simplified versions optimized for Vanilla
 	
@@ -1431,37 +1439,42 @@ function PawnScanEquippedItems()
 			-- Store the item link
 			PawnEquippedItems[slotId] = itemLink
 			
-			-- Get item data and calculate scores
-			local Item = PawnGetItemData(itemLink)
-			if Item then
-				-- Parse stats from equipped item
-				local tooltip = PawnPrivateTooltip
-				if not tooltip then
-					tooltip = CreateFrame("GameTooltip", "PawnPrivateTooltip", UIParent, "GameTooltipTemplate")
-					PawnPrivateTooltip = tooltip
-				end
-				
-				tooltip:SetOwner(UIParent, "ANCHOR_NONE")
-				tooltip:ClearLines()
-				tooltip:SetInventoryItem("player", slotId)
-				
-				local itemInfo = PawnExtractTooltipInfo(tooltip)
-				if itemInfo and itemInfo.parsedStats then
-					-- Calculate scores for all scales
-					PawnEquippedScores[slotId] = {}
-					local scoresFound = 0
-					for scaleName, _ in pairs(PawnCommon.Scales or {}) do
-						local score = PawnCalculateItemScore(itemInfo.parsedStats, scaleName)
-						if score and score > 0 then
-							PawnEquippedScores[slotId][scaleName] = score
-							scoresFound = scoresFound + 1
-						end
-					end
-					PawnDebugLog("Slot " .. slotId .. " scores calculated: " .. scoresFound)
-				end
-				
-				tooltip:Hide()
+			-- In Vanilla, GetItemInfo often fails, so we scan tooltip directly
+			-- Parse stats from equipped item
+			local tooltip = PawnPrivateTooltip
+			if not tooltip then
+				tooltip = CreateFrame("GameTooltip", "PawnPrivateTooltip", UIParent, "GameTooltipTemplate")
+				PawnPrivateTooltip = tooltip
 			end
+			
+			tooltip:SetOwner(UIParent, "ANCHOR_NONE")
+			tooltip:ClearLines()
+			tooltip:SetInventoryItem("player", slotId)
+			
+			-- Force the tooltip to load
+			local firstLine = getglobal(tooltip:GetName().."TextLeft1")
+			if firstLine and firstLine:GetText() then
+				PawnDebugLog("Scanning equipped slot " .. slotId .. ": " .. firstLine:GetText())
+			end
+			
+			local itemInfo = PawnExtractTooltipInfo(tooltip)
+			if itemInfo and itemInfo.parsedStats then
+				-- Calculate scores for all scales
+				PawnEquippedScores[slotId] = {}
+				local scoresFound = 0
+				for scaleName, _ in pairs(PawnCommon.Scales or {}) do
+					local score = PawnCalculateItemScore(itemInfo.parsedStats, scaleName)
+					if score and score > 0 then
+						PawnEquippedScores[slotId][scaleName] = score
+						scoresFound = scoresFound + 1
+					end
+				end
+				PawnDebugLog("Slot " .. slotId .. " scores calculated: " .. scoresFound)
+			else
+				PawnDebugLog("No stats found for slot " .. slotId)
+			end
+			
+			tooltip:Hide()
 		end
 	end
 	
@@ -1596,3 +1609,5 @@ if not PawnInitialized then
 		PawnInitializeScaleProviders()
 	end
 end
+
+-- Removed - will cause error
