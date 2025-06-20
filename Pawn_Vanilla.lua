@@ -325,6 +325,13 @@ function PawnHookTooltips()
 					if type(compareSlots) ~= "table" then
 						compareSlots = {compareSlots}
 					end
+					if PawnCommon.Debug then
+						PawnDebugLog("Compare slots: " .. table.concat(compareSlots, ", "))
+					end
+				else
+					if PawnCommon.Debug then
+						PawnDebugLog("No equip location found for comparison")
+					end
 				end
 				
 				this:AddLine("Pawn scores:", 1, 1, 0)
@@ -368,6 +375,11 @@ function PawnHookTooltips()
 						local score = PawnCalculateItemScore(itemInfo.parsedStats, scaleName)
 						if score and score > 0 then
 							scoresCalculated = true
+							
+							-- Debug which scale is being shown
+							if PawnCommon.Debug then
+								PawnDebugLog("Showing scale " .. scaleName .. " with score " .. score)
+							end
 						
 						-- Get the best equipped score for this scale
 						local bestEquippedScore = 0
@@ -423,6 +435,12 @@ function PawnHookTooltips()
 						
 						-- Format: "ScaleName: 123.4 ↑ +15.2%"
 						local scoreLine = scaleName .. ": " .. string.format("%.1f", score) .. upgradeText
+						
+						-- Debug: Show equipped score if exists
+						if PawnCommon.Debug and bestEquippedScore > 0 then
+							scoreLine = scoreLine .. " (vs " .. string.format("%.1f", bestEquippedScore) .. ")"
+						end
+						
 						this:AddLine("  " .. scoreLine, r, g, b)
 						end
 					end
@@ -1204,6 +1222,8 @@ function PawnInitializeClassicScales()
 		HitPercent = 20,
 		SpellPower = 0.3,
 		DPS = 3,
+		MinDamage = 0,  -- Don't double-count with DPS
+		MaxDamage = 0,  -- Don't double-count with DPS
 	}
 	
 	-- Paladin Prot
