@@ -465,7 +465,7 @@ function PawnHookTooltips()
 								
 								if upgradePercent > 0.5 then
 									-- Upgrade
-									upgradeText = string.format(" |cff00ff00↑ +%.1f%%|r", upgradePercent)
+									upgradeText = " ↑ " .. string.format("|cff00ff00+%.1f%%|r", upgradePercent)
 									if string.find(scaleName, "Classic:") then
 										r, g, b = 0.2, 1, 0.2 -- Bright green for classic
 									else
@@ -473,7 +473,7 @@ function PawnHookTooltips()
 									end
 								elseif upgradePercent < -0.5 then
 									-- Downgrade
-									upgradeText = string.format(" |cffff0000↓ %.1f%%|r", upgradePercent)
+									upgradeText = " ↓ " .. string.format("|cffff0000%.1f%%|r", upgradePercent)
 									if string.find(scaleName, "Classic:") then
 										r, g, b = 1, 0.2, 0.2 -- Bright red for classic
 									else
@@ -481,7 +481,7 @@ function PawnHookTooltips()
 									end
 								else
 									-- Sidegrade (very close)
-									upgradeText = " |cffffff00≈|r"
+									upgradeText = " ≈"
 									if string.find(scaleName, "Classic:") then
 										r, g, b = 1, 1, 0.5 -- Yellow for classic
 									else
@@ -492,7 +492,7 @@ function PawnHookTooltips()
 								-- Equipped item has no score (0)
 								if score > 0 then
 									-- New item is better than 0
-									upgradeText = " |cff00ff00↑ NEW|r"
+									upgradeText = " ↑ " .. "|cff00ff00NEW|r"
 									if string.find(scaleName, "Classic:") then
 										r, g, b = 0.2, 1, 0.2 -- Bright green for classic
 									else
@@ -500,7 +500,7 @@ function PawnHookTooltips()
 									end
 								else
 									-- Both items have 0 score
-									upgradeText = " |cffffff00≈ 0|r"
+									upgradeText = " ≈ " .. "|cffffff000|r"
 									if string.find(scaleName, "Classic:") then
 										r, g, b = 0.8, 0.8, 0.5 -- Dim yellow for classic
 									else
