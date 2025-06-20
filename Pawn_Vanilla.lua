@@ -434,13 +434,39 @@ function PawnExtractTooltipInfo(tooltip)
 				-- Green: enchants and bonuses
 				-- White: base stats
 				-- Let's collect all potential stats for now
-				if (r < 0.2 and g > 0.8 and b < 0.2) or -- Green
-				   (r > 0.9 and g > 0.9 and b > 0.9) or -- White
-				   (r > 0.9 and g > 0.8 and b < 0.2) then -- Yellow
-					-- Check if it looks like a stat
-					if string.find(text, "%+") or 
-					   string.find(text, "%-") or
-					   string.find(text, "%d") then
+				
+				-- Skip lines we don't care about
+				if string.find(text, "Durability") or 
+				   string.find(text, "Requires Level") or
+				   string.find(text, "Classes:") or
+				   string.find(text, "Races:") then
+					PawnDebugLog("Skipping line: " .. text)
+				else
+					-- Check if it's a stat line
+					local isStat = false
+					
+					-- Green text (bonuses)
+					if r < 0.2 and g > 0.8 and b < 0.2 then
+						isStat = true
+					-- White text with numbers (armor, damage, etc)
+					elseif r > 0.9 and g > 0.9 and b > 0.9 then
+						if string.find(text, "%d") and not string.find(text, "Item Level") then
+							isStat = true
+							-- Check if it's a damage line with speed (e.g. "38 - 58 Damage Speed 3.60")
+							if string.find(text, "Damage") and string.find(text, "Speed") then
+								-- This line contains both damage and speed, might want to split later
+								PawnDebugLog("Found damage+speed line: " .. text)
+							end
+						end
+					-- Yellow text (rare stats)
+					elseif r > 0.9 and g > 0.8 and b < 0.2 then
+						isStat = true
+					end
+					
+					-- Also check for weapon type line (e.g. "Two-Hand Axe")
+					-- This is usually gray text and we already handle it as item type
+					
+					if isStat then
 						table.insert(info.stats, text)
 						PawnDebugLog("Found stat: " .. text)
 					end
@@ -454,6 +480,15 @@ function PawnExtractTooltipInfo(tooltip)
 			if text and text ~= "" then
 				local r, g, b = rightText:GetTextColor()
 				PawnDebugLog("Line " .. i .. " (R): " .. text .. " [Color: " .. string.format("%.2f,%.2f,%.2f", r, g, b) .. "]")
+				
+				-- Right side often has weapon speed and other values
+				if string.find(text, "Speed") or string.find(text, "%d") then
+					-- Check if it's not something we want to skip
+					if not string.find(text, "Durability") then
+						table.insert(info.stats, text)
+						PawnDebugLog("Found stat (right): " .. text)
+					end
+				end
 			end
 		end
 	end
