@@ -47,6 +47,7 @@ PawnCommonDefault = {
 	UpgradeTrackingEnabled = true,
 	ShowUpgradeDebugInfo = false,
 	MigrationVersion = 0,
+	ShowOnlyClassScales = true, -- Only show scales relevant to player's class
 }
 
 PawnOptionsDefault = {
@@ -194,6 +195,12 @@ function PawnCommand(Command)
 		VgerCore.Message("Equipped items rescanned.")
 	elseif Command == "equipped" then
 		PawnShowEquippedScores()
+	elseif Command == "allscales" then
+		PawnCommon.ShowOnlyClassScales = false
+		VgerCore.Message("Now showing all scales in tooltips.")
+	elseif Command == "classscales" then
+		PawnCommon.ShowOnlyClassScales = true
+		VgerCore.Message("Now showing only class-relevant scales in tooltips.")
 	else
 		PawnShowHelp()
 	end
@@ -209,6 +216,8 @@ function PawnShowHelp()
 	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "init" .. VgerCore.Color.Blue .. " - Reinitialize scale providers")
 	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "scan" .. VgerCore.Color.Blue .. " - Rescan equipped items")
 	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "equipped" .. VgerCore.Color.Blue .. " - Show equipped item scores")
+	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "classscales" .. VgerCore.Color.Blue .. " - Show only your class scales (default)")
+	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "allscales" .. VgerCore.Color.Blue .. " - Show all scales")
 	VgerCore.Message(" ")
 end
 
@@ -321,10 +330,41 @@ function PawnHookTooltips()
 				this:AddLine("Pawn scores:", 1, 1, 0)
 				
 				local scoresCalculated = false
+				
+				-- Get player class for filtering
+				local playerClass = PawnPlayerClassName or string.upper(string.gsub(UnitClass("player") or "", " ", ""))
+				
 				for scaleName, scale in pairs(PawnCommon.Scales or {}) do
-					local score = PawnCalculateItemScore(itemInfo.parsedStats, scaleName)
-					if score and score > 0 then
-						scoresCalculated = true
+					-- Filter scales by class if option is enabled
+					local showScale = true
+					if PawnCommon.ShowOnlyClassScales and string.find(scaleName, "Classic:") then
+						-- Check if this scale is for the player's class
+						showScale = false
+						if playerClass == "WARRIOR" and string.find(scaleName, "Warrior") then
+							showScale = true
+						elseif playerClass == "PALADIN" and string.find(scaleName, "Paladin") then
+							showScale = true
+						elseif playerClass == "HUNTER" and string.find(scaleName, "Hunter") then
+							showScale = true
+						elseif playerClass == "ROGUE" and string.find(scaleName, "Rogue") then
+							showScale = true
+						elseif playerClass == "PRIEST" and string.find(scaleName, "Priest") then
+							showScale = true
+						elseif playerClass == "SHAMAN" and string.find(scaleName, "Shaman") then
+							showScale = true
+						elseif playerClass == "MAGE" and string.find(scaleName, "Mage") then
+							showScale = true
+						elseif playerClass == "WARLOCK" and string.find(scaleName, "Warlock") then
+							showScale = true
+						elseif playerClass == "DRUID" and string.find(scaleName, "Druid") then
+							showScale = true
+						end
+					end
+					
+					if showScale then
+						local score = PawnCalculateItemScore(itemInfo.parsedStats, scaleName)
+						if score and score > 0 then
+							scoresCalculated = true
 						
 						-- Get the best equipped score for this scale
 						local bestEquippedScore = 0
@@ -381,6 +421,7 @@ function PawnHookTooltips()
 						-- Format: "ScaleName: 123.4 ↑ +15.2%"
 						local scoreLine = scaleName .. ": " .. string.format("%.1f", score) .. upgradeText
 						this:AddLine("  " .. scoreLine, r, g, b)
+						end
 					end
 				end
 				
