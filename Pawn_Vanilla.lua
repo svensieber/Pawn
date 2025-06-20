@@ -349,7 +349,7 @@ function PawnGetItemLinkFromTooltip(tooltip)
 	if focus and focus.GetName then
 		local name = focus:GetName()
 		if name then
-			PawnDebugLog("Mouse focus: " .. name)
+			-- PawnDebugLog("Mouse focus: " .. name) -- Too spammy
 			
 			-- For container items
 			if string.find(name, "ContainerFrame") then
@@ -361,7 +361,7 @@ function PawnGetItemLinkFromTooltip(tooltip)
 					-- Try multiple methods to get the link
 					-- Method 1: Direct GetContainerItemLink
 					local link = GetContainerItemLink(container, slot)
-					PawnDebugLog("GetContainerItemLink returned: " .. tostring(link))
+					-- PawnDebugLog("GetContainerItemLink returned: " .. tostring(link))
 					
 					-- Method 2: Create link from item ID if we have it
 					if (not link or link == "" or not string.find(tostring(link), "^|c%x+|Hitem:")) and focus.hasItem then
@@ -400,7 +400,7 @@ function PawnGetItemLinkFromTooltip(tooltip)
 					local slotId = GetInventorySlotInfo(slotName .. "Slot")
 					if slotId then
 						local link = GetInventoryItemLink("player", slotId)
-						PawnDebugLog("GetInventoryItemLink returned: " .. tostring(link))
+						-- PawnDebugLog("GetInventoryItemLink returned: " .. tostring(link))
 						if link and string.find(tostring(link), "^|c%x+|Hitem:") then
 							return link
 						end
