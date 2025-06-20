@@ -1854,32 +1854,48 @@ end
 
 -- Debug message
 DEFAULT_CHAT_FRAME:AddMessage("|cffff0000Pawn_Vanilla.lua loaded|r")
+DEFAULT_CHAT_FRAME:AddMessage("|cffff0000PawnInitialized = " .. tostring(PawnInitialized) .. "|r")
 
--- Direct initialization for Vanilla
--- In Vanilla, sometimes ADDON_LOADED doesn't fire properly
--- So we initialize directly when the file loads
-if not PawnInitialized then
-	-- Delay initialization slightly to ensure all files are loaded
-	local InitFrame = CreateFrame("Frame")
-	InitFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-	InitFrame:SetScript("OnEvent", function()
+-- Force initialization for Vanilla
+-- Always set up the initialization, regardless of PawnInitialized state
+local InitFrame = CreateFrame("Frame", "PawnVanillaInitFrame")
+InitFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+InitFrame:RegisterEvent("PLAYER_LOGIN")
+InitFrame:RegisterEvent("VARIABLES_LOADED")
+
+InitFrame:SetScript("OnEvent", function()
+	-- In Vanilla, event is the first parameter to the function
+	DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00Pawn: Event fired: " .. tostring(event) .. "|r")
+	
+	if event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_LOGIN" then
+		-- Always initialize on these events
+		DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Running initialization...|r")
+		
+		-- Ensure initialization
 		if not PawnInitialized then
-			DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: PLAYER_ENTERING_WORLD - Starting initialization...|r")
 			PawnInitialize()
 		end
-		this:UnregisterEvent("PLAYER_ENTERING_WORLD")
-	end)
-	
-	-- Also try immediate initialization
-	-- This works if we're already in-game (reload)
-	if UnitName("player") and UnitName("player") ~= "Unknown Entity" then
-		DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Direct initialization (reload detected)|r")
-		PawnInitialize()
-	else
-		DEFAULT_CHAT_FRAME:AddMessage("|cffffff00Pawn: Waiting for PLAYER_ENTERING_WORLD|r")
+		
+		-- Always run player login (which scans equipment)
+		PawnPlayerLogin()
+		
+		-- Unregister after handling
+		if event == "PLAYER_ENTERING_WORLD" then
+			this:UnregisterEvent("PLAYER_ENTERING_WORLD")
+		end
 	end
+end)
+
+-- Also try immediate initialization for reloads
+if UnitName("player") and UnitName("player") ~= "Unknown Entity" then
+	DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Direct initialization (reload detected)|r")
+	if not PawnInitialized then
+		PawnInitialize()
+	end
+	-- Always run player login for equipment scan
+	PawnPlayerLogin()
 else
-	DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00Pawn: Already initialized|r")
+	DEFAULT_CHAT_FRAME:AddMessage("|cffffff00Pawn: Waiting for player data...|r")
 end
 
 -- Removed - will cause error
