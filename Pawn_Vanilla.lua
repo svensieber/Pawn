@@ -75,9 +75,11 @@ function PawnOnEvent(Event)
 	if Event == "ADDON_LOADED" then
 		-- In Vanilla, arg1 contains the addon name
 		if arg1 == "Pawn" then
+			DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: ADDON_LOADED event fired|r")
 			PawnInitialize()
 		end
 	elseif Event == "PLAYER_LOGIN" then
+		DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: PLAYER_LOGIN event fired|r")
 		PawnPlayerLogin()
 	elseif Event == "UNIT_INVENTORY_CHANGED" and arg1 == "player" then
 		PawnUnitInventoryChanged()
@@ -152,6 +154,7 @@ function PawnInitialize()
 end
 
 function PawnPlayerLogin()
+	DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: PawnPlayerLogin called|r")
 	PawnDebugLog("PawnPlayerLogin called")
 	
 	-- Register additional events after login
@@ -165,13 +168,22 @@ function PawnPlayerLogin()
 	-- Get player info FIRST
 	PawnPlayerClass = UnitClass("player")
 	PawnPlayerClassName = string.upper(string.gsub(PawnPlayerClass, " ", ""))
+	DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Player class: " .. tostring(PawnPlayerClassName) .. "|r")
 	
 	-- Initialize scale providers BEFORE scanning
 	PawnInitializeScaleProviders()
 	
 	-- NOW scan equipped items (only once, after scales are loaded)
+	DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Scanning equipped items...|r")
 	PawnDebugLog("Scanning equipped items after login")
 	PawnScanEquippedItems()
+	
+	-- Show results
+	local count = 0
+	for _ in pairs(PawnEquippedScores) do
+		count = count + 1
+	end
+	DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Found " .. count .. " equipped items with scores|r")
 	
 	VgerCore.Message(VgerCore.Color.Blue .. "Pawn loaded.  Type " .. VgerCore.Color.Green .. "/pawn" .. VgerCore.Color.Blue .. " for options.")
 end
@@ -1162,6 +1174,12 @@ function PawnInitializeScaleProviders()
 	-- Initialize classic scale providers
 	PawnInitializeClassicScales()
 	
+	-- Remove Test scale if it exists from SavedVariables
+	if PawnCommon.Scales and PawnCommon.Scales["Test"] then
+		PawnCommon.Scales["Test"] = nil
+		PawnDebugLog("Removed Test scale from SavedVariables")
+	end
+	
 	-- Debug: show all scales
 	PawnDebugLog("Available scales:")
 	for scaleName, _ in pairs(PawnCommon.Scales) do
@@ -1849,8 +1867,6 @@ if not PawnInitialized then
 	if UnitName("player") and UnitName("player") ~= "Unknown Entity" then
 		DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Direct initialization (reload detected)|r")
 		PawnInitialize()
-		-- Also initialize scales directly for reloads
-		PawnInitializeScaleProviders()
 	end
 end
 
