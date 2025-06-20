@@ -442,7 +442,14 @@ function PawnExtractTooltipInfo(tooltip)
 				   string.find(text, "Races:") or
 				   string.find(text, "Gold") or
 				   string.find(text, "Silver") or
-				   string.find(text, "Copper") then
+				   string.find(text, "Copper") or
+				   string.find(text, "Vendor") or
+				   string.find(text, "Value") or
+				   string.find(text, "Today") or
+				   string.find(text, "%d+g %d+s") or -- Gold patterns like "4g 69s"
+				   string.find(text, "%d+s %d+c") or -- Silver/copper patterns
+				   string.find(text, "^%d+c$") or -- Just copper like "0c"
+				   string.find(text, "^%d+$") then -- Just numbers like "22"
 					PawnDebugLog("Skipping line: " .. text)
 				else
 					-- Check if it's a stat line
@@ -485,12 +492,11 @@ function PawnExtractTooltipInfo(tooltip)
 				PawnDebugLog("Line " .. i .. " (R): " .. text .. " [Color: " .. string.format("%.2f,%.2f,%.2f", r, g, b) .. "]")
 				
 				-- Right side often has weapon speed and other values
-				if string.find(text, "Speed") or string.find(text, "%d") then
-					-- Check if it's not something we want to skip
-					if not string.find(text, "Durability") then
-						table.insert(info.stats, text)
-						PawnDebugLog("Found stat (right): " .. text)
-					end
+				if string.find(text, "Speed %d") then
+					-- Only add speed for weapons, not shields
+					-- We'll check item type later, for now add it
+					table.insert(info.stats, text)
+					PawnDebugLog("Found stat (right): " .. text)
 				end
 			end
 		end
