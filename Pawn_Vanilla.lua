@@ -439,9 +439,13 @@ function PawnHookTooltips()
 								PawnDebugLog("Showing scale " .. scaleName .. " with score " .. score)
 							end
 						
-						-- Get the best equipped score for this scale
+						-- Get the equipped score to compare with
 						local bestEquippedScore = 0
+						local worstEquippedScore = nil
+						local equippedScores = {}
+						
 						if compareSlots then
+							-- Collect all equipped scores for this scale
 							for _, slotId in pairs(compareSlots) do
 								if PawnCommon.Debug then
 									PawnDebugLog("Checking slot " .. slotId .. " for scale " .. scaleName)
@@ -456,10 +460,28 @@ function PawnHookTooltips()
 										PawnDebugLog("  Slot has no scores")
 									end
 								end
+								
 								if PawnEquippedScores[slotId] and PawnEquippedScores[slotId][scaleName] then
-									if PawnEquippedScores[slotId][scaleName] > bestEquippedScore then
-										bestEquippedScore = PawnEquippedScores[slotId][scaleName]
+									local equippedScore = PawnEquippedScores[slotId][scaleName]
+									table.insert(equippedScores, equippedScore)
+									
+									-- Track best score
+									if equippedScore > bestEquippedScore then
+										bestEquippedScore = equippedScore
 									end
+									
+									-- Track worst score
+									if worstEquippedScore == nil or equippedScore < worstEquippedScore then
+										worstEquippedScore = equippedScore
+									end
+								end
+							end
+							
+							-- For rings and trinkets (2 slots), compare with the worse item
+							if table.getn(equippedScores) == 2 then
+								bestEquippedScore = worstEquippedScore or 0
+								if PawnCommon.Debug then
+									PawnDebugLog("Two items equipped, comparing with weaker one: " .. bestEquippedScore)
 								end
 							end
 							if PawnCommon.Debug and bestEquippedScore == 0 then
@@ -576,8 +598,18 @@ function PawnHookTooltips()
 						displayName = string.gsub(displayName, "Fire Mage", "Fire")
 						displayName = string.gsub(displayName, "Arcane Mage", "Arcane")
 						
+						-- Add indicator for dual slot items
+						local slotIndicator = ""
+						if equipLoc and (equipLoc == "INVTYPE_FINGER" or equipLoc == "INVTYPE_TRINKET") then
+							if table.getn(equippedScores) == 2 and score > bestEquippedScore then
+								slotIndicator = " (replaces weaker)"
+							elseif table.getn(equippedScores) == 1 then
+								slotIndicator = " (2nd slot empty)"
+							end
+						end
+						
 						-- Format: "Paladin Retribution: 123.4 +15.2%"
-						local scoreLine = displayName .. ": " .. string.format("%.1f", score) .. upgradeText
+						local scoreLine = displayName .. ": " .. string.format("%.1f", score) .. upgradeText .. slotIndicator
 						
 						-- Debug: Show equipped score if exists
 						if PawnCommon.Debug and bestEquippedScore > 0 then
