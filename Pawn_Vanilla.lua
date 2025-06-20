@@ -335,9 +335,12 @@ function PawnHookTooltips()
 				local playerClass = PawnPlayerClassName or string.upper(string.gsub(UnitClass("player") or "", " ", ""))
 				
 				for scaleName, scale in pairs(PawnCommon.Scales or {}) do
-					-- Filter scales by class if option is enabled
+					-- Filter scales by class if option is enabled (default true if not set)
 					local showScale = true
-					if PawnCommon.ShowOnlyClassScales and string.find(scaleName, "Classic:") then
+					local showOnlyClass = PawnCommon.ShowOnlyClassScales
+					if showOnlyClass == nil then showOnlyClass = true end
+					
+					if showOnlyClass and string.find(scaleName, "Classic:") then
 						-- Check if this scale is for the player's class
 						showScale = false
 						if playerClass == "WARRIOR" and string.find(scaleName, "Warrior") then
