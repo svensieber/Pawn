@@ -239,8 +239,8 @@ function PawnHookTooltips()
 		end
 		if itemInfo.stats and table.getn(itemInfo.stats) > 0 then
 			this:AddLine("Stats found: " .. table.getn(itemInfo.stats), 1, 1, 1)
-			-- Show all stats (or max 10 to avoid tooltip overflow)
-			for i = 1, math.min(10, table.getn(itemInfo.stats)) do
+			-- Show all stats (Debug only anyway)
+			for i = 1, table.getn(itemInfo.stats) do
 				this:AddLine("  " .. itemInfo.stats[i], 0.8, 0.8, 0.8)
 			end
 		else
