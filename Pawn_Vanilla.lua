@@ -401,6 +401,12 @@ function PawnHookTooltips()
 							end
 							if PawnCommon.Debug and bestEquippedScore == 0 then
 								PawnDebugLog("No equipped score found for " .. scaleName .. " in slots: " .. table.concat(compareSlots, ", "))
+								-- Debug: Show what scores we have for this scale
+								for slotId, scores in pairs(PawnEquippedScores) do
+									if scores[scaleName] then
+										PawnDebugLog("  Found " .. scaleName .. " score " .. scores[scaleName] .. " in slot " .. slotId)
+									end
+								end
 							end
 						end
 						
@@ -955,7 +961,7 @@ function PawnGetItemEquipSlot(equipLoc)
 		["INVTYPE_TRINKET"] = {13, 14}, -- Two trinket slots
 		["INVTYPE_CLOAK"] = 15,
 		["INVTYPE_WEAPON"] = {16, 17}, -- Main hand, off hand
-		["INVTYPE_2HWEAPON"] = 16,
+		["INVTYPE_2HWEAPON"] = {16, 17}, -- Check both slots for 2H weapons
 		["INVTYPE_WEAPONMAINHAND"] = 16,
 		["INVTYPE_WEAPONOFFHAND"] = 17,
 		["INVTYPE_HOLDABLE"] = 17,
