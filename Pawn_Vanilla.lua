@@ -226,6 +226,10 @@ function PawnHookTooltips()
 		this:AddLine(VgerCore.Color.Blue .. "Pawn debug:", 1, 1, 1)
 		this:AddLine("Name: " .. name, 1, 1, 1)
 		
+		-- Show number of lines in tooltip
+		local numLines = this:NumLines()
+		this:AddLine("Tooltip lines: " .. numLines, 1, 1, 1)
+		
 		-- Show extracted info
 		if itemInfo.level then
 			this:AddLine("Level: " .. itemInfo.level, 1, 1, 1)
@@ -235,6 +239,10 @@ function PawnHookTooltips()
 		end
 		if itemInfo.stats and table.getn(itemInfo.stats) > 0 then
 			this:AddLine("Stats found: " .. table.getn(itemInfo.stats), 1, 1, 1)
+			-- Show first few stats
+			for i = 1, math.min(3, table.getn(itemInfo.stats)) do
+				this:AddLine("  " .. itemInfo.stats[i], 0.8, 0.8, 0.8)
+			end
 		end
 		
 		-- Try to get item link for more info
@@ -385,13 +393,19 @@ function PawnExtractTooltipInfo(tooltip)
 	
 	-- Scan all tooltip lines
 	local numLines = tooltip:NumLines()
+	PawnDebugLog("Scanning tooltip with " .. numLines .. " lines")
+	
 	for i = 2, numLines do  -- Start at 2 to skip item name
 		local leftText = getglobal(tooltip:GetName().."TextLeft"..i)
 		local rightText = getglobal(tooltip:GetName().."TextRight"..i)
 		
 		if leftText then
 			local text = leftText:GetText()
-			if text then
+			if text and text ~= "" then
+				-- Get text color
+				local r, g, b = leftText:GetTextColor()
+				PawnDebugLog("Line " .. i .. " (L): " .. text .. " [Color: " .. string.format("%.2f,%.2f,%.2f", r, g, b) .. "]")
+				
 				-- Check for item level (e.g. "Item Level 55")
 				local _, _, level = string.find(text, "Item Level (%d+)")
 				if level then
@@ -400,7 +414,6 @@ function PawnExtractTooltipInfo(tooltip)
 				
 				-- Check for item type (e.g. "Two-Hand Sword")
 				-- Usually in grey text
-				local r, g, b = leftText:GetTextColor()
 				if r > 0.6 and g > 0.6 and b > 0.6 and r < 0.7 and g < 0.7 and b < 0.7 then
 					-- Grey text, might be item type
 					if not string.find(text, "Level") and not string.find(text, "Durability") then
@@ -419,13 +432,14 @@ function PawnExtractTooltipInfo(tooltip)
 		-- Check right side text (often has values)
 		if rightText then
 			local text = rightText:GetText()
-			if text then
-				-- Right text often contains damage/armor values
-				PawnDebugLog("Right text line " .. i .. ": " .. text)
+			if text and text ~= "" then
+				local r, g, b = rightText:GetTextColor()
+				PawnDebugLog("Line " .. i .. " (R): " .. text .. " [Color: " .. string.format("%.2f,%.2f,%.2f", r, g, b) .. "]")
 			end
 		end
 	end
 	
+	PawnDebugLog("Extraction complete: Found " .. table.getn(info.stats) .. " stats")
 	return info
 end
 
