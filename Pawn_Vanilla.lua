@@ -22,6 +22,10 @@ local ScaleProviderName = "Pawn"
 PawnItemCache = {}
 PawnItemCacheMaxSize = 200
 
+-- Equipped items cache
+PawnEquippedItems = {}
+PawnEquippedScores = {}
+
 -- Saved variables defaults
 PawnCommonDefault = {
 	Debug = false,
@@ -153,6 +157,9 @@ function PawnPlayerLogin()
 	-- Initialize scale providers
 	PawnInitializeScaleProviders()
 	
+	-- Scan equipped items
+	PawnScanEquippedItems()
+	
 	VgerCore.Message(VgerCore.Color.Blue .. "Pawn loaded.  Type " .. VgerCore.Color.Green .. "/pawn" .. VgerCore.Color.Blue .. " for options.")
 end
 
@@ -282,6 +289,28 @@ function PawnHookTooltips()
 				
 				-- Calculate scores for all scales
 				this:AddLine(" ", 1, 1, 1)
+				
+				-- Get item equip slot to compare with equipped
+				local equipLoc = nil
+				local itemLink = PawnGetItemLinkFromTooltip(this)
+				if itemLink then
+					local Item = PawnGetItemData(itemLink)
+					if Item and Item.EquipLoc then
+						equipLoc = Item.EquipLoc
+						PawnDebugLog("Item equip location: " .. tostring(equipLoc))
+					end
+				end
+				
+				-- Determine which slot(s) to compare with
+				local compareSlots = nil
+				if equipLoc then
+					compareSlots = PawnGetItemEquipSlot(equipLoc)
+					-- Handle items that can go in multiple slots
+					if type(compareSlots) ~= "table" then
+						compareSlots = {compareSlots}
+					end
+				end
+				
 				this:AddLine("Pawn scores:", 1, 1, 0)
 				
 				local scoresCalculated = false
@@ -289,15 +318,62 @@ function PawnHookTooltips()
 					local score = PawnCalculateItemScore(itemInfo.parsedStats, scaleName)
 					if score and score > 0 then
 						scoresCalculated = true
-						-- Format: "ScaleName: 123.4"
-						local scoreLine = scaleName .. ": " .. string.format("%.1f", score)
 						
-						-- Check for upgrades (simplified for now - no comparison yet)
-						if string.find(scaleName, "Classic:") then
-							this:AddLine("  " .. scoreLine, 0.5, 1, 0.5)
-						else
-							this:AddLine("  " .. scoreLine, 0.8, 0.8, 0.8)
+						-- Get the best equipped score for this scale
+						local bestEquippedScore = 0
+						if compareSlots then
+							for _, slotId in pairs(compareSlots) do
+								if PawnEquippedScores[slotId] and PawnEquippedScores[slotId][scaleName] then
+									if PawnEquippedScores[slotId][scaleName] > bestEquippedScore then
+										bestEquippedScore = PawnEquippedScores[slotId][scaleName]
+									end
+								end
+							end
 						end
+						
+						-- Calculate upgrade percentage
+						local upgradePercent = 0
+						local upgradeText = ""
+						local r, g, b = 0.8, 0.8, 0.8 -- Default gray
+						
+						if bestEquippedScore > 0 then
+							upgradePercent = ((score - bestEquippedScore) / bestEquippedScore) * 100
+							
+							if upgradePercent > 0.5 then
+								-- Upgrade
+								upgradeText = string.format(" |cff00ff00↑ +%.1f%%|r", upgradePercent)
+								if string.find(scaleName, "Classic:") then
+									r, g, b = 0.2, 1, 0.2 -- Bright green for classic
+								else
+									r, g, b = 0.5, 1, 0.5 -- Light green
+								end
+							elseif upgradePercent < -0.5 then
+								-- Downgrade
+								upgradeText = string.format(" |cffff0000↓ %.1f%%|r", upgradePercent)
+								if string.find(scaleName, "Classic:") then
+									r, g, b = 1, 0.2, 0.2 -- Bright red for classic
+								else
+									r, g, b = 1, 0.5, 0.5 -- Light red
+								end
+							else
+								-- Sidegrade (very close)
+								upgradeText = " |cffffff00≈|r"
+								if string.find(scaleName, "Classic:") then
+									r, g, b = 1, 1, 0.5 -- Yellow for classic
+								else
+									r, g, b = 0.8, 0.8, 0.5 -- Dim yellow
+								end
+							end
+						else
+							-- No equipped item to compare
+							if string.find(scaleName, "Classic:") then
+								r, g, b = 0.5, 1, 0.5 -- Light green for classic
+							end
+						end
+						
+						-- Format: "ScaleName: 123.4 ↑ +15.2%"
+						local scoreLine = scaleName .. ": " .. string.format("%.1f", score) .. upgradeText
+						this:AddLine("  " .. scoreLine, r, g, b)
 					end
 				end
 				
@@ -726,6 +802,41 @@ function PawnParseStats(statLines)
 	end
 	
 	return parsedStats
+end
+
+-- Get the slot ID for an item based on its equip location
+function PawnGetItemEquipSlot(equipLoc)
+	if not equipLoc then return nil end
+	
+	local slotMap = {
+		["INVTYPE_HEAD"] = 1,
+		["INVTYPE_NECK"] = 2,
+		["INVTYPE_SHOULDER"] = 3,
+		["INVTYPE_BODY"] = 4, -- Shirt
+		["INVTYPE_CHEST"] = 5,
+		["INVTYPE_ROBE"] = 5,
+		["INVTYPE_WAIST"] = 6,
+		["INVTYPE_LEGS"] = 7,
+		["INVTYPE_FEET"] = 8,
+		["INVTYPE_WRIST"] = 9,
+		["INVTYPE_HAND"] = 10,
+		["INVTYPE_FINGER"] = {11, 12}, -- Two ring slots
+		["INVTYPE_TRINKET"] = {13, 14}, -- Two trinket slots
+		["INVTYPE_CLOAK"] = 15,
+		["INVTYPE_WEAPON"] = {16, 17}, -- Main hand, off hand
+		["INVTYPE_2HWEAPON"] = 16,
+		["INVTYPE_WEAPONMAINHAND"] = 16,
+		["INVTYPE_WEAPONOFFHAND"] = 17,
+		["INVTYPE_HOLDABLE"] = 17,
+		["INVTYPE_SHIELD"] = 17,
+		["INVTYPE_RANGED"] = 18,
+		["INVTYPE_THROWN"] = 18,
+		["INVTYPE_RANGEDRIGHT"] = 18,
+		["INVTYPE_RELIC"] = 18,
+		["INVTYPE_TABARD"] = 19,
+	}
+	
+	return slotMap[equipLoc]
 end
 
 function PawnGetItemData(ItemLink)
@@ -1268,6 +1379,77 @@ end
 
 function PawnPlayerEquipmentChanged()
 	PawnDebugLog("Player equipment changed")
+	-- Scan equipped items
+	PawnScanEquippedItems()
+end
+
+-- Scan all equipped items and calculate their scores
+function PawnScanEquippedItems()
+	PawnDebugLog("Scanning equipped items...")
+	
+	-- Clear old data
+	PawnEquippedItems = {}
+	PawnEquippedScores = {}
+	
+	-- Slot IDs for equipment
+	local slots = {
+		1, -- Head
+		2, -- Neck
+		3, -- Shoulder
+		5, -- Chest
+		6, -- Waist
+		7, -- Legs
+		8, -- Feet
+		9, -- Wrist
+		10, -- Hands
+		11, -- Finger 1
+		12, -- Finger 2
+		13, -- Trinket 1
+		14, -- Trinket 2
+		15, -- Back
+		16, -- Main Hand
+		17, -- Off Hand
+		18, -- Ranged
+	}
+	
+	for _, slotId in pairs(slots) do
+		local itemLink = GetInventoryItemLink("player", slotId)
+		if itemLink then
+			-- Store the item link
+			PawnEquippedItems[slotId] = itemLink
+			
+			-- Get item data and calculate scores
+			local Item = PawnGetItemData(itemLink)
+			if Item then
+				-- Parse stats from equipped item
+				local tooltip = PawnPrivateTooltip
+				if not tooltip then
+					tooltip = CreateFrame("GameTooltip", "PawnPrivateTooltip", UIParent, "GameTooltipTemplate")
+					PawnPrivateTooltip = tooltip
+				end
+				
+				tooltip:SetOwner(UIParent, "ANCHOR_NONE")
+				tooltip:ClearLines()
+				tooltip:SetInventoryItem("player", slotId)
+				
+				local itemInfo = PawnExtractTooltipInfo(tooltip)
+				if itemInfo and itemInfo.parsedStats then
+					-- Calculate scores for all scales
+					PawnEquippedScores[slotId] = {}
+					for scaleName, _ in pairs(PawnCommon.Scales or {}) do
+						local score = PawnCalculateItemScore(itemInfo.parsedStats, scaleName)
+						if score and score > 0 then
+							PawnEquippedScores[slotId][scaleName] = score
+						end
+					end
+				end
+				
+				tooltip:Hide()
+			end
+		end
+	end
+	
+	PawnDebugLog("Equipped items scan complete")
 end
 
 function PawnItemLocked(Bag, Slot)
