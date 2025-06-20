@@ -132,11 +132,22 @@ function PawnInitialize()
 	-- Hook tooltips (simplified for Vanilla)
 	PawnHookTooltips()
 	
+	-- Initialize scales EARLY (needed for equipped item scanning)
+	PawnInitializeScaleProviders()
+	
 	PawnDebugLog("Pawn initialized")
 	
 	-- Debug message
 	if DEFAULT_CHAT_FRAME then
-		DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Initialization complete, /pawn registered|r")
+		DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Initialization complete|r")
+		-- Show scale count
+		local scaleCount = 0
+		if PawnCommon and PawnCommon.Scales then
+			for _ in pairs(PawnCommon.Scales) do
+				scaleCount = scaleCount + 1
+			end
+		end
+		DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: " .. scaleCount .. " scales loaded|r")
 	end
 end
 
@@ -151,19 +162,15 @@ function PawnPlayerLogin()
 	PawnEventFrame:RegisterEvent("PLAYER_LEVEL_UP")
 	PawnEventFrame:RegisterEvent("CHAT_MSG_LOOT")
 	
-	-- Scan equipped items on login (items should be loaded by now)
-	PawnDebugLog("Rescanning equipped items on login")
-	PawnScanEquippedItems()
-	
-	-- Get player info
+	-- Get player info FIRST
 	PawnPlayerClass = UnitClass("player")
 	PawnPlayerClassName = string.upper(string.gsub(PawnPlayerClass, " ", ""))
 	
-	-- Initialize scale providers
+	-- Initialize scale providers BEFORE scanning
 	PawnInitializeScaleProviders()
 	
-	-- Scan equipped items
-	PawnDebugLog("Calling PawnScanEquippedItems from OnInitialize")
+	-- NOW scan equipped items (only once, after scales are loaded)
+	PawnDebugLog("Scanning equipped items after login")
 	PawnScanEquippedItems()
 	
 	VgerCore.Message(VgerCore.Color.Blue .. "Pawn loaded.  Type " .. VgerCore.Color.Green .. "/pawn" .. VgerCore.Color.Blue .. " for options.")
