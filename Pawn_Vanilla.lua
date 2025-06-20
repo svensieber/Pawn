@@ -720,8 +720,20 @@ end
 ------------------------------------------------------------
 
 function PawnInitializeScaleProviders()
+	-- Debug log
+	PawnDebugLog("Initializing scale providers...")
+	
+	-- Ensure PawnCommon exists
+	if not PawnCommon then 
+		PawnCommon = {}
+		PawnDebugLog("Created PawnCommon")
+	end
+	
 	-- Initialize built-in scales
-	if not PawnCommon.Scales then PawnCommon.Scales = {} end
+	if not PawnCommon.Scales then 
+		PawnCommon.Scales = {} 
+		PawnDebugLog("Created PawnCommon.Scales")
+	end
 	
 	-- Add default scale for testing
 	if not PawnCommon.Scales["Test"] then
@@ -741,6 +753,15 @@ function PawnInitializeScaleProviders()
 			["MinDamage"] = 0.5,
 			["MaxDamage"] = 0.5,
 		}
+		PawnDebugLog("Created Test scale")
+	else
+		PawnDebugLog("Test scale already exists")
+	end
+	
+	-- Debug: show all scales
+	PawnDebugLog("Available scales:")
+	for scaleName, _ in pairs(PawnCommon.Scales) do
+		PawnDebugLog("  - " .. scaleName)
 	end
 end
 
@@ -757,9 +778,23 @@ end
 function PawnCalculateItemScore(parsedStats, scaleName)
 	if not parsedStats or not scaleName then return 0 end
 	
+	-- Debug: Check if PawnCommon exists
+	if not PawnCommon then
+		PawnDebugLog("PawnCommon does not exist in PawnCalculateItemScore")
+		return 0
+	end
+	if not PawnCommon.Scales then
+		PawnDebugLog("PawnCommon.Scales does not exist")
+		return 0
+	end
+	
 	local scale = PawnGetScaleValues(scaleName)
 	if not scale then 
 		PawnDebugLog("Scale not found: " .. scaleName)
+		PawnDebugLog("Available scales: ")
+		for name, _ in pairs(PawnCommon.Scales or {}) do
+			PawnDebugLog("  - " .. name)
+		end
 		return 0 
 	end
 	
