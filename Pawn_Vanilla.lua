@@ -653,18 +653,18 @@ function PawnHookTooltips()
 	local OldSetHyperlink = ItemRefTooltip.SetHyperlink
 	ItemRefTooltip.SetHyperlink = function(link)
 		-- Make sure we have a valid link
-		if not link or type(link) ~= "string" then 
-			if OldSetHyperlink then
-				OldSetHyperlink(link)
-			end
+		if not link or type(link) ~= "string" or link == "" then 
+			PawnDebugLog("SetHyperlink called with invalid link: " .. tostring(link))
 			return 
 		end
 		
 		-- Call original function with error handling
-		local success, err = pcall(OldSetHyperlink, link)
-		if not success then
-			PawnDebugLog("SetHyperlink error: " .. tostring(err))
-			return
+		if OldSetHyperlink then
+			local success, err = pcall(OldSetHyperlink, link)
+			if not success then
+				PawnDebugLog("SetHyperlink error: " .. tostring(err))
+				return
+			end
 		end
 		
 		-- Add our info only for item links
