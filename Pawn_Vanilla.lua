@@ -726,11 +726,20 @@ function PawnInitializeScaleProviders()
 	-- Add default scale for testing
 	if not PawnCommon.Scales["Test"] then
 		PawnCommon.Scales["Test"] = {
+			-- Primary stats
 			["Strength"] = 1,
 			["Agility"] = 1,
 			["Stamina"] = 1,
 			["Intellect"] = 1,
 			["Spirit"] = 1,
+			-- Armor and defense
+			["Armor"] = 0.1,
+			["Block"] = 1,
+			["Defense"] = 1,
+			-- Damage
+			["DPS"] = 2,
+			["MinDamage"] = 0.5,
+			["MaxDamage"] = 0.5,
 		}
 	end
 end
