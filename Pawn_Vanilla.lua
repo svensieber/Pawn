@@ -225,6 +225,13 @@ function PawnCommand(Command)
 	elseif Command == "classscales" then
 		PawnCommon.ShowOnlyClassScales = true
 		VgerCore.Message("Now showing only class-relevant scales in tooltips.")
+	elseif Command == "removetest" then
+		if PawnCommon.Scales and PawnCommon.Scales["Test"] then
+			PawnCommon.Scales["Test"] = nil
+			VgerCore.Message("Test scale removed.")
+		else
+			VgerCore.Message("Test scale not found.")
+		end
 	else
 		PawnShowHelp()
 	end
@@ -242,6 +249,7 @@ function PawnShowHelp()
 	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "equipped" .. VgerCore.Color.Blue .. " - Show equipped item scores")
 	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "classscales" .. VgerCore.Color.Blue .. " - Show only your class scales (default)")
 	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "allscales" .. VgerCore.Color.Blue .. " - Show all scales")
+	VgerCore.Message("/pawn " .. VgerCore.Color.Green .. "removetest" .. VgerCore.Color.Blue .. " - Remove Test scale")
 	VgerCore.Message(" ")
 end
 
@@ -1845,7 +1853,7 @@ function PawnShowEquippedScores()
 end
 
 -- Debug message
-PawnDebugLog("Pawn_Vanilla.lua loaded")
+DEFAULT_CHAT_FRAME:AddMessage("|cffff0000Pawn_Vanilla.lua loaded|r")
 
 -- Direct initialization for Vanilla
 -- In Vanilla, sometimes ADDON_LOADED doesn't fire properly
@@ -1856,7 +1864,7 @@ if not PawnInitialized then
 	InitFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 	InitFrame:SetScript("OnEvent", function()
 		if not PawnInitialized then
-			DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Starting initialization...|r")
+			DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: PLAYER_ENTERING_WORLD - Starting initialization...|r")
 			PawnInitialize()
 		end
 		this:UnregisterEvent("PLAYER_ENTERING_WORLD")
@@ -1867,7 +1875,11 @@ if not PawnInitialized then
 	if UnitName("player") and UnitName("player") ~= "Unknown Entity" then
 		DEFAULT_CHAT_FRAME:AddMessage("|cff8ec3e6Pawn: Direct initialization (reload detected)|r")
 		PawnInitialize()
+	else
+		DEFAULT_CHAT_FRAME:AddMessage("|cffffff00Pawn: Waiting for PLAYER_ENTERING_WORLD|r")
 	end
+else
+	DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00Pawn: Already initialized|r")
 end
 
 -- Removed - will cause error
