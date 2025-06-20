@@ -151,6 +151,10 @@ function PawnPlayerLogin()
 	PawnEventFrame:RegisterEvent("PLAYER_LEVEL_UP")
 	PawnEventFrame:RegisterEvent("CHAT_MSG_LOOT")
 	
+	-- Scan equipped items on login (items should be loaded by now)
+	PawnDebugLog("Rescanning equipped items on login")
+	PawnScanEquippedItems()
+	
 	-- Get player info
 	PawnPlayerClass = UnitClass("player")
 	PawnPlayerClassName = string.upper(string.gsub(PawnPlayerClass, " ", ""))
@@ -159,6 +163,7 @@ function PawnPlayerLogin()
 	PawnInitializeScaleProviders()
 	
 	-- Scan equipped items
+	PawnDebugLog("Calling PawnScanEquippedItems from OnInitialize")
 	PawnScanEquippedItems()
 	
 	VgerCore.Message(VgerCore.Color.Blue .. "Pawn loaded.  Type " .. VgerCore.Color.Green .. "/pawn" .. VgerCore.Color.Blue .. " for options.")
@@ -337,11 +342,17 @@ function PawnHookTooltips()
 				if equipLoc then
 					compareSlots = PawnGetItemEquipSlot(equipLoc)
 					-- Handle items that can go in multiple slots
-					if type(compareSlots) ~= "table" then
-						compareSlots = {compareSlots}
-					end
-					if PawnCommon.Debug then
-						PawnDebugLog("Compare slots: " .. table.concat(compareSlots, ", "))
+					if compareSlots then
+						if type(compareSlots) ~= "table" then
+							compareSlots = {compareSlots}
+						end
+						if PawnCommon.Debug then
+							PawnDebugLog("Compare slots: " .. table.concat(compareSlots, ", "))
+						end
+					else
+						if PawnCommon.Debug then
+							PawnDebugLog("PawnGetItemEquipSlot returned nil for equipLoc: " .. tostring(equipLoc))
+						end
 					end
 				else
 					if PawnCommon.Debug then
@@ -400,6 +411,19 @@ function PawnHookTooltips()
 						local bestEquippedScore = 0
 						if compareSlots then
 							for _, slotId in pairs(compareSlots) do
+								if PawnCommon.Debug then
+									PawnDebugLog("Checking slot " .. slotId .. " for scale " .. scaleName)
+									if PawnEquippedScores[slotId] then
+										PawnDebugLog("  Slot has scores table")
+										if PawnEquippedScores[slotId][scaleName] then
+											PawnDebugLog("  Found score: " .. PawnEquippedScores[slotId][scaleName])
+										else
+											PawnDebugLog("  No score for this scale")
+										end
+									else
+										PawnDebugLog("  Slot has no scores")
+									end
+								end
 								if PawnEquippedScores[slotId] and PawnEquippedScores[slotId][scaleName] then
 									if PawnEquippedScores[slotId][scaleName] > bestEquippedScore then
 										bestEquippedScore = PawnEquippedScores[slotId][scaleName]
@@ -1566,6 +1590,13 @@ function PawnScanEquippedItems()
 		return
 	end
 	
+	-- Debug: Check if we have scales
+	local scaleCount = 0
+	for _ in pairs(PawnCommon.Scales) do
+		scaleCount = scaleCount + 1
+	end
+	PawnDebugLog("Number of scales available: " .. scaleCount)
+	
 	-- Clear old data
 	PawnEquippedItems = {}
 	PawnEquippedScores = {}
@@ -1645,6 +1676,9 @@ function PawnScanEquippedItems()
 					if score and score > 0 then
 						PawnEquippedScores[slotId][scaleName] = score
 						scoresFound = scoresFound + 1
+						if PawnCommon.Debug then
+							PawnDebugLog("  Stored score for " .. scaleName .. ": " .. score)
+						end
 					end
 				end
 				if PawnCommon.Debug then
@@ -1660,7 +1694,17 @@ function PawnScanEquippedItems()
 		end
 	end
 	
-	PawnDebugLog("Equipped items scan complete")
+	-- Summary
+	local totalSlots = 0
+	local totalScores = 0
+	for slotId, scores in pairs(PawnEquippedScores) do
+		totalSlots = totalSlots + 1
+		for _, _ in pairs(scores) do
+			totalScores = totalScores + 1
+		end
+	end
+	
+	PawnDebugLog("Equipped items scan complete: " .. totalSlots .. " slots with " .. totalScores .. " total scores")
 end
 
 function PawnItemLocked(Bag, Slot)
