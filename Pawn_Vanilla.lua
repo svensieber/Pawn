@@ -877,6 +877,8 @@ function PawnExtractTooltipInfo(tooltip)
 							info.equipLoc = "INVTYPE_SHIELD"
 						elseif string.find(text, "Bow") or string.find(text, "Gun") or string.find(text, "Crossbow") then
 							info.equipLoc = "INVTYPE_RANGED"
+						elseif string.find(text, "Wand") then
+							info.equipLoc = "INVTYPE_RANGEDRIGHT"  -- Wands go in the ranged slot
 						elseif string.find(text, "Thrown") then
 							info.equipLoc = "INVTYPE_THROWN"
 						end
@@ -965,6 +967,25 @@ function PawnExtractTooltipInfo(tooltip)
 	-- Parse the extracted stats
 	info.parsedStats = PawnParseStats(info.stats)
 	
+	-- Post-process: Convert DPS to RangedDPS for ranged weapons
+	if info.parsedStats and info.equipLoc and 
+	   (info.equipLoc == "INVTYPE_RANGED" or info.equipLoc == "INVTYPE_RANGEDRIGHT" or info.equipLoc == "INVTYPE_THROWN") then
+		if info.parsedStats.DPS and not info.parsedStats.RangedDPS then
+			info.parsedStats.RangedDPS = info.parsedStats.DPS
+			info.parsedStats.DPS = nil
+			PawnDebugLog("Converted DPS to RangedDPS for ranged weapon")
+		end
+		-- Also convert regular damage to ranged damage
+		if info.parsedStats.MinDamage and not info.parsedStats.RangedMinDamage then
+			info.parsedStats.RangedMinDamage = info.parsedStats.MinDamage
+			info.parsedStats.MinDamage = nil
+		end
+		if info.parsedStats.MaxDamage and not info.parsedStats.RangedMaxDamage then
+			info.parsedStats.RangedMaxDamage = info.parsedStats.MaxDamage
+			info.parsedStats.MaxDamage = nil
+		end
+	end
+	
 	return info
 end
 
@@ -986,6 +1007,13 @@ function PawnParseStats(statLines)
 		{pattern = "(%d+) %- (%d+) Damage", stat = "DPS", special = "damage"},
 		{pattern = "%(([%d%.]+) damage per second%)", stat = "DPS", isDPS = true},
 		{pattern = "(%d+) Block", stat = "Block"},
+		
+		-- Ranged weapon specific
+		{pattern = "(%d+) %- (%d+) Arcane Damage", stat = "RangedDPS", special = "damage"},  -- Wands
+		{pattern = "(%d+) %- (%d+) Fire Damage", stat = "RangedDPS", special = "damage"},    -- Wands
+		{pattern = "(%d+) %- (%d+) Frost Damage", stat = "RangedDPS", special = "damage"},   -- Wands
+		{pattern = "(%d+) %- (%d+) Nature Damage", stat = "RangedDPS", special = "damage"},  -- Wands
+		{pattern = "(%d+) %- (%d+) Shadow Damage", stat = "RangedDPS", special = "damage"},  -- Wands
 		
 		-- Resistances
 		{pattern = "%+(%d+) Shadow Resistance", stat = "ShadowResistance"},
