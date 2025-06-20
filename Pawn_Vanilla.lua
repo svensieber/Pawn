@@ -307,14 +307,22 @@ function PawnHookTooltips()
 				this:AddLine(" ", 1, 1, 1)
 				
 				-- Get item equip slot to compare with equipped
-				local equipLoc = nil
-				local itemLink = PawnGetItemLinkFromTooltip(this)
-				if itemLink then
-					local Item = PawnGetItemData(itemLink)
-					if Item and Item.EquipLoc then
-						equipLoc = Item.EquipLoc
-						PawnDebugLog("Item equip location: " .. tostring(equipLoc))
+				local equipLoc = itemInfo.equipLoc
+				if not equipLoc then
+					-- Try to get from item link as fallback
+					local itemLink = PawnGetItemLinkFromTooltip(this)
+					if itemLink then
+						local Item = PawnGetItemData(itemLink)
+						if Item and Item.EquipLoc then
+							equipLoc = Item.EquipLoc
+						end
 					end
+				end
+				
+				if equipLoc then
+					PawnDebugLog("Item equip location: " .. tostring(equipLoc))
+				else
+					PawnDebugLog("No equip location found")
 				end
 				
 				-- Determine which slot(s) to compare with
@@ -390,6 +398,9 @@ function PawnHookTooltips()
 										bestEquippedScore = PawnEquippedScores[slotId][scaleName]
 									end
 								end
+							end
+							if PawnCommon.Debug and bestEquippedScore == 0 then
+								PawnDebugLog("No equipped score found for " .. scaleName .. " in slots: " .. table.concat(compareSlots, ", "))
 							end
 						end
 						
@@ -600,7 +611,8 @@ end
 function PawnExtractTooltipInfo(tooltip)
 	local info = {
 		stats = {},
-		parsedStats = {}  -- New: parsed stats with values
+		parsedStats = {},  -- New: parsed stats with values
+		equipLoc = nil,  -- Equipment location
 	}
 	
 	-- Scan all tooltip lines
@@ -624,6 +636,41 @@ function PawnExtractTooltipInfo(tooltip)
 				-- Temporary: collect all lines
 				table.insert(allLines, {text = text, color = string.format("%.2f,%.2f,%.2f", r, g, b), side = "left"})
 				
+				-- Check for equipment slot indicators
+				if text == "Two-Hand" then
+					info.equipLoc = "INVTYPE_2HWEAPON"
+				elseif text == "Main Hand" then
+					info.equipLoc = "INVTYPE_WEAPONMAINHAND"
+				elseif text == "One-Hand" then
+					info.equipLoc = "INVTYPE_WEAPON"
+				elseif text == "Off Hand" then
+					info.equipLoc = "INVTYPE_WEAPONOFFHAND"
+				elseif text == "Head" then
+					info.equipLoc = "INVTYPE_HEAD"
+				elseif text == "Chest" then
+					info.equipLoc = "INVTYPE_CHEST"
+				elseif text == "Legs" then
+					info.equipLoc = "INVTYPE_LEGS"
+				elseif text == "Feet" then
+					info.equipLoc = "INVTYPE_FEET"
+				elseif text == "Hands" then
+					info.equipLoc = "INVTYPE_HAND"
+				elseif text == "Waist" then
+					info.equipLoc = "INVTYPE_WAIST"
+				elseif text == "Wrist" then
+					info.equipLoc = "INVTYPE_WRIST"
+				elseif text == "Shoulder" then
+					info.equipLoc = "INVTYPE_SHOULDER"
+				elseif text == "Back" then
+					info.equipLoc = "INVTYPE_CLOAK"
+				elseif text == "Neck" then
+					info.equipLoc = "INVTYPE_NECK"
+				elseif text == "Finger" then
+					info.equipLoc = "INVTYPE_FINGER"
+				elseif text == "Trinket" then
+					info.equipLoc = "INVTYPE_TRINKET"
+				end
+				
 				-- Check for item level (e.g. "Item Level 55")
 				local _, _, level = string.find(text, "Item Level (%d+)")
 				if level then
@@ -636,6 +683,21 @@ function PawnExtractTooltipInfo(tooltip)
 					-- Grey text, might be item type
 					if not string.find(text, "Level") and not string.find(text, "Durability") then
 						info.type = text
+						
+						-- Try to determine equipment slot from type
+						if string.find(text, "Two%-Hand") then
+							info.equipLoc = "INVTYPE_2HWEAPON"
+						elseif string.find(text, "One%-Hand") or string.find(text, "Main Hand") then
+							info.equipLoc = "INVTYPE_WEAPONMAINHAND"
+						elseif string.find(text, "Off Hand") and not string.find(text, "Shield") then
+							info.equipLoc = "INVTYPE_WEAPONOFFHAND"
+						elseif string.find(text, "Shield") then
+							info.equipLoc = "INVTYPE_SHIELD"
+						elseif string.find(text, "Bow") or string.find(text, "Gun") or string.find(text, "Crossbow") then
+							info.equipLoc = "INVTYPE_RANGED"
+						elseif string.find(text, "Thrown") then
+							info.equipLoc = "INVTYPE_THROWN"
+						end
 					end
 				end
 				
