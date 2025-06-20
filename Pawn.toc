@@ -18,6 +18,6 @@ ScaleTemplates_Vanilla.lua
 Pawn_Vanilla.lua
 PawnUI_Vanilla.lua
 PawnUI_Vanilla.xml
-ClassicHawsJon_Vanilla.lua
+ClassicHawsJon.lua
 Pawn_Vanilla_Test.lua
 Pawn_Vanilla_ChronoboonFix.lua

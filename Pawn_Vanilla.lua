@@ -1022,6 +1022,23 @@ function PawnParseStats(statLines)
 		{pattern = "Equip: Restores (%d+) mana per 5 sec%.", stat = "Mp5"},
 		{pattern = "%+(%d+) Mana every 5 seconds", stat = "Mp5"},
 		{pattern = "Equip: Restores (%d+) health per 5 sec%.", stat = "Hp5"},
+		{pattern = "%+(%d+) mana per 5 sec", stat = "Mp5"},
+		{pattern = "%+(%d+) health per 5 sec", stat = "Hp5"},
+		{pattern = "%+(%d+) Mana Regen", stat = "Mp5"},
+		
+		-- Additional stats for ClassicHawsJon compatibility
+		{pattern = "%+(%d+) Mana", stat = "Mana"},
+		{pattern = "%+(%d+) Health", stat = "Health"},
+		{pattern = "Equip: %+(%d+) Ranged Attack Power", stat = "RangedAttackPower"},
+		{pattern = "%+(%d+) Ranged Attack Power", stat = "RangedAttackPower"},
+		{pattern = "%+(%d+) Spell Hit", stat = "SpellHitPercent"},
+		{pattern = "%+(%d+)%% Spell Hit", stat = "SpellHitPercent"},
+		{pattern = "%+(%d+) Spell Critical", stat = "SpellCritPercent"}, 
+		{pattern = "%+(%d+)%% Spell Critical", stat = "SpellCritPercent"},
+		{pattern = "%+(%d+) Armor Penetration", stat = "ArmorPenetration"},
+		{pattern = "%+(%d+) Expertise", stat = "Expertise"},
+		{pattern = "%+(%d+) All Resistances", stat = "AllResist"},
+		{pattern = "%+(%d+) to All Resistances", stat = "AllResist"},
 		
 		-- Weapon skill
 		{pattern = "%+(%d+) Axe Skill", stat = "AxeSkill"},
@@ -1329,6 +1346,134 @@ function PawnCalculateItemScore(parsedStats, scaleName)
 	return score
 end
 
+-- Load scales from ClassicHawsJon addon
+function PawnLoadClassicHawsJonScales()
+	-- Check if PawnClassicScaleProvider_AddScales function exists
+	if not PawnClassicScaleProvider_AddScales then
+		PawnDebugLog("ClassicHawsJon scales not available")
+		return
+	end
+	
+	-- Create a simple implementation of PawnAddPluginScaleFromTemplate for Vanilla
+	if not PawnAddPluginScaleFromTemplate then
+		function PawnAddPluginScaleFromTemplate(ProviderInternalName, ClassID, SpecID, Stats, NormalizationFactor)
+			-- Map class IDs to names
+			local classNames = {
+				[1] = "Warrior",
+				[2] = "Paladin", 
+				[3] = "Hunter",
+				[4] = "Rogue",
+				[5] = "Priest",
+				[7] = "Shaman",
+				[8] = "Mage",
+				[9] = "Warlock",
+				[11] = "Druid"
+			}
+			
+			-- Map spec IDs to names
+			local specNames = {
+				-- Druid
+				[11] = {[1] = "Balance", [2] = "FeralDPS", [3] = "FeralTank", [4] = "Resto"},
+				-- Hunter  
+				[3] = {[1] = "BeastMastery", [2] = "Marksmanship", [3] = "Survival"},
+				-- Mage
+				[8] = {[1] = "Arcane", [2] = "Fire", [3] = "Frost"},
+				-- Paladin
+				[2] = {[1] = "Holy", [2] = "Protection", [3] = "Ret"},
+				-- Priest
+				[5] = {[1] = "Discipline", [2] = "Holy", [3] = "Shadow"},
+				-- Rogue
+				[4] = {[1] = "Assassination", [2] = "Combat", [3] = "Subtlety"},
+				-- Shaman
+				[7] = {[1] = "Elemental", [2] = "Enhancement", [3] = "Resto"},
+				-- Warlock
+				[9] = {[1] = "Affliction", [2] = "Demonology", [3] = "Destruction"},
+				-- Warrior
+				[1] = {[1] = "Arms", [2] = "Fury", [3] = "Protection"}
+			}
+			
+			local className = classNames[ClassID]
+			if not className then return end
+			
+			local scaleName = "Classic:" .. className
+			if SpecID and specNames[ClassID] and specNames[ClassID][SpecID] then
+				scaleName = scaleName .. specNames[ClassID][SpecID]
+			end
+			
+			-- Convert rating stats to percentages for Vanilla
+			local convertedStats = {}
+			for stat, value in pairs(Stats) do
+				local convertedStat = stat
+				local convertedValue = value
+				
+				-- Convert ratings to percentages
+				if stat == "HitRating" then
+					convertedStat = "HitPercent"
+				elseif stat == "SpellHitRating" then
+					convertedStat = "SpellHitPercent"
+				elseif stat == "CritRating" then
+					convertedStat = "CritPercent"
+				elseif stat == "SpellCritRating" then
+					convertedStat = "SpellCritPercent"
+				elseif stat == "HasteRating" then
+					convertedStat = "HastePercent"
+				elseif stat == "SpellHasteRating" then
+					convertedStat = "SpellHastePercent"
+				elseif stat == "DefenseRating" then
+					convertedStat = "Defense"
+				elseif stat == "DodgeRating" then
+					convertedStat = "DodgePercent"
+				elseif stat == "ParryRating" then
+					convertedStat = "ParryPercent"
+				elseif stat == "BlockRating" then
+					convertedStat = "BlockPercent"
+				elseif stat == "ExpertiseRating" then
+					convertedStat = "Expertise"
+				elseif stat == "Ap" then
+					convertedStat = "AttackPower"
+				elseif stat == "Rap" then
+					convertedStat = "RangedAttackPower"
+				elseif stat == "FeralAp" then
+					convertedStat = "FeralAttackPower"
+				elseif stat == "Healing" then
+					convertedStat = "SpellHealing"
+				elseif stat == "MeleeDps" then
+					convertedStat = "MeleeDPS"
+				elseif stat == "RangedDps" then
+					convertedStat = "RangedDPS"
+				elseif stat == "Dps" then
+					convertedStat = "DPS"
+				end
+				
+				-- Skip stats that don't exist in Vanilla
+				if stat ~= "ResilienceRating" and stat ~= "MetaSocketEffect" and stat ~= "IsOffHand" then
+					convertedStats[convertedStat] = convertedValue
+				end
+			end
+			
+			-- Store the scale
+			PawnCommon.Scales[scaleName] = convertedStats
+			PawnDebugLog("Added scale: " .. scaleName)
+		end
+	end
+	
+	-- Set up VgerCore.IsClassic flag for ClassicHawsJon
+	local oldIsClassic = VgerCore.IsClassic
+	VgerCore.IsClassic = true
+	
+	-- Call the ClassicHawsJon function to add scales
+	local success, err = pcall(PawnClassicScaleProvider_AddScales)
+	
+	-- Restore original flag
+	VgerCore.IsClassic = oldIsClassic
+	
+	if success then
+		PawnDebugLog("Successfully loaded ClassicHawsJon scales")
+	else
+		PawnDebugLog("Error loading ClassicHawsJon scales: " .. tostring(err))
+	end
+end
+
 -- Initialize Classic scales for Vanilla
 function PawnInitializeClassicScales()
 	PawnDebugLog("Initializing Classic scales...")
@@ -1340,6 +1485,9 @@ function PawnInitializeClassicScales()
 	if not PawnCommon.Scales then
 		PawnCommon.Scales = {}
 	end
+	
+	-- First load scales from ClassicHawsJon if available
+	PawnLoadClassicHawsJonScales()
 	
 	-- Classic scales for different classes/specs
 	-- These are simplified versions optimized for Vanilla
@@ -1395,17 +1543,19 @@ function PawnInitializeClassicScales()
 		DPS = 3,
 	}
 	
-	-- Mage
-	PawnCommon.Scales["Classic:Mage"] = {
-		Intellect = 1,
-		Stamina = 0.1,
-		Spirit = 0.3,
-		SpellPower = 1.2,
-		SpellDamage = 1.2,
-		SpellCritPercent = 10,
-		SpellHitPercent = 16,
-		Mp5 = 2,
-	}
+	-- Mage - Basic scale if ClassicHawsJon not loaded
+	if not PawnCommon.Scales["Classic:MageArcane"] then
+		PawnCommon.Scales["Classic:Mage"] = {
+			Intellect = 1,
+			Stamina = 0.1,
+			Spirit = 0.3,
+			SpellPower = 1.2,
+			SpellDamage = 1.2,
+			SpellCritPercent = 10,
+			SpellHitPercent = 16,
+			Mp5 = 2,
+		}
+	end
 	
 	-- Warlock
 	PawnCommon.Scales["Classic:Warlock"] = {
