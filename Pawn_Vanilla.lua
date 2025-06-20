@@ -239,8 +239,8 @@ function PawnHookTooltips()
 		end
 		if itemInfo.stats and table.getn(itemInfo.stats) > 0 then
 			this:AddLine("Stats found: " .. table.getn(itemInfo.stats), 1, 1, 1)
-			-- Show first few stats
-			for i = 1, math.min(3, table.getn(itemInfo.stats)) do
+			-- Show all stats (or max 10 to avoid tooltip overflow)
+			for i = 1, math.min(10, table.getn(itemInfo.stats)) do
 				this:AddLine("  " .. itemInfo.stats[i], 0.8, 0.8, 0.8)
 			end
 		else
@@ -439,7 +439,10 @@ function PawnExtractTooltipInfo(tooltip)
 				if string.find(text, "Durability") or 
 				   string.find(text, "Requires Level") or
 				   string.find(text, "Classes:") or
-				   string.find(text, "Races:") then
+				   string.find(text, "Races:") or
+				   string.find(text, "Gold") or
+				   string.find(text, "Silver") or
+				   string.find(text, "Copper") then
 					PawnDebugLog("Skipping line: " .. text)
 				else
 					-- Check if it's a stat line
