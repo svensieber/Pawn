@@ -211,12 +211,31 @@ function PawnHookTooltips()
 		if not PawnCommon or not PawnCommon.Debug then return end
 		if this.PawnInfoAdded then return end
 		
+		-- CRITICAL: Prevent recursion - don't process if we're showing our own tooltip
+		if this.PawnProcessing then return end
+		this.PawnProcessing = true
+		
 		-- Get the first line of the tooltip (item name)
 		local itemName = getglobal(this:GetName().."TextLeft1")
-		if not itemName then return end
+		if not itemName then 
+			this.PawnProcessing = nil
+			return 
+		end
 		
 		local name = itemName:GetText()
-		if not name or name == "" then return end
+		if not name or name == "" then 
+			this.PawnProcessing = nil
+			return 
+		end
+		
+		-- Skip non-item tooltips (check for common non-item patterns)
+		if string.find(name, "^Login:") or 
+		   string.find(name, "^This Session:") or
+		   string.find(name, "^Now:") or
+		   this:NumLines() < 3 then
+			this.PawnProcessing = nil
+			return
+		end
 		
 		-- Extract basic info from tooltip
 		local itemInfo = PawnExtractTooltipInfo(this)
@@ -275,11 +294,13 @@ function PawnHookTooltips()
 		
 		this:Show()
 		this.PawnInfoAdded = true
+		this.PawnProcessing = nil
 	end)
 	
 	-- Clear flag when tooltip hides
 	GameTooltip:HookScript("OnHide", function()
 		this.PawnInfoAdded = nil
+		this.PawnProcessing = nil
 	end)
 	
 	-- For item links in chat
