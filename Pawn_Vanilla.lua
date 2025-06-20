@@ -280,11 +280,29 @@ function PawnHookTooltips()
 					this:AddLine("  " .. stat .. ": " .. value, 0.5, 0.8, 1)
 				end
 				
-				-- Calculate score with test scale
-				local testScore = PawnCalculateItemScore(itemInfo.parsedStats, "Test")
-				if testScore and testScore > 0 then
-					this:AddLine(" ", 1, 1, 1)
-					this:AddLine("Test scale score: " .. string.format("%.1f", testScore), 1, 1, 0)
+				-- Calculate scores for all scales
+				this:AddLine(" ", 1, 1, 1)
+				this:AddLine("Pawn scores:", 1, 1, 0)
+				
+				local scoresCalculated = false
+				for scaleName, scale in pairs(PawnCommon.Scales or {}) do
+					local score = PawnCalculateItemScore(itemInfo.parsedStats, scaleName)
+					if score and score > 0 then
+						scoresCalculated = true
+						-- Format: "ScaleName: 123.4"
+						local scoreLine = scaleName .. ": " .. string.format("%.1f", score)
+						
+						-- Check for upgrades (simplified for now - no comparison yet)
+						if string.find(scaleName, "Classic:") then
+							this:AddLine("  " .. scoreLine, 0.5, 1, 0.5)
+						else
+							this:AddLine("  " .. scoreLine, 0.8, 0.8, 0.8)
+						end
+					end
+				end
+				
+				if not scoresCalculated then
+					this:AddLine("  No scores calculated", 0.5, 0.5, 0.5)
 				end
 			end
 		else
@@ -591,12 +609,46 @@ function PawnParseStats(statLines)
 		{pattern = "%+(%d+) Attack Power", stat = "AttackPower"},
 		{pattern = "%+(%d+) Spell Power", stat = "SpellPower"},
 		{pattern = "%+(%d+) Healing", stat = "SpellHealing"},
-		{pattern = "Equip: %+(%d+) Hit Rating%.", stat = "HitRating"},
-		{pattern = "Equip: %+(%d+) Critical Strike Rating%.", stat = "CritRating"},
+		{pattern = "%+(%d+) Spell Damage", stat = "SpellDamage"},
+		{pattern = "%+(%d+) Healing Spells", stat = "SpellHealing"},
+		{pattern = "%+(%d+) Damage and Healing Spells", stat = "SpellPower"},
+		
+		-- Hit and Crit (Vanilla uses % not rating)
+		{pattern = "Equip: Improves your chance to hit by (%d+)%%%.", stat = "HitPercent"},
+		{pattern = "Equip: Improves your chance to get a critical strike by (%d+)%%%.", stat = "CritPercent"},
+		{pattern = "Equip: Improves your chance to hit with spells by (%d+)%%%.", stat = "SpellHitPercent"},
+		{pattern = "Equip: Improves your chance to get a critical strike with spells by (%d+)%%%.", stat = "SpellCritPercent"},
+		{pattern = "%+(%d+)%% Critical Strike", stat = "CritPercent"},
+		{pattern = "%+(%d+)%% Hit", stat = "HitPercent"},
+		
+		-- Defense and Avoidance
 		{pattern = "%+(%d+) Defense", stat = "Defense"},
+		{pattern = "%+(%d+) Defense Rating", stat = "Defense"},
+		{pattern = "%+(%d+) Dodge", stat = "DodgePercent"},
+		{pattern = "%+(%d+) Parry", stat = "ParryPercent"},
+		{pattern = "%+(%d+)%% Dodge", stat = "DodgePercent"},
+		{pattern = "%+(%d+)%% Parry", stat = "ParryPercent"},
+		
+		-- Mana regen
+		{pattern = "Equip: Restores (%d+) mana per 5 sec%.", stat = "Mp5"},
+		{pattern = "%+(%d+) Mana every 5 seconds", stat = "Mp5"},
+		{pattern = "Equip: Restores (%d+) health per 5 sec%.", stat = "Hp5"},
+		
+		-- Weapon skill
+		{pattern = "%+(%d+) Axe Skill", stat = "AxeSkill"},
+		{pattern = "%+(%d+) Sword Skill", stat = "SwordSkill"},
+		{pattern = "%+(%d+) Mace Skill", stat = "MaceSkill"},
+		{pattern = "%+(%d+) Dagger Skill", stat = "DaggerSkill"},
+		{pattern = "%+(%d+) Bow Skill", stat = "BowSkill"},
+		{pattern = "%+(%d+) Gun Skill", stat = "GunSkill"},
+		{pattern = "%+(%d+) Staff Skill", stat = "StaffSkill"},
 		
 		-- Weapon stats
 		{pattern = "Speed ([%d%.]+)", stat = "Speed"},
+		
+		-- Special procs (simplified - just detect presence)
+		{pattern = "Equip: Chance on hit", stat = "HasProc", special = "proc"},
+		{pattern = "Use:", stat = "HasUse", special = "use"},
 	}
 	
 	-- Process each stat line
@@ -641,6 +693,13 @@ function PawnParseStats(statLines)
 							matched = true
 							PawnDebugLog("Parsed damage: " .. min .. "-" .. max)
 						end
+					end
+				elseif pattern.special == "proc" or pattern.special == "use" then
+					-- For procs and use effects, just check if they exist
+					if string.find(statLine, pattern.pattern) then
+						parsedStats[pattern.stat] = 1
+						matched = true
+						PawnDebugLog("Found special: " .. pattern.stat)
 					end
 				else
 					-- Handle regular stats
@@ -765,6 +824,9 @@ function PawnInitializeScaleProviders()
 		PawnDebugLog("Created PawnCommon.Scales")
 	end
 	
+	-- Initialize classic scale providers
+	PawnInitializeClassicScales()
+	
 	-- Add default scale for testing
 	if not PawnCommon.Scales["Test"] then
 		PawnCommon.Scales["Test"] = {
@@ -842,6 +904,237 @@ function PawnCalculateItemScore(parsedStats, scaleName)
 	
 	PawnDebugLog("Total score for " .. scaleName .. ": " .. score)
 	return score
+end
+
+-- Initialize Classic scales for Vanilla
+function PawnInitializeClassicScales()
+	PawnDebugLog("Initializing Classic scales...")
+	
+	-- Classic scales for different classes/specs
+	-- These are simplified versions optimized for Vanilla
+	
+	-- Warrior Tank
+	PawnCommon.Scales["Classic:WarriorTank"] = {
+		Strength = 0.5,
+		Agility = 0.7,
+		Stamina = 1,
+		Armor = 0.1,
+		Defense = 2,
+		DodgePercent = 10,
+		ParryPercent = 10,
+		Block = 1,
+		BlockValue = 0.5,
+	}
+	
+	-- Warrior DPS
+	PawnCommon.Scales["Classic:WarriorDPS"] = {
+		Strength = 2,
+		Agility = 1,
+		Stamina = 0.1,
+		AttackPower = 1,
+		CritPercent = 20,
+		HitPercent = 30,
+		ArmorPenetration = 0.3,
+		DPS = 3,
+	}
+	
+	-- Rogue
+	PawnCommon.Scales["Classic:Rogue"] = {
+		Strength = 1,
+		Agility = 2,
+		Stamina = 0.1,
+		AttackPower = 1,
+		CritPercent = 20,
+		HitPercent = 30,
+		DaggerSkill = 2,
+		SwordSkill = 2,
+		DPS = 3,
+	}
+	
+	-- Hunter
+	PawnCommon.Scales["Classic:Hunter"] = {
+		Agility = 2,
+		Stamina = 0.1,
+		Intellect = 0.5,
+		AttackPower = 1,
+		RangedAttackPower = 1,
+		CritPercent = 20,
+		HitPercent = 30,
+		Mp5 = 2,
+		DPS = 3,
+	}
+	
+	-- Mage
+	PawnCommon.Scales["Classic:Mage"] = {
+		Intellect = 1,
+		Stamina = 0.1,
+		Spirit = 0.3,
+		SpellPower = 1.2,
+		SpellDamage = 1.2,
+		SpellCritPercent = 10,
+		SpellHitPercent = 16,
+		Mp5 = 2,
+	}
+	
+	-- Warlock
+	PawnCommon.Scales["Classic:Warlock"] = {
+		Intellect = 0.7,
+		Stamina = 0.3,
+		Spirit = 0.1,
+		SpellPower = 1.2,
+		SpellDamage = 1.2,
+		ShadowSpellDamage = 1.3,
+		SpellCritPercent = 10,
+		SpellHitPercent = 16,
+		Mp5 = 1,
+	}
+	
+	-- Priest Heal
+	PawnCommon.Scales["Classic:PriestHeal"] = {
+		Intellect = 1,
+		Stamina = 0.1,
+		Spirit = 0.8,
+		SpellHealing = 1.2,
+		SpellPower = 0.6,
+		Mp5 = 3,
+		SpellCritPercent = 8,
+	}
+	
+	-- Priest Shadow
+	PawnCommon.Scales["Classic:PriestShadow"] = {
+		Intellect = 0.8,
+		Stamina = 0.2,
+		Spirit = 0.3,
+		SpellPower = 1.2,
+		SpellDamage = 1.2,
+		ShadowSpellDamage = 1.3,
+		SpellCritPercent = 10,
+		SpellHitPercent = 16,
+		Mp5 = 2,
+	}
+	
+	-- Paladin Holy
+	PawnCommon.Scales["Classic:PaladinHoly"] = {
+		Intellect = 1,
+		Stamina = 0.1,
+		SpellHealing = 1.2,
+		SpellPower = 0.6,
+		SpellCritPercent = 8,
+		Mp5 = 3,
+	}
+	
+	-- Paladin Ret
+	PawnCommon.Scales["Classic:PaladinRet"] = {
+		Strength = 2,
+		Agility = 0.7,
+		Stamina = 0.1,
+		Intellect = 0.3,
+		AttackPower = 1,
+		CritPercent = 15,
+		HitPercent = 20,
+		SpellPower = 0.3,
+		DPS = 3,
+	}
+	
+	-- Paladin Prot
+	PawnCommon.Scales["Classic:PaladinProt"] = {
+		Strength = 0.5,
+		Stamina = 1,
+		Intellect = 0.5,
+		Armor = 0.1,
+		Defense = 2,
+		DodgePercent = 8,
+		ParryPercent = 8,
+		Block = 1,
+		BlockValue = 0.5,
+		SpellPower = 0.3,
+	}
+	
+	-- Druid Balance
+	PawnCommon.Scales["Classic:DruidBalance"] = {
+		Intellect = 1,
+		Stamina = 0.1,
+		Spirit = 0.5,
+		SpellPower = 1.2,
+		SpellDamage = 1.2,
+		NatureSpellDamage = 1.3,
+		ArcaneSpellDamage = 1.1,
+		SpellCritPercent = 10,
+		SpellHitPercent = 16,
+		Mp5 = 2,
+	}
+	
+	-- Druid Feral DPS
+	PawnCommon.Scales["Classic:DruidFeralDPS"] = {
+		Strength = 2,
+		Agility = 1.5,
+		Stamina = 0.1,
+		AttackPower = 1,
+		FeralAttackPower = 1,
+		CritPercent = 20,
+		HitPercent = 25,
+		DPS = 3,
+	}
+	
+	-- Druid Feral Tank
+	PawnCommon.Scales["Classic:DruidFeralTank"] = {
+		Strength = 0.5,
+		Agility = 1,
+		Stamina = 1.2,
+		Armor = 0.2,
+		Defense = 1.5,
+		DodgePercent = 15,
+	}
+	
+	-- Druid Resto
+	PawnCommon.Scales["Classic:DruidResto"] = {
+		Intellect = 1,
+		Stamina = 0.1,
+		Spirit = 0.9,
+		SpellHealing = 1.2,
+		SpellPower = 0.6,
+		Mp5 = 3.5,
+		SpellCritPercent = 8,
+	}
+	
+	-- Shaman Elemental
+	PawnCommon.Scales["Classic:ShamanElemental"] = {
+		Intellect = 1,
+		Stamina = 0.1,
+		SpellPower = 1.2,
+		SpellDamage = 1.2,
+		NatureSpellDamage = 1.3,
+		SpellCritPercent = 10,
+		SpellHitPercent = 16,
+		Mp5 = 2,
+	}
+	
+	-- Shaman Enhancement
+	PawnCommon.Scales["Classic:ShamanEnhancement"] = {
+		Strength = 1.8,
+		Agility = 1.2,
+		Stamina = 0.1,
+		Intellect = 0.3,
+		AttackPower = 1,
+		CritPercent = 18,
+		HitPercent = 25,
+		SpellPower = 0.2,
+		Mp5 = 1,
+		DPS = 3,
+	}
+	
+	-- Shaman Resto
+	PawnCommon.Scales["Classic:ShamanResto"] = {
+		Intellect = 1,
+		Stamina = 0.1,
+		Spirit = 0.5,
+		SpellHealing = 1.2,
+		SpellPower = 0.6,
+		Mp5 = 3.5,
+		SpellCritPercent = 8,
+	}
+	
+	PawnDebugLog("Classic scales initialized")
 end
 
 ------------------------------------------------------------
