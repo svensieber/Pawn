@@ -466,9 +466,9 @@ function PawnHookTooltips()
 						end
 						
 						this:AddLine("  " .. scoreLine, r, g, b)
-						end
-					end
-				end
+					end -- end of "if score and score > 0"
+				end -- end of "if showScale"
+			end -- end of "for scaleName, scale"
 				
 			if not scoresCalculated then
 				this:AddLine("  No scores calculated", 0.5, 0.5, 0.5)
