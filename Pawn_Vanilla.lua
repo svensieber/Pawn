@@ -243,6 +243,8 @@ function PawnHookTooltips()
 			for i = 1, math.min(3, table.getn(itemInfo.stats)) do
 				this:AddLine("  " .. itemInfo.stats[i], 0.8, 0.8, 0.8)
 			end
+		else
+			this:AddLine("No stats found - check chat for details", 1, 0.5, 0.5)
 		end
 		
 		-- Try to get item link for more info
@@ -395,6 +397,9 @@ function PawnExtractTooltipInfo(tooltip)
 	local numLines = tooltip:NumLines()
 	PawnDebugLog("Scanning tooltip with " .. numLines .. " lines")
 	
+	-- Temporary: collect all lines for debugging
+	local allLines = {}
+	
 	for i = 2, numLines do  -- Start at 2 to skip item name
 		local leftText = getglobal(tooltip:GetName().."TextLeft"..i)
 		local rightText = getglobal(tooltip:GetName().."TextRight"..i)
@@ -405,6 +410,9 @@ function PawnExtractTooltipInfo(tooltip)
 				-- Get text color
 				local r, g, b = leftText:GetTextColor()
 				PawnDebugLog("Line " .. i .. " (L): " .. text .. " [Color: " .. string.format("%.2f,%.2f,%.2f", r, g, b) .. "]")
+				
+				-- Temporary: collect all lines
+				table.insert(allLines, {text = text, color = string.format("%.2f,%.2f,%.2f", r, g, b), side = "left"})
 				
 				-- Check for item level (e.g. "Item Level 55")
 				local _, _, level = string.find(text, "Item Level (%d+)")
@@ -421,10 +429,21 @@ function PawnExtractTooltipInfo(tooltip)
 					end
 				end
 				
-				-- Check for stats (green text)
-				if r < 0.2 and g > 0.8 and b < 0.2 then
-					-- Green text, probably a stat
-					table.insert(info.stats, text)
+				-- Check for stats (green text or other stat colors)
+				-- In Vanilla/Turtle WoW, stats can have different colors
+				-- Green: enchants and bonuses
+				-- White: base stats
+				-- Let's collect all potential stats for now
+				if (r < 0.2 and g > 0.8 and b < 0.2) or -- Green
+				   (r > 0.9 and g > 0.9 and b > 0.9) or -- White
+				   (r > 0.9 and g > 0.8 and b < 0.2) then -- Yellow
+					-- Check if it looks like a stat
+					if string.find(text, "%+") or 
+					   string.find(text, "%-") or
+					   string.find(text, "%d") then
+						table.insert(info.stats, text)
+						PawnDebugLog("Found stat: " .. text)
+					end
 				end
 			end
 		end
