@@ -243,6 +243,22 @@ function PawnHookTooltips()
 			for i = 1, table.getn(itemInfo.stats) do
 				this:AddLine("  " .. itemInfo.stats[i], 0.8, 0.8, 0.8)
 			end
+			
+			-- Show parsed stats
+			if itemInfo.parsedStats then
+				this:AddLine(" ", 1, 1, 1)
+				this:AddLine("Parsed stats:", 0.5, 0.8, 1)
+				for stat, value in pairs(itemInfo.parsedStats) do
+					this:AddLine("  " .. stat .. ": " .. value, 0.5, 0.8, 1)
+				end
+				
+				-- Calculate score with test scale
+				local testScore = PawnCalculateItemScore(itemInfo.parsedStats, "Test")
+				if testScore and testScore > 0 then
+					this:AddLine(" ", 1, 1, 1)
+					this:AddLine("Test scale score: " .. string.format("%.1f", testScore), 1, 1, 0)
+				end
+			end
 		else
 			this:AddLine("No stats found - check chat for details", 1, 0.5, 0.5)
 		end
@@ -390,7 +406,8 @@ end
 -- Extract basic info from visible tooltip
 function PawnExtractTooltipInfo(tooltip)
 	local info = {
-		stats = {}
+		stats = {},
+		parsedStats = {}  -- New: parsed stats with values
 	}
 	
 	-- Scan all tooltip lines
@@ -507,7 +524,119 @@ function PawnExtractTooltipInfo(tooltip)
 	end
 	
 	PawnDebugLog("Extraction complete: Found " .. table.getn(info.stats) .. " stats")
+	
+	-- Parse the extracted stats
+	info.parsedStats = PawnParseStats(info.stats)
+	
 	return info
+end
+
+-- Parse stat strings into Pawn stat names and values
+function PawnParseStats(statLines)
+	local parsedStats = {}
+	
+	-- Stat patterns for Vanilla/Turtle WoW
+	local statPatterns = {
+		-- Primary stats
+		{pattern = "%+(%d+) Strength", stat = "Strength"},
+		{pattern = "%+(%d+) Agility", stat = "Agility"},
+		{pattern = "%+(%d+) Stamina", stat = "Stamina"},
+		{pattern = "%+(%d+) Intellect", stat = "Intellect"},
+		{pattern = "%+(%d+) Spirit", stat = "Spirit"},
+		
+		-- Armor and damage
+		{pattern = "(%d+) Armor", stat = "Armor"},
+		{pattern = "(%d+) %- (%d+) Damage", stat = "DPS", special = "damage"},
+		{pattern = "%(([%d%.]+) damage per second%)", stat = "DPS", isDPS = true},
+		{pattern = "(%d+) Block", stat = "Block"},
+		
+		-- Resistances
+		{pattern = "%+(%d+) Shadow Resistance", stat = "ShadowResistance"},
+		{pattern = "%+(%d+) Fire Resistance", stat = "FireResistance"},
+		{pattern = "%+(%d+) Nature Resistance", stat = "NatureResistance"},
+		{pattern = "%+(%d+) Frost Resistance", stat = "FrostResistance"},
+		{pattern = "%+(%d+) Arcane Resistance", stat = "ArcaneResistance"},
+		
+		-- Secondary stats
+		{pattern = "%+(%d+) Attack Power", stat = "AttackPower"},
+		{pattern = "%+(%d+) Spell Power", stat = "SpellPower"},
+		{pattern = "%+(%d+) Healing", stat = "SpellHealing"},
+		{pattern = "Equip: %+(%d+) Hit Rating%.", stat = "HitRating"},
+		{pattern = "Equip: %+(%d+) Critical Strike Rating%.", stat = "CritRating"},
+		{pattern = "%+(%d+) Defense", stat = "Defense"},
+		
+		-- Weapon stats
+		{pattern = "Speed ([%d%.]+)", stat = "Speed"},
+	}
+	
+	-- Process each stat line
+	for _, statLine in pairs(statLines) do
+		local matched = false
+		
+		-- First check if line contains multiple stats (e.g. "+2 Strength +2 Stamina")
+		if string.find(statLine, "%+%d+.+%+%d+") then
+			-- Split and process each part
+			PawnDebugLog("Multi-stat line detected: " .. statLine)
+			-- Process the line multiple times to catch all stats
+			for _, pattern in pairs(statPatterns) do
+				-- Use gsub to find all matches
+				local count = 0
+				string.gsub(statLine, pattern.pattern, function(value)
+					local numValue = tonumber(value)
+					if numValue then
+						if parsedStats[pattern.stat] then
+							parsedStats[pattern.stat] = parsedStats[pattern.stat] + numValue
+						else
+							parsedStats[pattern.stat] = numValue
+						end
+						count = count + 1
+						PawnDebugLog("Parsed stat (multi): " .. pattern.stat .. " = " .. numValue)
+					end
+				end)
+				if count > 0 then matched = true end
+			end
+		end
+		
+		-- If not matched as multi-stat, try single stat patterns
+		if not matched then
+			for _, pattern in pairs(statPatterns) do
+					if pattern.special == "damage" then
+					-- Handle damage range
+					local minDmg, maxDmg = string.find(statLine, pattern.pattern)
+					if minDmg then
+						local _, _, min, max = string.find(statLine, pattern.pattern)
+						if min and max then
+							parsedStats["MinDamage"] = tonumber(min)
+							parsedStats["MaxDamage"] = tonumber(max)
+							matched = true
+							PawnDebugLog("Parsed damage: " .. min .. "-" .. max)
+						end
+					end
+				else
+					-- Handle regular stats
+					local _, _, value = string.find(statLine, pattern.pattern)
+					if value then
+						local numValue = tonumber(value)
+						if numValue then
+							if parsedStats[pattern.stat] then
+								parsedStats[pattern.stat] = parsedStats[pattern.stat] + numValue
+							else
+								parsedStats[pattern.stat] = numValue
+							end
+							matched = true
+							PawnDebugLog("Parsed stat: " .. pattern.stat .. " = " .. numValue)
+						end
+					end
+				end
+			end
+		end
+		
+		if not matched then
+			PawnDebugLog("Unmatched stat line: " .. statLine)
+		end
+	end
+	
+	return parsedStats
 end
 
 function PawnGetItemData(ItemLink)
@@ -613,6 +742,32 @@ end
 function PawnGetScaleValues(ScaleName)
 	if not ScaleName or not PawnCommon.Scales then return end
 	return PawnCommon.Scales[ScaleName]
+end
+
+-- Calculate item score based on parsed stats and scale
+function PawnCalculateItemScore(parsedStats, scaleName)
+	if not parsedStats or not scaleName then return 0 end
+	
+	local scale = PawnGetScaleValues(scaleName)
+	if not scale then 
+		PawnDebugLog("Scale not found: " .. scaleName)
+		return 0 
+	end
+	
+	local score = 0
+	
+	-- Calculate score by multiplying stat values with scale weights
+	for stat, value in pairs(parsedStats) do
+		local weight = scale[stat]
+		if weight and weight > 0 then
+			local contribution = value * weight
+			score = score + contribution
+			PawnDebugLog("Score calc: " .. stat .. " (" .. value .. ") * " .. weight .. " = " .. contribution)
+		end
+	end
+	
+	PawnDebugLog("Total score for " .. scaleName .. ": " .. score)
+	return score
 end
 
 ------------------------------------------------------------
