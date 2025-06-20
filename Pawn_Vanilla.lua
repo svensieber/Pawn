@@ -1587,10 +1587,24 @@ function PawnScanEquippedItems()
 			local firstLine = getglobal(tooltip:GetName().."TextLeft1")
 			if firstLine and firstLine:GetText() then
 				PawnDebugLog("Scanning equipped slot " .. slotId .. ": " .. firstLine:GetText())
+			else
+				PawnDebugLog("Slot " .. slotId .. " tooltip is empty")
 			end
 			
+			-- WICHTIG: Private tooltip braucht keine Debug-Info Zeilen
+			local oldDebug = this.PawnInfoAdded
+			this.PawnInfoAdded = true -- Prevent debug info being added
+			
 			local itemInfo = PawnExtractTooltipInfo(tooltip)
+			
+			this.PawnInfoAdded = oldDebug
+			
 			if itemInfo and itemInfo.parsedStats then
+				PawnDebugLog("Slot " .. slotId .. " has parsed stats:")
+				for stat, value in pairs(itemInfo.parsedStats) do
+					PawnDebugLog("  " .. stat .. " = " .. value)
+				end
+				
 				-- Calculate scores for all scales
 				PawnEquippedScores[slotId] = {}
 				local scoresFound = 0
