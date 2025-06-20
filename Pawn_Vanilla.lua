@@ -623,7 +623,9 @@ function PawnExtractTooltipInfo(tooltip)
 	
 	-- Scan all tooltip lines
 	local numLines = tooltip:NumLines()
-	PawnDebugLog("Scanning tooltip with " .. numLines .. " lines")
+	if PawnCommon.Debug then
+		PawnDebugLog("Scanning tooltip with " .. numLines .. " lines")
+	end
 	
 	-- Temporary: collect all lines for debugging
 	local allLines = {}
@@ -637,7 +639,9 @@ function PawnExtractTooltipInfo(tooltip)
 			if text and text ~= "" then
 				-- Get text color
 				local r, g, b = leftText:GetTextColor()
-				PawnDebugLog("Line " .. i .. " (L): " .. text .. " [Color: " .. string.format("%.2f,%.2f,%.2f", r, g, b) .. "]")
+				if PawnCommon.Debug then
+					PawnDebugLog("Line " .. i .. " (L): " .. text .. " [Color: " .. string.format("%.2f,%.2f,%.2f", r, g, b) .. "]")
+				end
 				
 				-- Temporary: collect all lines
 				table.insert(allLines, {text = text, color = string.format("%.2f,%.2f,%.2f", r, g, b), side = "left"})
@@ -871,7 +875,9 @@ function PawnParseStats(statLines)
 		-- First check if line contains multiple stats (e.g. "+2 Strength +2 Stamina")
 		if string.find(statLine, "%+%d+.+%+%d+") then
 			-- Split and process each part
-			PawnDebugLog("Multi-stat line detected: " .. statLine)
+			if PawnCommon.Debug then
+				PawnDebugLog("Multi-stat line detected: " .. statLine)
+			end
 			-- Process the line multiple times to catch all stats
 			for _, pattern in pairs(statPatterns) do
 				-- Use gsub to find all matches
@@ -885,7 +891,9 @@ function PawnParseStats(statLines)
 							parsedStats[pattern.stat] = numValue
 						end
 						count = count + 1
-						PawnDebugLog("Parsed stat (multi): " .. pattern.stat .. " = " .. numValue)
+						if PawnCommon.Debug then
+							PawnDebugLog("Parsed stat (multi): " .. pattern.stat .. " = " .. numValue)
+						end
 					end
 				end)
 				if count > 0 then matched = true end
@@ -904,7 +912,9 @@ function PawnParseStats(statLines)
 							parsedStats["MinDamage"] = tonumber(min)
 							parsedStats["MaxDamage"] = tonumber(max)
 							matched = true
-							PawnDebugLog("Parsed damage: " .. min .. "-" .. max)
+							if PawnCommon.Debug then
+								PawnDebugLog("Parsed damage: " .. min .. "-" .. max)
+							end
 						end
 					end
 				elseif pattern.special == "proc" or pattern.special == "use" then
@@ -912,7 +922,9 @@ function PawnParseStats(statLines)
 					if string.find(statLine, pattern.pattern) then
 						parsedStats[pattern.stat] = 1
 						matched = true
-						PawnDebugLog("Found special: " .. pattern.stat)
+						if PawnCommon.Debug then
+							PawnDebugLog("Found special: " .. pattern.stat)
+						end
 					end
 				else
 					-- Handle regular stats
@@ -926,7 +938,9 @@ function PawnParseStats(statLines)
 								parsedStats[pattern.stat] = numValue
 							end
 							matched = true
-							PawnDebugLog("Parsed stat: " .. pattern.stat .. " = " .. numValue)
+							if PawnCommon.Debug then
+								PawnDebugLog("Parsed stat: " .. pattern.stat .. " = " .. numValue)
+							end
 						end
 					end
 				end
@@ -934,7 +948,9 @@ function PawnParseStats(statLines)
 		end
 		
 		if not matched then
-			PawnDebugLog("Unmatched stat line: " .. statLine)
+			if PawnCommon.Debug then
+				PawnDebugLog("Unmatched stat line: " .. statLine)
+			end
 		end
 	end
 	
@@ -1146,11 +1162,15 @@ function PawnCalculateItemScore(parsedStats, scaleName)
 		if weight and weight > 0 then
 			local contribution = value * weight
 			score = score + contribution
-			PawnDebugLog("Score calc: " .. stat .. " (" .. value .. ") * " .. weight .. " = " .. contribution)
+			if PawnCommon.Debug then
+				PawnDebugLog("Score calc: " .. stat .. " (" .. value .. ") * " .. weight .. " = " .. contribution)
+			end
 		end
 	end
 	
-	PawnDebugLog("Total score for " .. scaleName .. ": " .. score)
+	if PawnCommon.Debug then
+		PawnDebugLog("Total score for " .. scaleName .. ": " .. score)
+	end
 	return score
 end
 
@@ -1586,9 +1606,13 @@ function PawnScanEquippedItems()
 			-- Force the tooltip to load
 			local firstLine = getglobal(tooltip:GetName().."TextLeft1")
 			if firstLine and firstLine:GetText() then
-				PawnDebugLog("Scanning equipped slot " .. slotId .. ": " .. firstLine:GetText())
+				if PawnCommon.Debug then
+					PawnDebugLog("Scanning equipped slot " .. slotId .. ": " .. firstLine:GetText())
+				end
 			else
-				PawnDebugLog("Slot " .. slotId .. " tooltip is empty")
+				if PawnCommon.Debug then
+					PawnDebugLog("Slot " .. slotId .. " tooltip is empty")
+				end
 			end
 			
 			-- WICHTIG: Private tooltip braucht keine Debug-Info Zeilen
@@ -1600,9 +1624,11 @@ function PawnScanEquippedItems()
 			this.PawnInfoAdded = oldDebug
 			
 			if itemInfo and itemInfo.parsedStats then
-				PawnDebugLog("Slot " .. slotId .. " has parsed stats:")
-				for stat, value in pairs(itemInfo.parsedStats) do
-					PawnDebugLog("  " .. stat .. " = " .. value)
+				if PawnCommon.Debug then
+					PawnDebugLog("Slot " .. slotId .. " has parsed stats:")
+					for stat, value in pairs(itemInfo.parsedStats) do
+						PawnDebugLog("  " .. stat .. " = " .. value)
+					end
 				end
 				
 				-- Calculate scores for all scales
@@ -1615,9 +1641,13 @@ function PawnScanEquippedItems()
 						scoresFound = scoresFound + 1
 					end
 				end
-				PawnDebugLog("Slot " .. slotId .. " scores calculated: " .. scoresFound)
+				if PawnCommon.Debug then
+					PawnDebugLog("Slot " .. slotId .. " scores calculated: " .. scoresFound)
+				end
 			else
-				PawnDebugLog("No stats found for slot " .. slotId)
+				if PawnCommon.Debug then
+					PawnDebugLog("No stats found for slot " .. slotId)
+				end
 			end
 			
 			tooltip:Hide()
