@@ -342,9 +342,36 @@ function PawnHookTooltips()
 			end
 		end -- End of debug block
 		
+		-- Debug output for all items
+		if PawnCommon.Debug then
+			PawnDebugLog("Score calculation check:")
+			PawnDebugLog("  Has parsed stats: " .. tostring(itemInfo.parsedStats ~= nil))
+			if itemInfo.parsedStats then
+				local statCount = 0
+				for _, _ in pairs(itemInfo.parsedStats) do
+					statCount = statCount + 1
+				end
+				PawnDebugLog("  Number of parsed stats: " .. statCount)
+			end
+			PawnDebugLog("  Has equip loc: " .. tostring(itemInfo.equipLoc))
+			PawnDebugLog("  Is consumable: " .. tostring(itemInfo.isConsumable))
+			PawnDebugLog("  Is quest item: " .. tostring(itemInfo.isQuestItem))
+		end
+		
 		-- Calculate and show scores ONLY for equipment items
 		if itemInfo.parsedStats and itemInfo.equipLoc and not itemInfo.isConsumable and not itemInfo.isQuestItem then
 				-- Only show scores for items that can be equipped (not consumables or quest items)
+				
+				-- Debug output for wands
+				if PawnCommon.Debug and itemInfo.type and string.find(itemInfo.type, "Wand") then
+					PawnDebugLog("Processing Wand:")
+					PawnDebugLog("  Type: " .. tostring(itemInfo.type))
+					PawnDebugLog("  EquipLoc: " .. tostring(itemInfo.equipLoc))
+					PawnDebugLog("  Parsed stats:")
+					for stat, value in pairs(itemInfo.parsedStats) do
+						PawnDebugLog("    " .. stat .. " = " .. value)
+					end
+				end
 				
 				-- Calculate scores for all scales
 				this:AddLine(" ", 1, 1, 1)
@@ -1479,6 +1506,17 @@ function PawnLoadClassicHawsJonScales()
 				end
 			end
 			
+			-- Add small RangedDPS value for caster classes so wands get scores
+			if (ClassID == 5 or ClassID == 8 or ClassID == 9 or -- Priest, Mage, Warlock
+			    (ClassID == 11 and SpecID == 1) or -- Druid Balance
+			    (ClassID == 11 and SpecID == 4) or -- Druid Resto
+			    (ClassID == 7 and (SpecID == 1 or SpecID == 3)) or -- Shaman Elemental/Resto
+			    (ClassID == 2 and SpecID == 1)) and -- Paladin Holy
+			   not convertedStats.RangedDPS then
+				convertedStats.RangedDPS = 0.1  -- Small value so wands show up
+				PawnDebugLog("Added RangedDPS for caster spec: " .. scaleName)
+			end
+			
 			-- Store the scale
 			PawnCommon.Scales[scaleName] = convertedStats
 			PawnDebugLog("Added scale: " .. scaleName)
@@ -1582,6 +1620,7 @@ function PawnInitializeClassicScales()
 			SpellCritPercent = 10,
 			SpellHitPercent = 16,
 			Mp5 = 2,
+			RangedDPS = 0.1,  -- For wands
 		}
 	end
 	
@@ -1596,6 +1635,7 @@ function PawnInitializeClassicScales()
 		SpellCritPercent = 10,
 		SpellHitPercent = 16,
 		Mp5 = 1,
+		RangedDPS = 0.1,  -- For wands
 	}
 	
 	-- Priest Heal
@@ -1607,6 +1647,7 @@ function PawnInitializeClassicScales()
 		SpellPower = 0.6,
 		Mp5 = 3,
 		SpellCritPercent = 8,
+		RangedDPS = 0.1,  -- For wands
 	}
 	
 	-- Priest Shadow
@@ -1620,6 +1661,7 @@ function PawnInitializeClassicScales()
 		SpellCritPercent = 10,
 		SpellHitPercent = 16,
 		Mp5 = 2,
+		RangedDPS = 0.1,  -- For wands
 	}
 	
 	-- Paladin Holy
@@ -1630,6 +1672,7 @@ function PawnInitializeClassicScales()
 		SpellPower = 0.6,
 		SpellCritPercent = 8,
 		Mp5 = 3,
+		RangedDPS = 0.1,  -- For wands/librams
 	}
 	
 	-- Paladin Ret
@@ -1673,6 +1716,7 @@ function PawnInitializeClassicScales()
 		SpellCritPercent = 10,
 		SpellHitPercent = 16,
 		Mp5 = 2,
+		RangedDPS = 0.1,  -- For relics
 	}
 	
 	-- Druid Feral DPS
@@ -1706,6 +1750,7 @@ function PawnInitializeClassicScales()
 		SpellPower = 0.6,
 		Mp5 = 3.5,
 		SpellCritPercent = 8,
+		RangedDPS = 0.1,  -- For relics
 	}
 	
 	-- Shaman Elemental
@@ -1718,6 +1763,7 @@ function PawnInitializeClassicScales()
 		SpellCritPercent = 10,
 		SpellHitPercent = 16,
 		Mp5 = 2,
+		RangedDPS = 0.1,  -- For relics
 	}
 	
 	-- Shaman Enhancement
@@ -1743,6 +1789,7 @@ function PawnInitializeClassicScales()
 		SpellPower = 0.6,
 		Mp5 = 3.5,
 		SpellCritPercent = 8,
+		RangedDPS = 0.1,  -- For relics
 	}
 	
 	PawnDebugLog("Classic scales initialized")
