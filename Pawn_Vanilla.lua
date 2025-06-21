@@ -65,6 +65,25 @@ PawnOptionsDefault = {
 -- Main event frame
 local PawnEventFrame = CreateFrame("Frame", "PawnEventFrame")
 
+-- Performance optimization: Class scale mapping
+local ClassScaleMap = {
+	WARRIOR = "Warrior",
+	PALADIN = "Paladin",
+	HUNTER = "Hunter",
+	ROGUE = "Rogue",
+	PRIEST = "Priest",
+	SHAMAN = "Shaman",
+	MAGE = "Mage",
+	WARLOCK = "Warlock",
+	DRUID = "Druid"
+}
+
+-- Performance optimization: Pre-compiled stat patterns
+local StatPatterns = nil  -- Will be initialized once
+
+-- Performance optimization: Display name cache
+local DisplayNameCache = {}
+
 ------------------------------------------------------------
 -- Main event handler
 ------------------------------------------------------------
@@ -279,8 +298,15 @@ function PawnHookTooltips()
 		if this.PawnProcessing then return end
 		this.PawnProcessing = true
 		
+		-- Safe tooltip name access
+		local tooltipName = this.GetName and this:GetName()
+		if not tooltipName then
+			this.PawnProcessing = nil
+			return
+		end
+		
 		-- Get the first line of the tooltip (item name)
-		local itemName = getglobal(this:GetName().."TextLeft1")
+		local itemName = getglobal(tooltipName.."TextLeft1")
 		if not itemName then 
 			this.PawnProcessing = nil
 			return 
@@ -300,6 +326,12 @@ function PawnHookTooltips()
 		   string.find(name, "^Rank %d+") or   -- PvP ranks
 		   string.find(name, "%(Player%)") or  -- Player tooltips
 		   this:NumLines() < 3 then
+			this.PawnProcessing = nil
+			return
+		end
+		
+		-- Early exit for obvious non-equipment
+		if this:NumLines() < 3 then
 			this.PawnProcessing = nil
 			return
 		end
@@ -433,25 +465,10 @@ function PawnHookTooltips()
 					if showOnlyClass == nil then showOnlyClass = true end
 					
 					if showOnlyClass and string.find(scaleName, "Classic:") then
-						-- Check if this scale is for the player's class
+						-- Optimized class checking using lookup table
 						showScale = false
-						if playerClass == "WARRIOR" and string.find(scaleName, "Warrior") then
-							showScale = true
-						elseif playerClass == "PALADIN" and string.find(scaleName, "Paladin") then
-							showScale = true
-						elseif playerClass == "HUNTER" and string.find(scaleName, "Hunter") then
-							showScale = true
-						elseif playerClass == "ROGUE" and string.find(scaleName, "Rogue") then
-							showScale = true
-						elseif playerClass == "PRIEST" and string.find(scaleName, "Priest") then
-							showScale = true
-						elseif playerClass == "SHAMAN" and string.find(scaleName, "Shaman") then
-							showScale = true
-						elseif playerClass == "MAGE" and string.find(scaleName, "Mage") then
-							showScale = true
-						elseif playerClass == "WARLOCK" and string.find(scaleName, "Warlock") then
-							showScale = true
-						elseif playerClass == "DRUID" and string.find(scaleName, "Druid") then
+						local classPattern = ClassScaleMap[playerClass]
+						if classPattern and string.find(scaleName, classPattern) then
 							showScale = true
 						end
 					end
@@ -596,34 +613,40 @@ function PawnHookTooltips()
 							end
 						end
 						
-						-- Format scale name for display
-						local displayName = scaleName
-						-- Remove "Classic:" prefix
-						if string.find(displayName, "Classic:") then
-							displayName = string.sub(displayName, 9) -- Remove "Classic:" (8 chars + 1)
+						-- Format scale name for display (with caching)
+						local displayName = DisplayNameCache[scaleName]
+						if not displayName then
+							displayName = scaleName
+							-- Remove "Classic:" prefix
+							if string.find(displayName, "Classic:") then
+								displayName = string.sub(displayName, 9) -- Remove "Classic:" (8 chars + 1)
+							end
+							-- Add spaces before capital letters (except first)
+							-- PaladinRet -> Paladin Ret
+							displayName = string.gsub(displayName, "(%l)(%u)", "%1 %2")
+							
+							-- Special replacements for common abbreviations
+							displayName = string.gsub(displayName, "DPS", "DPS")
+							displayName = string.gsub(displayName, "Ret$", "Retribution")
+							displayName = string.gsub(displayName, "Prot$", "Protection")
+							displayName = string.gsub(displayName, "Resto$", "Restoration")
+							displayName = string.gsub(displayName, "Ele$", "Elemental")
+							displayName = string.gsub(displayName, "Enh$", "Enhancement")
+							
+							-- Fix spacing issues after replacements
+							displayName = string.gsub(displayName, "Feral DPS", "Feral (DPS)")
+							displayName = string.gsub(displayName, "Feral Tank", "Feral (Tank)")
+							displayName = string.gsub(displayName, "Warrior DPS", "Warrior (DPS)")
+							displayName = string.gsub(displayName, "Warrior Tank", "Warrior (Tank)")
+							displayName = string.gsub(displayName, "Beast Mastery", "Beast Mastery")
+							displayName = string.gsub(displayName, "Marks Man", "Marksmanship") -- Fix MarksMan
+							displayName = string.gsub(displayName, "Frost Mage", "Frost")
+							displayName = string.gsub(displayName, "Fire Mage", "Fire")
+							displayName = string.gsub(displayName, "Arcane Mage", "Arcane")
+							
+							-- Cache the result
+							DisplayNameCache[scaleName] = displayName
 						end
-						-- Add spaces before capital letters (except first)
-						-- PaladinRet -> Paladin Ret
-						displayName = string.gsub(displayName, "(%l)(%u)", "%1 %2")
-						
-						-- Special replacements for common abbreviations
-						displayName = string.gsub(displayName, "DPS", "DPS")
-						displayName = string.gsub(displayName, "Ret$", "Retribution")
-						displayName = string.gsub(displayName, "Prot$", "Protection")
-						displayName = string.gsub(displayName, "Resto$", "Restoration")
-						displayName = string.gsub(displayName, "Ele$", "Elemental")
-						displayName = string.gsub(displayName, "Enh$", "Enhancement")
-						
-						-- Fix spacing issues after replacements
-						displayName = string.gsub(displayName, "Feral DPS", "Feral (DPS)")
-						displayName = string.gsub(displayName, "Feral Tank", "Feral (Tank)")
-						displayName = string.gsub(displayName, "Warrior DPS", "Warrior (DPS)")
-						displayName = string.gsub(displayName, "Warrior Tank", "Warrior (Tank)")
-						displayName = string.gsub(displayName, "Beast Mastery", "Beast Mastery")
-						displayName = string.gsub(displayName, "Marks Man", "Marksmanship") -- Fix MarksMan
-						displayName = string.gsub(displayName, "Frost Mage", "Frost")
-						displayName = string.gsub(displayName, "Fire Mage", "Fire")
-						displayName = string.gsub(displayName, "Arcane Mage", "Arcane")
 						
 						-- Add indicator for dual slot items
 						local slotIndicator = ""
@@ -805,6 +828,19 @@ function PawnExtractTooltipInfo(tooltip)
 		equipLoc = nil,  -- Equipment location
 	}
 	
+	-- Safe tooltip access
+	if not tooltip or not tooltip.NumLines then
+		PawnDebugLog("Invalid tooltip object")
+		return info
+	end
+	
+	-- Safe tooltip name access
+	local tooltipName = tooltip.GetName and tooltip:GetName()
+	if not tooltipName then
+		PawnDebugLog("Tooltip has no name")
+		return info
+	end
+	
 	-- Scan all tooltip lines
 	local numLines = tooltip:NumLines()
 	if PawnCommon.Debug then
@@ -815,8 +851,8 @@ function PawnExtractTooltipInfo(tooltip)
 	local allLines = {}
 	
 	for i = 2, numLines do  -- Start at 2 to skip item name
-		local leftText = getglobal(tooltip:GetName().."TextLeft"..i)
-		local rightText = getglobal(tooltip:GetName().."TextRight"..i)
+		local leftText = getglobal(tooltipName.."TextLeft"..i)
+		local rightText = getglobal(tooltipName.."TextRight"..i)
 		
 		if leftText then
 			local text = leftText:GetText()
@@ -1016,12 +1052,12 @@ function PawnExtractTooltipInfo(tooltip)
 	return info
 end
 
--- Parse stat strings into Pawn stat names and values
-function PawnParseStats(statLines)
-	local parsedStats = {}
+-- Initialize stat patterns (called once)
+function PawnInitializeStatPatterns()
+	if StatPatterns then return end  -- Already initialized
 	
 	-- Stat patterns for Vanilla/Turtle WoW
-	local statPatterns = {
+	StatPatterns = {
 		-- Primary stats
 		{pattern = "%+(%d+) Strength", stat = "Strength"},
 		{pattern = "%+(%d+) Agility", stat = "Agility"},
@@ -1111,6 +1147,16 @@ function PawnParseStats(statLines)
 		{pattern = "Equip: Chance on hit", stat = "HasProc", special = "proc"},
 		{pattern = "Use:", stat = "HasUse", special = "use"},
 	}
+end
+
+-- Parse stat strings into Pawn stat names and values
+function PawnParseStats(statLines)
+	-- Initialize patterns if needed
+	if not StatPatterns then
+		PawnInitializeStatPatterns()
+	end
+	
+	local parsedStats = {}
 	
 	-- Process each stat line
 	for _, statLine in pairs(statLines) do
@@ -1123,7 +1169,7 @@ function PawnParseStats(statLines)
 				PawnDebugLog("Multi-stat line detected: " .. statLine)
 			end
 			-- Process the line multiple times to catch all stats
-			for _, pattern in pairs(statPatterns) do
+			for _, pattern in pairs(StatPatterns) do
 				-- Use gsub to find all matches
 				local count = 0
 				string.gsub(statLine, pattern.pattern, function(value)
@@ -1146,7 +1192,7 @@ function PawnParseStats(statLines)
 		
 		-- If not matched as multi-stat, try single stat patterns
 		if not matched then
-			for _, pattern in pairs(statPatterns) do
+			for _, pattern in pairs(StatPatterns) do
 					if pattern.special == "damage" then
 					-- Handle damage range
 					local minDmg, maxDmg = string.find(statLine, pattern.pattern)
@@ -1359,24 +1405,33 @@ end
 
 -- Calculate item score based on parsed stats and scale
 function PawnCalculateItemScore(parsedStats, scaleName)
-	if not parsedStats or not scaleName then return 0 end
+	-- Validate inputs
+	if not parsedStats or type(parsedStats) ~= "table" then return 0 end
+	if not scaleName or type(scaleName) ~= "string" then return 0 end
 	
-	-- Debug: Check if PawnCommon exists
-	if not PawnCommon then
-		PawnDebugLog("PawnCommon does not exist in PawnCalculateItemScore")
-		return 0
-	end
-	if not PawnCommon.Scales then
-		PawnDebugLog("PawnCommon.Scales does not exist")
+	-- Check if PawnCommon exists
+	if not PawnCommon or not PawnCommon.Scales then
+		if PawnCommon and PawnCommon.Debug then
+			PawnDebugLog("PawnCommon.Scales does not exist in PawnCalculateItemScore")
+		end
 		return 0
 	end
 	
 	local scale = PawnGetScaleValues(scaleName)
 	if not scale then 
-		PawnDebugLog("Scale not found: " .. scaleName)
-		PawnDebugLog("Available scales: ")
-		for name, _ in pairs(PawnCommon.Scales or {}) do
-			PawnDebugLog("  - " .. name)
+		if PawnCommon.Debug then
+			PawnDebugLog("Scale not found: " .. scaleName)
+			PawnDebugLog("Available scales: ")
+			local count = 0
+			for name, _ in pairs(PawnCommon.Scales) do
+				count = count + 1
+				if count <= 10 then  -- Limit output to prevent spam
+					PawnDebugLog("  - " .. name)
+				end
+			end
+			if count > 10 then
+				PawnDebugLog("  ... and " .. (count - 10) .. " more")
+			end
 		end
 		return 0 
 	end
