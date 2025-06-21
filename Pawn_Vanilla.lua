@@ -1305,6 +1305,11 @@ function PawnInitializeStatPatterns()
 		{pattern = "Equip: %+(%d+) Attack Power when fighting Undead%.", stat = "APvsUndead"},
 		{pattern = "Equip: %+(%d+) Attack Power when fighting Demons%.", stat = "APvsDemons"},
 		{pattern = "Equip: %+(%d+) Attack Power when fighting Beasts%.", stat = "APvsBeasts"},
+		{pattern = "Equip: %+(%d+) Attack Power when fighting Dragonkin%.", stat = "APvsDragonkin"},
+		{pattern = "Equip: %+(%d+) Attack Power when fighting Elementals%.", stat = "APvsElementals"},
+		{pattern = "%+(%d+) Attack Power vs Undead", stat = "APvsUndead"},
+		{pattern = "%+(%d+) Attack Power vs Demons", stat = "APvsDemons"},
+		{pattern = "%+(%d+) Attack Power vs Beasts", stat = "APvsBeasts"},
 		
 		-- Fishing
 		{pattern = "Equip: %+(%d+) Fishing%.", stat = "Fishing"},
@@ -1422,11 +1427,39 @@ function PawnParseStats(statLines)
 							if statName == "SpellPower" then
 								statName = "SpellDamage"
 							elseif statName == "UndeadDemonSpellDamage" or statName == "UndeadSpellDamage" or statName == "DemonSpellDamage" then
-								-- Situational damage is worth 35% of regular spell damage
+								-- Situational spell damage is worth 35% of regular spell damage
 								statName = "SpellDamage"
 								statValue = numValue * 0.35
 								if PawnCommon.Debug then
-									PawnDebugLog("Situational damage reduced: " .. numValue .. " -> " .. statValue)
+									PawnDebugLog("Situational spell damage reduced: " .. numValue .. " -> " .. statValue)
+								end
+							elseif statName == "APvsUndead" or statName == "APvsDemons" then
+								-- Situational attack power is worth 35% of regular attack power
+								statName = "AttackPower"
+								statValue = numValue * 0.35
+								if PawnCommon.Debug then
+									PawnDebugLog("Situational AP reduced: " .. numValue .. " -> " .. statValue)
+								end
+							elseif statName == "APvsBeasts" then
+								-- Beast AP is worth more (50%) since beasts are more common
+								statName = "AttackPower"
+								statValue = numValue * 0.5
+								if PawnCommon.Debug then
+									PawnDebugLog("Beast AP reduced: " .. numValue .. " -> " .. statValue)
+								end
+							elseif statName == "APvsDragonkin" then
+								-- Dragonkin AP is worth less (25%) - mainly BWL/Onyxia
+								statName = "AttackPower"
+								statValue = numValue * 0.25
+								if PawnCommon.Debug then
+									PawnDebugLog("Dragonkin AP reduced: " .. numValue .. " -> " .. statValue)
+								end
+							elseif statName == "APvsElementals" then
+								-- Elemental AP is worth moderate (40%) - MC/AQ have many
+								statName = "AttackPower"
+								statValue = numValue * 0.4
+								if PawnCommon.Debug then
+									PawnDebugLog("Elemental AP reduced: " .. numValue .. " -> " .. statValue)
 								end
 							end
 							
