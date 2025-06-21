@@ -1652,6 +1652,11 @@ function PawnCalculateItemScore(parsedStats, scaleName)
 	if PawnCommon.Debug then
 		PawnDebugLog("Total score for " .. scaleName .. ": " .. score)
 	end
+	
+	-- Multiply by 100 for better readability
+	-- This makes scores like 0.1 become 10, 2.5 become 250, etc.
+	score = score * 100
+	
 	return score
 end
 
