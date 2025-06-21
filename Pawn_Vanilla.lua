@@ -650,11 +650,19 @@ function PawnHookTooltips()
 						
 						-- Add indicator for dual slot items
 						local slotIndicator = ""
-						if equipLoc and (equipLoc == "INVTYPE_FINGER" or equipLoc == "INVTYPE_TRINKET") then
-							if table.getn(equippedScores) == 2 and score > bestEquippedScore then
+						if equipLoc and compareSlots and (equipLoc == "INVTYPE_FINGER" or equipLoc == "INVTYPE_TRINKET") then
+							-- Count how many items are actually equipped in the slots
+							local equippedCount = 0
+							for _, slotId in pairs(compareSlots) do
+								if PawnEquippedItems[slotId] then
+									equippedCount = equippedCount + 1
+								end
+							end
+							
+							if equippedCount == 2 and score > bestEquippedScore then
 								slotIndicator = " (replaces weaker)"
-							elseif table.getn(equippedScores) == 1 then
-								slotIndicator = " (2nd slot empty)"
+							elseif equippedCount == 1 then
+								slotIndicator = " (other slot empty)"
 							end
 						end
 						
