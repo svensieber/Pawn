@@ -890,6 +890,9 @@ function PawnExtractTooltipInfo(tooltip)
 					info.equipLoc = "INVTYPE_WEAPON"
 				elseif text == "Off Hand" then
 					info.equipLoc = "INVTYPE_WEAPONOFFHAND"
+				elseif text == "Wand" then
+					info.equipLoc = "INVTYPE_RANGEDRIGHT"
+					info.type = "Wand"  -- Set type explicitly
 				elseif text == "Head" then
 					info.equipLoc = "INVTYPE_HEAD"
 				elseif text == "Chest" then
@@ -1100,6 +1103,16 @@ function PawnInitializeStatPatterns()
 		{pattern = "Equip: Improves your chance to get a critical strike with spells by (%d+)%%%.", stat = "SpellCritPercent"},
 		{pattern = "%+(%d+)%% Critical Strike", stat = "CritPercent"},
 		{pattern = "%+(%d+)%% Hit", stat = "HitPercent"},
+		
+		-- Equip effects for spell damage
+		{pattern = "Equip: Increases damage done by Fire spells and effects by up to (%d+)%.", stat = "FireSpellDamage"},
+		{pattern = "Equip: Increases damage done by Frost spells and effects by up to (%d+)%.", stat = "FrostSpellDamage"},
+		{pattern = "Equip: Increases damage done by Arcane spells and effects by up to (%d+)%.", stat = "ArcaneSpellDamage"},
+		{pattern = "Equip: Increases damage done by Shadow spells and effects by up to (%d+)%.", stat = "ShadowSpellDamage"},
+		{pattern = "Equip: Increases damage done by Nature spells and effects by up to (%d+)%.", stat = "NatureSpellDamage"},
+		{pattern = "Equip: Increases damage done by Holy spells and effects by up to (%d+)%.", stat = "HolySpellDamage"},
+		{pattern = "Equip: Increases damage and healing done by magical spells and effects by up to (%d+)%.", stat = "SpellPower"},
+		{pattern = "Equip: Increases healing done by spells and effects by up to (%d+)%.", stat = "SpellHealing"},
 		
 		-- Defense and Avoidance
 		{pattern = "%+(%d+) Defense", stat = "Defense"},
