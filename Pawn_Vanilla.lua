@@ -392,8 +392,13 @@ function PawnHookTooltips()
 		
 		-- Calculate and show scores ONLY for equipment items
 		-- Trinkets can have Use effects but are still equipment
-		if itemInfo.parsedStats and itemInfo.equipLoc and not itemInfo.isQuestItem and 
+		-- Allow items with equipLoc even if they have no parsed stats (e.g. trinkets with only use effects)
+		if itemInfo.equipLoc and not itemInfo.isQuestItem and 
 		   (not itemInfo.isConsumable or itemInfo.equipLoc == "INVTYPE_TRINKET") then
+				-- Initialize empty parsedStats if needed
+				if not itemInfo.parsedStats then
+					itemInfo.parsedStats = {}
+				end
 				-- Only show scores for items that can be equipped (not consumables or quest items)
 				
 				-- Debug output for wands
@@ -1199,6 +1204,9 @@ function PawnInitializeStatPatterns()
 		{pattern = "Equip: Increases damage done by Nature spells and effects by up to (%d+)%.", stat = "NatureSpellDamage"},
 		{pattern = "Equip: Increases damage done by Holy spells and effects by up to (%d+)%.", stat = "HolySpellDamage"},
 		{pattern = "Equip: Increases damage and healing done by magical spells and effects by up to (%d+)%.", stat = "SpellPower"},
+		{pattern = "Equip: Increases damage done to Undead and Demons by magical spells and effects by up to (%d+)%.", stat = "SpellPower"},
+		{pattern = "Equip: Increases damage done to Undead by magical spells and effects by up to (%d+)%.", stat = "SpellPower"},
+		{pattern = "Equip: Increases damage done to Demons by magical spells and effects by up to (%d+)%.", stat = "SpellPower"},
 		{pattern = "Equip: Increases healing done by spells and effects by up to (%d+)%.", stat = "SpellHealing"},
 		
 		-- Defense and Avoidance
