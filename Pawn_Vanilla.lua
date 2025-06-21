@@ -1152,12 +1152,53 @@ function PawnInitializeStatPatterns()
 		{pattern = "%+(%d+) Bow Skill", stat = "BowSkill"},
 		{pattern = "%+(%d+) Gun Skill", stat = "GunSkill"},
 		{pattern = "%+(%d+) Staff Skill", stat = "StaffSkill"},
+		{pattern = "%+(%d+) Fist Skill", stat = "FistSkill"},
+		{pattern = "%+(%d+) Unarmed Skill", stat = "FistSkill"},
+		
+		-- Equip weapon skill increases
+		{pattern = "Equip: %+(%d+) Weapon Skill%.", stat = "WeaponSkill"},
+		{pattern = "Equip: Increased Axes %+(%d+)%.", stat = "AxeSkill"},
+		{pattern = "Equip: Increased Swords %+(%d+)%.", stat = "SwordSkill"},
+		{pattern = "Equip: Increased Maces %+(%d+)%.", stat = "MaceSkill"},
+		{pattern = "Equip: Increased Daggers %+(%d+)%.", stat = "DaggerSkill"},
+		{pattern = "Equip: Increased Defense %+(%d+)%.", stat = "Defense"},
 		
 		-- Weapon stats
 		{pattern = "Speed ([%d%.]+)", stat = "Speed"},
 		
+		-- Movement speed
+		{pattern = "Equip: Increases run speed by (%d+)%%%.", stat = "RunSpeed"},
+		{pattern = "Equip: Minor Speed Increase", stat = "MinorRunSpeed", isBoolean = true},
+		{pattern = "Equip: Increases mounted speed by (%d+)%%%.", stat = "MountSpeed"},
+		
+		-- Stealth and detection
+		{pattern = "Equip: Increases stealth detection%.", stat = "StealthDetection", isBoolean = true},
+		{pattern = "Equip: Increases effective stealth level by (%d+)%.", stat = "StealthLevel"},
+		{pattern = "Equip: Slightly increases your stealth detection%.", stat = "StealthDetection", isBoolean = true},
+		
+		-- Threat
+		{pattern = "Equip: Reduces threat from all attacks and spells by (%d+)%%%.", stat = "ThreatReduction"},
+		
+		-- Block
+		{pattern = "Equip: Increases your chance to block attacks with a shield by (%d+)%%%.", stat = "BlockPercent"},
+		{pattern = "Equip: Increases the block value of your shield by (%d+)%.", stat = "BlockValue"},
+		
+		-- Spell penetration
+		{pattern = "Equip: Decreases the magical resistances of your spell targets by (%d+)%.", stat = "SpellPenetration"},
+		
+		-- Attack Power vs creature types
+		{pattern = "Equip: %+(%d+) Attack Power when fighting Undead%.", stat = "APvsUndead"},
+		{pattern = "Equip: %+(%d+) Attack Power when fighting Demons%.", stat = "APvsDemons"},
+		{pattern = "Equip: %+(%d+) Attack Power when fighting Beasts%.", stat = "APvsBeasts"},
+		
+		-- Fishing
+		{pattern = "Equip: %+(%d+) Fishing%.", stat = "Fishing"},
+		{pattern = "Equip: Increased Fishing %+(%d+)%.", stat = "Fishing"},
+		
 		-- Special procs (simplified - just detect presence)
 		{pattern = "Equip: Chance on hit", stat = "HasProc", special = "proc"},
+		{pattern = "Equip: Your attacks have a chance", stat = "HasProc", special = "proc"},
+		{pattern = "Equip: When struck in combat", stat = "HasProc", special = "proc"},
 		{pattern = "Use:", stat = "HasUse", special = "use"},
 	}
 end
@@ -1220,8 +1261,8 @@ function PawnParseStats(statLines)
 							end
 						end
 					end
-				elseif pattern.special == "proc" or pattern.special == "use" then
-					-- For procs and use effects, just check if they exist
+				elseif pattern.special == "proc" or pattern.special == "use" or pattern.isBoolean then
+					-- For procs, use effects, and boolean stats, just check if they exist
 					if string.find(statLine, pattern.pattern) then
 						parsedStats[pattern.stat] = 1
 						matched = true
