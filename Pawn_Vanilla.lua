@@ -925,6 +925,16 @@ function PawnExtractTooltipInfo(tooltip)
 					info.equipLoc = "INVTYPE_FINGER"
 				elseif text == "Trinket" then
 					info.equipLoc = "INVTYPE_TRINKET"
+				elseif text == "Ranged" then
+					info.equipLoc = "INVTYPE_RANGED"
+				elseif text == "Thrown" then
+					info.equipLoc = "INVTYPE_THROWN"
+				elseif text == "Gun" then
+					info.equipLoc = "INVTYPE_RANGEDRIGHT"
+				elseif text == "Bow" then
+					info.equipLoc = "INVTYPE_RANGED"
+				elseif text == "Crossbow" then
+					info.equipLoc = "INVTYPE_RANGED"
 				end
 				
 				-- Check for item level (e.g. "Item Level 55")
@@ -1025,6 +1035,27 @@ function PawnExtractTooltipInfo(tooltip)
 			if text and text ~= "" then
 				local r, g, b = rightText:GetTextColor()
 				PawnDebugLog("Line " .. i .. " (R): " .. text .. " [Color: " .. string.format("%.2f,%.2f,%.2f", r, g, b) .. "]")
+				
+				-- Check for weapon type on right side (e.g. "Bow", "Gun", etc.)
+				if not info.equipLoc then
+					if text == "Bow" then
+						info.equipLoc = "INVTYPE_RANGED"
+						PawnDebugLog("Found weapon type on right: Bow")
+					elseif text == "Gun" then
+						info.equipLoc = "INVTYPE_RANGEDRIGHT"
+						PawnDebugLog("Found weapon type on right: Gun")
+					elseif text == "Crossbow" then
+						info.equipLoc = "INVTYPE_RANGED"
+						PawnDebugLog("Found weapon type on right: Crossbow")
+					elseif text == "Thrown" then
+						info.equipLoc = "INVTYPE_THROWN"
+						PawnDebugLog("Found weapon type on right: Thrown")
+					elseif text == "Wand" then
+						info.equipLoc = "INVTYPE_RANGEDRIGHT"
+						info.type = "Wand"
+						PawnDebugLog("Found weapon type on right: Wand")
+					end
+				end
 				
 				-- Right side often has weapon speed and other values
 				-- But Speed shouldn't appear for armor/shields
