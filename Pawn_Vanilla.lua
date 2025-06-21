@@ -391,7 +391,9 @@ function PawnHookTooltips()
 		end
 		
 		-- Calculate and show scores ONLY for equipment items
-		if itemInfo.parsedStats and itemInfo.equipLoc and not itemInfo.isConsumable and not itemInfo.isQuestItem then
+		-- Trinkets can have Use effects but are still equipment
+		if itemInfo.parsedStats and itemInfo.equipLoc and not itemInfo.isQuestItem and 
+		   (not itemInfo.isConsumable or itemInfo.equipLoc == "INVTYPE_TRINKET") then
 				-- Only show scores for items that can be equipped (not consumables or quest items)
 				
 				-- Debug output for wands
@@ -875,9 +877,9 @@ function PawnExtractTooltipInfo(tooltip)
 				table.insert(allLines, {text = text, color = string.format("%.2f,%.2f,%.2f", r, g, b), side = "left"})
 				
 				-- Check for consumables and non-equipment items
-				if string.find(text, "^Use:") then
-					-- This is a consumable/usable item, not equipment
-					info.isConsumable = true
+				if string.find(text, "^Use:") and text ~= "Trinket" then
+					-- This might be a consumable, but check later if it's a trinket
+					info.hasUseEffect = true
 				elseif string.find(text, "^Conjured") then
 					-- Mage water/food
 					info.isConsumable = true
@@ -1016,6 +1018,14 @@ function PawnExtractTooltipInfo(tooltip)
 					-- Yellow text (rare stats)
 					elseif r > 0.9 and g > 0.8 and b < 0.2 then
 						isStat = true
+					-- Light blue text (set bonuses) - approximately rgb(0, 0.7, 1)
+					elseif r < 0.2 and g > 0.6 and g < 0.8 and b > 0.8 then
+						isStat = true
+						PawnDebugLog("Found set bonus (light blue): " .. text)
+					-- Any "Set:" or "Equip:" or "Use:" text
+					elseif string.find(text, "^%(") or string.find(text, "^Set:") or string.find(text, "^Equip:") or string.find(text, "^Use:") then
+						isStat = true
+						PawnDebugLog("Found special effect: " .. text)
 					end
 					
 					-- Also check for weapon type line (e.g. "Two-Hand Axe")
@@ -1207,6 +1217,18 @@ function PawnInitializeStatPatterns()
 		{pattern = "%+(%d+) Ranged Attack Power", stat = "RangedAttackPower"},
 		{pattern = "%+(%d+) Spell Hit", stat = "SpellHitPercent"},
 		{pattern = "%+(%d+)%% Spell Hit", stat = "SpellHitPercent"},
+		
+		-- Set bonuses
+		{pattern = "%(2%) Set: %+(%d+) Attack Power", stat = "AttackPower"},
+		{pattern = "%(3%) Set: %+(%d+) Attack Power", stat = "AttackPower"},
+		{pattern = "%(4%) Set: %+(%d+) Attack Power", stat = "AttackPower"},
+		{pattern = "%(2%) Set: %+(%d+) Spell Damage", stat = "SpellDamage"},
+		{pattern = "%(3%) Set: %+(%d+) Spell Damage", stat = "SpellDamage"},
+		{pattern = "%(4%) Set: %+(%d+) Spell Damage", stat = "SpellDamage"},
+		{pattern = "Set: Increases damage and healing done by magical spells and effects by up to (%d+)", stat = "SpellDamage"},
+		{pattern = "Set: %+(%d+) Stamina", stat = "Stamina"},
+		{pattern = "Set: %+(%d+) Intellect", stat = "Intellect"},
+		{pattern = "Set: Improves your chance to get a critical strike with spells by (%d+)%%", stat = "SpellCritPercent"},
 		{pattern = "%+(%d+) Spell Critical", stat = "SpellCritPercent"}, 
 		{pattern = "%+(%d+)%% Spell Critical", stat = "SpellCritPercent"},
 		{pattern = "%+(%d+) Armor Penetration", stat = "ArmorPenetration"},
