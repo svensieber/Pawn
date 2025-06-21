@@ -674,7 +674,7 @@ function PawnHookTooltips()
 						end
 						
 						-- Format: "Paladin Retribution: 123.4 +15.2%"
-						local scoreLine = displayName .. ": " .. string.format("%.1f", score) .. upgradeText .. slotIndicator
+						local scoreLine = displayName .. ": " .. string.format("%.0f", score) .. upgradeText .. slotIndicator
 						
 						-- Debug: Show equipped score if exists
 						if PawnCommon.Debug and bestEquippedScore > 0 then
@@ -2165,7 +2165,7 @@ function PawnShowEquippedScores()
 			for scaleName, score in pairs(scores) do
 				scaleCount = scaleCount + 1
 				if scaleCount <= 3 then -- Show first 3 scales
-					VgerCore.Message("  " .. scaleName .. ": " .. string.format("%.1f", score))
+					VgerCore.Message("  " .. scaleName .. ": " .. string.format("%.0f", score))
 				end
 			end
 			if scaleCount > 3 then
