@@ -1644,10 +1644,12 @@ function PawnLoadClassicHawsJonScales()
 			    (ClassID == 11 and SpecID == 1) or -- Druid Balance
 			    (ClassID == 11 and SpecID == 4) or -- Druid Resto
 			    (ClassID == 7 and (SpecID == 1 or SpecID == 3)) or -- Shaman Elemental/Resto
-			    (ClassID == 2 and SpecID == 1)) and -- Paladin Holy
-			   not convertedStats.RangedDPS then
-				convertedStats.RangedDPS = 0.1  -- Small value so wands show up
-				PawnDebugLog("Added RangedDPS for caster spec: " .. scaleName)
+			    (ClassID == 2 and SpecID == 1)) then -- Paladin Holy
+				-- Override RangedDPS even if it's set to 0
+				if not convertedStats.RangedDPS or convertedStats.RangedDPS == 0 then
+					convertedStats.RangedDPS = 0.1  -- Small value so wands show up
+					PawnDebugLog("Added/Fixed RangedDPS for caster spec: " .. scaleName)
+				end
 			end
 			
 			-- Store the scale
