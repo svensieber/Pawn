@@ -1903,7 +1903,7 @@ function PawnScanEquippedItems()
 				local scoresFound = 0
 				for scaleName, _ in pairs(PawnCommon.Scales or {}) do
 					local score = PawnCalculateItemScore(itemInfo.parsedStats, scaleName)
-					if score and score > 0 then
+					if score and score >= 0 then
 						PawnEquippedScores[slotId][scaleName] = score
 						scoresFound = scoresFound + 1
 						if PawnCommon.Debug then
