@@ -1058,6 +1058,16 @@ function PawnExtractTooltipInfo(tooltip)
 			info.parsedStats.RangedMaxDamage = info.parsedStats.MaxDamage
 			info.parsedStats.MaxDamage = nil
 		end
+		
+		-- Calculate RangedDPS if not present but we have damage and speed
+		if not info.parsedStats.RangedDPS and info.parsedStats.RangedMinDamage and 
+		   info.parsedStats.RangedMaxDamage and info.parsedStats.Speed then
+			local avgDamage = (info.parsedStats.RangedMinDamage + info.parsedStats.RangedMaxDamage) / 2
+			info.parsedStats.RangedDPS = avgDamage / info.parsedStats.Speed
+			PawnDebugLog("Calculated RangedDPS: " .. string.format("%.2f", info.parsedStats.RangedDPS) .. 
+			             " from damage " .. info.parsedStats.RangedMinDamage .. "-" .. info.parsedStats.RangedMaxDamage .. 
+			             " and speed " .. info.parsedStats.Speed)
+		end
 	end
 	
 	return info
@@ -1261,11 +1271,17 @@ function PawnParseStats(statLines)
 					if minDmg then
 						local _, _, min, max = string.find(statLine, pattern.pattern)
 						if min and max then
-							parsedStats["MinDamage"] = tonumber(min)
-							parsedStats["MaxDamage"] = tonumber(max)
+							-- Check if this is for ranged weapons (wands)
+							if pattern.stat == "RangedDPS" then
+								parsedStats["MinDamage"] = tonumber(min)
+								parsedStats["MaxDamage"] = tonumber(max)
+							else
+								parsedStats["MinDamage"] = tonumber(min)
+								parsedStats["MaxDamage"] = tonumber(max)
+							end
 							matched = true
 							if PawnCommon.Debug then
-								PawnDebugLog("Parsed damage: " .. min .. "-" .. max)
+								PawnDebugLog("Parsed damage: " .. min .. "-" .. max .. " (stat: " .. pattern.stat .. ")")
 							end
 						end
 					end
