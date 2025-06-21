@@ -1151,6 +1151,9 @@ function PawnInitializeStatPatterns()
 		{pattern = "%+(%d+) Stamina", stat = "Stamina"},
 		{pattern = "%+(%d+) Intellect", stat = "Intellect"},
 		{pattern = "%+(%d+) Spirit", stat = "Spirit"},
+		{pattern = "All Stats %+(%d+)", stat = "AllStats", special = "allstats"},
+		{pattern = "%+(%d+) All Stats", stat = "AllStats", special = "allstats"},
+		{pattern = "%+(%d+) to All Stats", stat = "AllStats", special = "allstats"},
 		
 		-- Armor and damage
 		{pattern = "(%d+) Armor", stat = "Armor"},
@@ -1371,6 +1374,24 @@ function PawnParseStats(statLines)
 							end
 						end
 					end
+				elseif pattern.special == "allstats" then
+					-- Handle "All Stats +X"
+					local _, _, value = string.find(statLine, pattern.pattern)
+					if value then
+						local numValue = tonumber(value)
+						if numValue then
+							-- Add to all primary stats
+							parsedStats["Strength"] = (parsedStats["Strength"] or 0) + numValue
+							parsedStats["Agility"] = (parsedStats["Agility"] or 0) + numValue
+							parsedStats["Stamina"] = (parsedStats["Stamina"] or 0) + numValue
+							parsedStats["Intellect"] = (parsedStats["Intellect"] or 0) + numValue
+							parsedStats["Spirit"] = (parsedStats["Spirit"] or 0) + numValue
+							matched = true
+							if PawnCommon.Debug then
+								PawnDebugLog("Parsed All Stats: +" .. numValue .. " to all primary stats")
+							end
+						end
+					end
 				elseif pattern.special == "proc" or pattern.special == "use" or pattern.isBoolean then
 					-- For procs, use effects, and boolean stats, just check if they exist
 					if string.find(statLine, pattern.pattern) then
@@ -1386,10 +1407,16 @@ function PawnParseStats(statLines)
 					if value then
 						local numValue = tonumber(value)
 						if numValue then
-							if parsedStats[pattern.stat] then
-								parsedStats[pattern.stat] = parsedStats[pattern.stat] + numValue
+							-- Convert SpellPower to SpellDamage immediately
+							local statName = pattern.stat
+							if statName == "SpellPower" then
+								statName = "SpellDamage"
+							end
+							
+							if parsedStats[statName] then
+								parsedStats[statName] = parsedStats[statName] + numValue
 							else
-								parsedStats[pattern.stat] = numValue
+								parsedStats[statName] = numValue
 							end
 							matched = true
 							if PawnCommon.Debug then
