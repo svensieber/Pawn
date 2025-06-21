@@ -1328,6 +1328,65 @@ function PawnInitializeStatPatterns()
 		{pattern = "Equip: Your attacks have a chance", stat = "HasProc", special = "proc"},
 		{pattern = "Equip: When struck in combat", stat = "HasProc", special = "proc"},
 		{pattern = "Use:", stat = "HasUse", special = "use"},
+		
+		-- Weapon enchantments
+		{pattern = "%+(%d+) Weapon Damage", stat = "WeaponDamage"},
+		{pattern = "%+(%d+) Weapon Damage vs Demons", stat = "WeaponDamageVsDemons"},
+		{pattern = "%+(%d+) Weapon Damage vs Undead", stat = "WeaponDamageVsUndead"},
+		{pattern = "Counterweight %(%+(%d+)%% Haste%)", stat = "HastePercent"},
+		{pattern = "Counterweight %(%+(%d+)%% Attack Speed%)", stat = "MeleeHastePercent"},
+		
+		-- Classic weapon enchant procs
+		{pattern = "Permanently enchant a melee weapon to often strike for (%d+) additional Fire damage", stat = "FieryWeaponProc"},
+		{pattern = "often strike for (%d+) additional Fire damage", stat = "FieryWeaponProc"},
+		{pattern = "Permanently enchant a melee weapon to often chill the target, dealing (%d+)%-(%d+) Frost damage", stat = "IcyChillProc", special = "range"},
+		{pattern = "often chill the target", stat = "IcyChill", isBoolean = true},
+		{pattern = "often inflict a curse", stat = "UnholyWeapon", isBoolean = true},
+		{pattern = "Crusader", stat = "CrusaderProc", isBoolean = true},
+		{pattern = "Lifestealing", stat = "LifestealingProc", isBoolean = true},
+		{pattern = "Fiery Weapon", stat = "FieryWeapon", isBoolean = true},
+		{pattern = "Icy Chill", stat = "IcyChill", isBoolean = true},
+		{pattern = "Unholy Weapon", stat = "UnholyWeapon", isBoolean = true},
+		
+		-- Enchantment-specific patterns (from enchantment lines)
+		{pattern = "Minor Speed Increase", stat = "MinorRunSpeed", isBoolean = true},
+		{pattern = "Spell Damage %+(%d+)", stat = "SpellDamage"},
+		{pattern = "Healing %+(%d+)", stat = "SpellHealing"},
+		{pattern = "Health %+(%d+)", stat = "Health"},
+		{pattern = "Mana %+(%d+)", stat = "Mana"},
+		{pattern = "Armor %+(%d+)", stat = "Armor"},
+		{pattern = "Spirit %+(%d+)", stat = "Spirit"},
+		{pattern = "Stamina %+(%d+)", stat = "Stamina"},
+		{pattern = "Strength %+(%d+)", stat = "Strength"},
+		{pattern = "Agility %+(%d+)", stat = "Agility"},
+		{pattern = "Intellect %+(%d+)", stat = "Intellect"},
+		{pattern = "All Stats %+(%d+)", stat = "AllStats", special = "allstats"},
+		{pattern = "Attack Power %+(%d+)", stat = "AttackPower"},
+		{pattern = "Fire Resistance %+(%d+)", stat = "FireResistance"},
+		{pattern = "Shadow Resistance %+(%d+)", stat = "ShadowResistance"},
+		{pattern = "Frost Resistance %+(%d+)", stat = "FrostResistance"},
+		{pattern = "Nature Resistance %+(%d+)", stat = "NatureResistance"},
+		{pattern = "Arcane Resistance %+(%d+)", stat = "ArcaneResistance"},
+		{pattern = "Defense %+(%d+)", stat = "Defense"},
+		{pattern = "Dodge %+(%d+)%%", stat = "DodgePercent"},
+		{pattern = "Block %+(%d+)%%", stat = "BlockPercent"},
+		{pattern = "Parry %+(%d+)%%", stat = "ParryPercent"},
+		{pattern = "Fishing %+(%d+)", stat = "Fishing"},
+		{pattern = "Herbalism %+(%d+)", stat = "Herbalism"},
+		{pattern = "Mining %+(%d+)", stat = "Mining"},
+		{pattern = "Skinning %+(%d+)", stat = "Skinning"},
+		
+		-- Special enchantment effects
+		{pattern = "Run speed increased slightly", stat = "MinorRunSpeed", isBoolean = true},
+		{pattern = "Movement Speed increased slightly", stat = "MinorRunSpeed", isBoolean = true},
+		{pattern = "Reinforced %(%+(%d+) Armor%)", stat = "Armor"},
+		{pattern = "Scope %(%+(%d+) Damage%)", stat = "ScopeDamage"},
+		{pattern = "Scope %(%+(%d+)%% Hit%)", stat = "HitPercent"},
+		{pattern = "Scope %(%+(%d+) Critical Strike%)", stat = "CritPercent"},
+		
+		-- Turtle WoW specific enchantments
+		{pattern = "Mana Regeneration %+(%d+) per 5 seconds", stat = "Mp5"},
+		{pattern = "Health Regeneration %+(%d+) per 5 seconds", stat = "Hp5"},
 	}
 end
 
@@ -1410,6 +1469,22 @@ function PawnParseStats(statLines)
 							matched = true
 							if PawnCommon.Debug then
 								PawnDebugLog("Parsed All Stats: +" .. numValue .. " to all primary stats")
+							end
+						end
+					end
+				elseif pattern.special == "range" then
+					-- Handle range values like "7-9 Frost damage"
+					local _, _, min, max = string.find(statLine, pattern.pattern)
+					if min and max then
+						local minValue = tonumber(min)
+						local maxValue = tonumber(max)
+						if minValue and maxValue then
+							-- Use average for range values
+							local avgValue = (minValue + maxValue) / 2
+							parsedStats[pattern.stat] = avgValue
+							matched = true
+							if PawnCommon.Debug then
+								PawnDebugLog("Parsed range " .. pattern.stat .. ": " .. min .. "-" .. max .. " (avg: " .. avgValue .. ")")
 							end
 						end
 					end
