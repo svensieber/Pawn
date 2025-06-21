@@ -927,6 +927,10 @@ function PawnExtractTooltipInfo(tooltip)
 					info.equipLoc = "INVTYPE_FINGER"
 				elseif text == "Trinket" then
 					info.equipLoc = "INVTYPE_TRINKET"
+				elseif text == "Held In Off-hand" then
+					info.equipLoc = "INVTYPE_HOLDABLE"
+				elseif text == "Off Hand" and not info.equipLoc then
+					info.equipLoc = "INVTYPE_HOLDABLE"
 				elseif text == "Ranged" then
 					info.equipLoc = "INVTYPE_RANGED"
 				elseif text == "Thrown" then
@@ -1209,6 +1213,14 @@ function PawnInitializeStatPatterns()
 		{pattern = "%+(%d+) mana per 5 sec", stat = "Mp5"},
 		{pattern = "%+(%d+) health per 5 sec", stat = "Hp5"},
 		{pattern = "%+(%d+) Mana Regen", stat = "Mp5"},
+		
+		-- Haste
+		{pattern = "Equip: Increases your attack and casting speed by (%d+)%%", stat = "HastePercent"},
+		{pattern = "Equip: Increases attack speed by (%d+)%%", stat = "MeleeHastePercent"},
+		{pattern = "Equip: Increases casting speed by (%d+)%%", stat = "SpellHastePercent"},
+		{pattern = "%+(%d+)%% Haste", stat = "HastePercent"},
+		{pattern = "%+(%d+)%% Attack Speed", stat = "MeleeHastePercent"},
+		{pattern = "%+(%d+)%% Casting Speed", stat = "SpellHastePercent"},
 		
 		-- Additional stats for ClassicHawsJon compatibility
 		{pattern = "%+(%d+) Mana", stat = "Mana"},
@@ -1680,6 +1692,9 @@ function PawnLoadClassicHawsJonScales()
 				elseif stat == "HasteRating" then
 					convertedStat = "HastePercent"
 				elseif stat == "SpellHasteRating" then
+					convertedStat = "SpellHastePercent"
+				elseif stat == "HastePercent" then
+					-- Already in percent form, but check if scale expects SpellHastePercent
 					convertedStat = "SpellHastePercent"
 				elseif stat == "DefenseRating" then
 					convertedStat = "Defense"
