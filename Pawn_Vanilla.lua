@@ -1204,9 +1204,9 @@ function PawnInitializeStatPatterns()
 		{pattern = "Equip: Increases damage done by Nature spells and effects by up to (%d+)%.", stat = "NatureSpellDamage"},
 		{pattern = "Equip: Increases damage done by Holy spells and effects by up to (%d+)%.", stat = "HolySpellDamage"},
 		{pattern = "Equip: Increases damage and healing done by magical spells and effects by up to (%d+)%.", stat = "SpellPower"},
-		{pattern = "Equip: Increases damage done to Undead and Demons by magical spells and effects by up to (%d+)%.", stat = "SpellPower"},
-		{pattern = "Equip: Increases damage done to Undead by magical spells and effects by up to (%d+)%.", stat = "SpellPower"},
-		{pattern = "Equip: Increases damage done to Demons by magical spells and effects by up to (%d+)%.", stat = "SpellPower"},
+		{pattern = "Equip: Increases damage done to Undead and Demons by magical spells and effects by up to (%d+)%.", stat = "UndeadDemonSpellDamage"},
+		{pattern = "Equip: Increases damage done to Undead by magical spells and effects by up to (%d+)%.", stat = "UndeadSpellDamage"},
+		{pattern = "Equip: Increases damage done to Demons by magical spells and effects by up to (%d+)%.", stat = "DemonSpellDamage"},
 		{pattern = "Equip: Increases healing done by spells and effects by up to (%d+)%.", stat = "SpellHealing"},
 		
 		-- Defense and Avoidance
@@ -1417,14 +1417,23 @@ function PawnParseStats(statLines)
 						if numValue then
 							-- Convert SpellPower to SpellDamage immediately
 							local statName = pattern.stat
+							local statValue = numValue
+							
 							if statName == "SpellPower" then
 								statName = "SpellDamage"
+							elseif statName == "UndeadDemonSpellDamage" or statName == "UndeadSpellDamage" or statName == "DemonSpellDamage" then
+								-- Situational damage is worth 35% of regular spell damage
+								statName = "SpellDamage"
+								statValue = numValue * 0.35
+								if PawnCommon.Debug then
+									PawnDebugLog("Situational damage reduced: " .. numValue .. " -> " .. statValue)
+								end
 							end
 							
 							if parsedStats[statName] then
-								parsedStats[statName] = parsedStats[statName] + numValue
+								parsedStats[statName] = parsedStats[statName] + statValue
 							else
-								parsedStats[statName] = numValue
+								parsedStats[statName] = statValue
 							end
 							matched = true
 							if PawnCommon.Debug then
