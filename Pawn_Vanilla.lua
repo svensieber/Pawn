@@ -1720,6 +1720,8 @@ function PawnLoadClassicHawsJonScales()
 					convertedStat = "RangedDPS"
 				elseif stat == "Dps" then
 					convertedStat = "DPS"
+				elseif stat == "SpellPower" then
+					convertedStat = "SpellDamage"
 				end
 				
 				-- Skip stats that don't exist in Vanilla
