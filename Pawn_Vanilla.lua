@@ -1041,32 +1041,53 @@ function PawnExtractTooltipInfo(tooltip)
 	-- Parse the extracted stats
 	info.parsedStats = PawnParseStats(info.stats)
 	
-	-- Post-process: Convert DPS to RangedDPS for ranged weapons
-	if info.parsedStats and info.equipLoc and 
-	   (info.equipLoc == "INVTYPE_RANGED" or info.equipLoc == "INVTYPE_RANGEDRIGHT" or info.equipLoc == "INVTYPE_THROWN") then
-		if info.parsedStats.DPS and not info.parsedStats.RangedDPS then
-			info.parsedStats.RangedDPS = info.parsedStats.DPS
-			info.parsedStats.DPS = nil
-			PawnDebugLog("Converted DPS to RangedDPS for ranged weapon")
-		end
-		-- Also convert regular damage to ranged damage
-		if info.parsedStats.MinDamage and not info.parsedStats.RangedMinDamage then
-			info.parsedStats.RangedMinDamage = info.parsedStats.MinDamage
-			info.parsedStats.MinDamage = nil
-		end
-		if info.parsedStats.MaxDamage and not info.parsedStats.RangedMaxDamage then
-			info.parsedStats.RangedMaxDamage = info.parsedStats.MaxDamage
-			info.parsedStats.MaxDamage = nil
-		end
-		
-		-- Calculate RangedDPS if not present but we have damage and speed
-		if not info.parsedStats.RangedDPS and info.parsedStats.RangedMinDamage and 
-		   info.parsedStats.RangedMaxDamage and info.parsedStats.Speed then
-			local avgDamage = (info.parsedStats.RangedMinDamage + info.parsedStats.RangedMaxDamage) / 2
-			info.parsedStats.RangedDPS = avgDamage / info.parsedStats.Speed
-			PawnDebugLog("Calculated RangedDPS: " .. string.format("%.2f", info.parsedStats.RangedDPS) .. 
-			             " from damage " .. info.parsedStats.RangedMinDamage .. "-" .. info.parsedStats.RangedMaxDamage .. 
-			             " and speed " .. info.parsedStats.Speed)
+	-- Post-process: Convert DPS to appropriate stat based on weapon type
+	if info.parsedStats and info.equipLoc then
+		-- Handle ranged weapons
+		if (info.equipLoc == "INVTYPE_RANGED" or info.equipLoc == "INVTYPE_RANGEDRIGHT" or info.equipLoc == "INVTYPE_THROWN") then
+			if info.parsedStats.DPS and not info.parsedStats.RangedDPS then
+				info.parsedStats.RangedDPS = info.parsedStats.DPS
+				info.parsedStats.DPS = nil
+				PawnDebugLog("Converted DPS to RangedDPS for ranged weapon")
+			end
+			-- Also convert regular damage to ranged damage
+			if info.parsedStats.MinDamage and not info.parsedStats.RangedMinDamage then
+				info.parsedStats.RangedMinDamage = info.parsedStats.MinDamage
+				info.parsedStats.MinDamage = nil
+			end
+			if info.parsedStats.MaxDamage and not info.parsedStats.RangedMaxDamage then
+				info.parsedStats.RangedMaxDamage = info.parsedStats.MaxDamage
+				info.parsedStats.MaxDamage = nil
+			end
+			
+			-- Calculate RangedDPS if not present but we have damage and speed
+			if not info.parsedStats.RangedDPS and info.parsedStats.RangedMinDamage and 
+			   info.parsedStats.RangedMaxDamage and info.parsedStats.Speed then
+				local avgDamage = (info.parsedStats.RangedMinDamage + info.parsedStats.RangedMaxDamage) / 2
+				info.parsedStats.RangedDPS = avgDamage / info.parsedStats.Speed
+				PawnDebugLog("Calculated RangedDPS: " .. string.format("%.2f", info.parsedStats.RangedDPS) .. 
+				             " from damage " .. info.parsedStats.RangedMinDamage .. "-" .. info.parsedStats.RangedMaxDamage .. 
+				             " and speed " .. info.parsedStats.Speed)
+			end
+		-- Handle melee weapons
+		elseif (info.equipLoc == "INVTYPE_WEAPON" or info.equipLoc == "INVTYPE_WEAPONMAINHAND" or 
+		        info.equipLoc == "INVTYPE_WEAPONOFFHAND" or info.equipLoc == "INVTYPE_2HWEAPON") then
+			if info.parsedStats.DPS and not info.parsedStats.MeleeDPS then
+				info.parsedStats.MeleeDPS = info.parsedStats.DPS
+				-- Keep DPS as well for compatibility
+				PawnDebugLog("Converted DPS to MeleeDPS for melee weapon: " .. info.parsedStats.MeleeDPS)
+			end
+			
+			-- Calculate MeleeDPS if not present but we have damage and speed
+			if not info.parsedStats.MeleeDPS and not info.parsedStats.DPS and 
+			   info.parsedStats.MinDamage and info.parsedStats.MaxDamage and info.parsedStats.Speed then
+				local avgDamage = (info.parsedStats.MinDamage + info.parsedStats.MaxDamage) / 2
+				info.parsedStats.MeleeDPS = avgDamage / info.parsedStats.Speed
+				info.parsedStats.DPS = info.parsedStats.MeleeDPS  -- Also set DPS for compatibility
+				PawnDebugLog("Calculated MeleeDPS: " .. string.format("%.2f", info.parsedStats.MeleeDPS) .. 
+				             " from damage " .. info.parsedStats.MinDamage .. "-" .. info.parsedStats.MaxDamage .. 
+				             " and speed " .. info.parsedStats.Speed)
+			end
 		end
 	end
 	
