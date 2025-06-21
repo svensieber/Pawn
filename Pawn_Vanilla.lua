@@ -1035,6 +1035,14 @@ function PawnExtractTooltipInfo(tooltip)
 					elseif string.find(text, "^%(") or string.find(text, "^Set:") or string.find(text, "^Equip:") or string.find(text, "^Use:") then
 						isStat = true
 						PawnDebugLog("Found special effect: " .. text)
+					-- Enchantments (any text with parentheses at the end)
+					elseif string.find(text, "%(Verzauberung%)$") or string.find(text, "%(Enchantment%)$") then
+						isStat = true
+						PawnDebugLog("Found enchantment: " .. text)
+					-- Also check if line contains common stat patterns regardless of color
+					elseif string.find(text, "%+%d+") or string.find(text, "Equip:") or string.find(text, "Use:") then
+						isStat = true
+						PawnDebugLog("Found stat by pattern: " .. text)
 					end
 					
 					-- Also check for weapon type line (e.g. "Two-Hand Axe")
