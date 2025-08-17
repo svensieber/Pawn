@@ -1,7 +1,7 @@
 ﻿## Interface: 11200
 ## Title: Pawn |cff8ec3e6(Turtle-WoW Test)|r
-## Version: 1.0.0-turtle-test
-## Notes: Item comparison addon - Turtle-WoW backport Phase 1 test
+## Version: 1.0.0-turtle-test-phase2
+## Notes: Item comparison addon - Turtle-WoW backport Phase 2 test
 ## Author: Vger (Turtle-WoW backport)
 ## SavedVariables: PawnCommon
 ## SavedVariablesPerCharacter: PawnOptions
@@ -9,14 +9,20 @@
 # Core compatibility layer
 VgerCore\VgerCore-TurtleWoW.lua
 
-# Turtle-WoW compatibility
+# Phase 1: Core System
 turtle-wow\core\APICompat.lua
 turtle-wow\core\EventCompat.lua
 turtle-wow\core\EquipmentMonitor.lua
 turtle-wow\core\Debug.lua
+
+# Phase 2: API Migration
+turtle-wow\core\ItemInfo.lua
+turtle-wow\parsing\StatPatterns.lua
+turtle-wow\parsing\StatParser.lua
 
 # Test framework
 tests\PawnTestFramework.lua
 
 # Test initialization
 tests\Phase1TestInit.lua
+tests\Phase2TestInit.lua
