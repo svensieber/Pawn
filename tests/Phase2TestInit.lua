@@ -121,29 +121,42 @@ end
 local function TestPerformance()
     print("|cff8ec3e6=== Testing Parser Performance ===|r")
     
-    -- Find an item to test with
-    local testLink = GetInventoryItemLink("player", 5) or "item:6948:0:0:0"
+    -- Find an item to test with - use slot 5 (chest) which usually has stats
+    local testSlot = 5
+    local hasItem = GetInventoryItemLink("player", testSlot)
     
-    -- Clear cache first
-    PawnStatParser:ClearCache()
+    if not hasItem then
+        print("No item in chest slot to test performance")
+        return
+    end
     
-    -- Test uncached performance
-    local startTime = GetTime()
+    -- We'll test the equipped item parser performance
+    print("Testing with equipped chest item...")
+    
+    -- Test uncached performance (no cache for equipped items currently)
+    local startTime = debugprofilestop()
     for i = 1, 10 do
-        PawnStatParser:ParseItemStats(testLink)
+        PawnEquippedItemParser:ParseEquippedItem("player", testSlot)
     end
-    local uncachedTime = (GetTime() - startTime) * 1000
+    local uncachedTime = debugprofilestop() - startTime
     
-    -- Test cached performance
-    startTime = GetTime()
+    -- Test multiple parses
+    startTime = debugprofilestop()
     for i = 1, 100 do
-        PawnStatParser:ParseItemStats(testLink)
+        PawnEquippedItemParser:ParseEquippedItem("player", testSlot)
     end
-    local cachedTime = (GetTime() - startTime) * 1000
+    local multiTime = debugprofilestop() - startTime
     
-    print(format("Uncached: 10 parses in %.2f ms (%.2f ms/parse)", uncachedTime, uncachedTime/10))
-    print(format("Cached: 100 parses in %.2f ms (%.2f ms/parse)", cachedTime, cachedTime/100))
-    print(format("Cache speedup: %.1fx faster", (uncachedTime/10) / (cachedTime/100)))
+    print(format("First run: 10 parses in %.2f ms (%.2f ms/parse)", uncachedTime, uncachedTime/10))
+    print(format("Bulk run: 100 parses in %.2f ms (%.2f ms/parse)", multiTime, multiTime/100))
+    
+    if uncachedTime > 0 and multiTime > 0 then
+        local avgFirst = uncachedTime / 10
+        local avgBulk = multiTime / 100
+        if avgBulk > 0 then
+            print(format("Consistency: %.1fx difference", avgFirst / avgBulk))
+        end
+    end
 end
 
 local function RunPhase2Tests()
