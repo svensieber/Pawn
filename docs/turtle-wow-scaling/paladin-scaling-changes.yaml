@@ -1,0 +1,345 @@
+# Turtle WoW Paladin Scaling Changes - Damage/Healing Calculations Only
+# Contains only scaling coefficients, percentage modifiers, resource costs, cooldowns, durations, and crit modifiers
+
+paladin_scaling_changes:
+  # Patch 1.16.1 - Oldest patch
+  patch_1_16_1:
+    baseline_changes:
+      consecration:
+        spellpower_coefficient: "0.042 -> 0.119"
+        mana_cost_rank_5: "565 -> 505"
+      judgement_of_righteousness:
+        spellpower_coefficient: "0.5 -> 0.728"
+      retribution_aura:
+        spellpower_coefficient: "0.033 (new)"
+      holy_strike:
+        cooldown: "8s -> 10s"
+
+    talent_changes:
+      holy:
+        healing_light:
+          bonus: "4/8/12%"
+        holy_shock:
+          rank_3_rework:
+            cooldown: "30s -> 20s"
+            mana: "325 -> 485"
+            healing: "365 -> 628"
+            damage: "365 -> 496"
+            
+      protection:
+        precision:
+          bonus: "+1/2/3% hit with melee and spells"
+        shield_specialization:
+          shield_absorption: "+10/20/30%"
+          mana_restore: "33/66/100% chance to restore 2% mana on block"
+          mana_restore_limit: "max once per second"
+        improved_seal_of_justice:
+          stun_chance: "+22/33/67%"
+          judgement_taunt: "33/66/100% chance"
+          
+      retribution:
+        greater_blessing_of_kings:
+          mana_cost: "150 -> 15% Base Mana"
+        improved_seal_of_the_crusader:
+          renamed_to: "Heart of the Crusader"
+        sanctified_command:
+          seal_dispel_resist: "45/90%"
+          judgement_mana_restore: "10/20% base mana to party"
+
+  # Patch 1.17.0 
+  patch_1_17_0:
+    baseline_changes:
+      divine_shield:
+        damage_reduction: "attack speed -100% -> damage -50%"
+      grace_of_the_sunwell:
+        mana_cost: "21% base mana -> 6% base mana"
+
+  # Patch 1.17.2 - Major content update
+  patch_1_17_2:
+    baseline_changes:
+      crusader_strike:
+        weapon_damage:
+          rank_1: "80%"
+          rank_2: "85%"
+          rank_3: "90%"
+          rank_4: "95%"
+          rank_5: "100%"
+        bonus_damage:
+          rank_1: "+31"
+          rank_2: "+47"
+          rank_3: "+71"
+          rank_4: "+107"
+          rank_5: "+161"
+        mana_cost:
+          rank_1: 20
+          rank_2: 40
+          rank_3: 70
+          rank_4: 100
+          rank_5: 120
+        spellpower_coefficient: "33%"
+        zeal_stacks: "3 max"
+        zeal_bonus: "3% attack/cast speed per stack"
+        zeal_duration: "30 sec"
+        cooldown: "6 sec (shared with Holy Strike)"
+        
+      holy_strike:
+        damage:
+          rank_1: "20-22"
+          rank_2: "41-45"
+          rank_3: "64-67"
+          rank_4: "94-101"
+          rank_5: "152-171"
+          rank_6: "193-214"
+          rank_7: "242-267"
+          rank_8: "293-325"
+        mana_cost:
+          rank_1: 5
+          rank_2: 12
+          rank_3: 25
+          rank_4: 38
+          rank_5: 51
+          rank_6: 64
+          rank_7: 75
+          rank_8: 90
+        health_restored:
+          rank_1: 5
+          rank_2: 12
+          rank_3: 25
+          rank_4: 38
+          rank_5: 51
+          rank_6: 64
+          rank_7: 75
+          rank_8: 90
+        mana_restored: "Same as health restored"
+        party_heal_mana: "Equal to mana restored"
+        spellpower_coefficient: "43%"
+        healing_coefficient: "5%"
+        cooldown: "6 sec (shared with Crusader Strike)"
+        
+      hand_of_reckoning:
+        cooldown: "10 sec"
+        mana_cost: 90
+        
+      flash_of_light:
+        new_rank_60: 
+          healing: "428-493"
+          mana_cost: 180
+          
+      seal_of_wisdom:
+        mana_gain: "+100%"
+        
+      blessing_duration:
+        all_blessings: "10 min"
+        greater_blessings: "30 min"
+        
+      divine_shield:
+        change: "Damage dealt -50% instead of attack speed -100%"
+        
+    talent_changes:
+      holy:
+        holy_judgement:
+          holy_light_cast_reduction: "0.3/0.6/1 sec after Judgement"
+        improved_seal_of_righteousness:
+          damage: "15% -> 10%"
+        illumination:
+          mana_restore: "20/40/60/80/100% -> 12/24/36/48/60% of base cost"
+        ironclad:
+          healing_power: "1/2% of armor contribution"
+        holy_shock:
+          reset_chance: "5% base + 1% per 100 healing power"
+        divine_favor:
+          passive_crit: "6/12/18/24/30% to Holy Shock"
+        holy_power:
+          crit_chance: "2/4/6% to Flash of Light and Holy Light"
+        blessed_strikes:
+          crusader_reset_holy_shock: "20/40/60/80/100% chance"
+          holy_shock_gcd_reduction: "1 sec after reset"
+          holy_strike_healing: "+30/60/90/120/150%"
+        daybreak:
+          duration: "12 sec"
+          healing_increase: "+20% from Flash/Holy Light/Holy Shock"
+          max_hp: "+5%"
+          
+      protection:
+        anticipation:
+          defense: "2/4/6/8/10 -> 7/14/20"
+        shield_specialization:
+          mana_restore_cooldown: "1s -> 5s"
+        improved_righteous_fury:
+          threat: "16/33/50% -> 25/50/75%"
+        righteous_defense:
+          damage_reduction: "3/6/10% while Righteous Fury active"
+        improved_hand_of_reckoning:
+          hit_chance: "+4/8%"
+        holy_shield:
+          block_chance: "30% -> 50%"
+          spellpower_coefficient: "5% -> 33%"
+          threat_modifier: "30% -> 45%"
+        reckoning:
+          extra_attack_on_block: "5/10/15/20/25% chance"
+        righteous_strikes:
+          block_per_zeal: "1/2/3/4/5% per stack"
+          holy_strike_threat: "+50%"
+          holy_strike_damage: "+10/20/30/40/50%"
+        bulwark_of_the_righteous:
+          damage: 
+            rank_1: "274-301"
+            rank_2: "417-451"
+            rank_3: "556-601"
+          spellpower: "43%"
+          damage_reduction: "30% for 12s"
+          cooldown: "5 min"
+          mana_cost: 200
+          
+      retribution:
+        improved_blessings:
+          might_and_wisdom: "4/8/12/16/20%"
+        heart_of_the_crusader:
+          seal_bonus: "5/10/15% melee AP and holy damage"
+        vindication:
+          damage_reduction: "1/2/3% for 10s"
+        vengeance:
+          damage_bonus: "3/6/9/12/15% -> 1/2/3/4/5% per stack"
+          threat_reduction: "2/4/6/8/10%"
+          duration: "8s -> 30s"
+          stacks: "3 max"
+        seal_of_command:
+          spellpower_modifier: "small amount added"
+        judgement_of_command:
+          attack_power_modifier: "small amount added"
+        crusading_strikes:
+          crusader_strike_damage: "+3/6/9/12/15%"
+          zeal_speed: "+2% per stack additional"
+          holy_might_strength: "+4/8/12/16/20% for 20s"
+        repentance:
+          incapacitate: "6 sec on non-immune"
+          immune_damage: 
+            rank_1: "80 holy"
+            rank_2: "120 holy"
+            rank_3: "160 holy"
+          coefficient: "12% AP + 50% SP"
+
+  # Patch 1.17.2 October Updates - Hotfix adjustments
+  patch_1_17_2_updates_october:
+    talent_changes:
+      protection:
+        bulwark_of_the_righteous:
+          cooldown: "3 min -> 5 min"
+          damage_reduction: "40% -> 30%"
+
+  # Patch 1.17.2 November Updates - Balance adjustments
+  patch_1_17_2_updates_november:
+    baseline_changes:
+      crusader_strike:
+        weapon_damage: "-10% all ranks"
+    talent_changes:
+      protection:
+        righteous_strikes:
+          holy_strike_damage: "10-50% -> 5-25%"
+
+  # Patch 1.18.0 - Newest patch
+  patch_1_18_0:
+    baseline_changes:
+      hand_of_freedom:
+        cooldown: "20s -> 24s"
+      divine_shield:
+        damage_reduction: "50% -> 60%"
+        
+    talent_changes:
+      holy:
+        daybreak:
+          healing: "348-389 healing on damage"
+          spellpower: "43%"
+          duration: "30 sec"
+        holy_shock:
+          rank_1: "97-104"
+          rank_4: "256-271"
+          spellpower: "43%"
+          
+      retribution:
+        crusader_strike:
+          spellpower: "33% -> 20%"
+        seal_of_righteousness:
+          two_handed_coefficient: "12.8% -> 12.5% x weapon speed"
+        vengeance:
+          no_threat_reduction_with_righteous_fury: true
+
+key_scaling_values:
+  spellpower_coefficients:
+    consecration: "0.119"
+    judgement_of_righteousness: "0.728"
+    retribution_aura: "0.033"
+    crusader_strike: "20%"
+    holy_strike: "43%"
+    holy_strike_healing: "5%"
+    holy_shield: "33%"
+    holy_shock: "43%"
+    bulwark_of_the_righteous: "43%"
+    daybreak: "43%"
+    seal_of_righteousness_2h: "12.5% x weapon speed"
+    
+  percentage_modifiers:
+    divine_shield_reduction: "60%"
+    illumination_mana: "100% -> 60%"
+    holy_shield_block: "30% -> 50%"
+    holy_shield_threat: "30% -> 45%"
+    vengeance_damage: "1-5% per stack (3 max)"
+    vengeance_threat: "-2-10%"
+    righteous_fury_threat: "+25-75%"
+    healing_light_bonus: "4/8/12%"
+    vindication_damage_reduction: "1/2/3%"
+    righteous_defense_damage_reduction: "3/6/10%"
+    
+  attack_speed_modifiers:
+    zeal: "3% per stack (9% max)"
+    crusading_strikes: "+2% per stack"
+    
+  damage_scaling:
+    ironclad: "1/2% armor as healing power"
+    holy_shock_reset: "5% + 1% per 100 healing power"
+    repentance: "12% AP + 50% SP"
+    blessed_strikes_healing: "+30-150%"
+    
+  cooldown_changes:
+    holy_strike: "8s -> 10s -> 6s"
+    holy_shock: "30s -> 20s"
+    bulwark: "3 min -> 5 min"
+    hand_of_freedom: "20s -> 24s"
+    hand_of_reckoning: "10s"
+    
+  duration_changes:
+    blessings: "5 min -> 10 min"
+    greater_blessings: "15 min -> 30 min"
+    vengeance: "8s -> 30s"
+    daybreak: "12s -> 30s"
+    zeal: "30s"
+    holy_might: "20s"
+    vindication: "10s"
+    
+  critical_strike_modifiers:
+    divine_favor: "6/12/18/24/30% to Holy Shock"
+    holy_power: "2/4/6% to Flash of Light and Holy Light"
+    
+  mana_costs:
+    crusader_strike:
+      rank_1: 20
+      rank_2: 40
+      rank_3: 70
+      rank_4: 100
+      rank_5: 120
+    holy_strike:
+      rank_1: 5
+      rank_2: 12
+      rank_3: 25
+      rank_4: 38
+      rank_5: 51
+      rank_6: 64
+      rank_7: 75
+      rank_8: 90
+    hand_of_reckoning: 90
+    flash_of_light_rank_60: 180
+    bulwark_of_the_righteous: 200
+    consecration_rank_5: 505
+    holy_shock_rank_3: 485
+    grace_of_the_sunwell: "21% -> 6% base mana"
+    greater_blessing_of_kings: "15% base mana"

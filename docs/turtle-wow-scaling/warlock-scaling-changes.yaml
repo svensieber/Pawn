@@ -1,0 +1,397 @@
+# Turtle WoW Warlock Scaling Changes - Spell Coefficients & Demon Scaling
+# Focus on spell power coefficients, demon scaling, and percentage modifiers
+# Updated with full 1.17.2 changelog information
+
+warlock_scaling_changes:
+  patch_1_16_1:
+    baseline_changes:
+      voidwalker_torment:
+        damage_type: "Shadow damage (increased by Improved Voidwalker)"
+        shadow_damage:
+          rank_1: "7-6"
+          rank_2: "13-15"
+          rank_3: "18-21"
+          rank_4: "26-30"
+          rank_5: "36-40"
+          rank_6: "43-48"
+      avoidance:
+        aoe_damage_reduction: "50%"
+        
+    talent_changes:
+      affliction:
+        soul_siphon:
+          health_drain: "+5/10%"
+          mana_drain: "15/30% damages opponent"
+          
+      demonology:
+        improved_enslave_demon:
+          speed_penalty: "-10/20%"
+          resist_chance: "-10/20%"
+        master_conjurer:
+          healthstone_healing: "+10/20%"
+          stone_effects: "+15/30%"
+        inferno:
+          cooldown: "1 hour -> 20 min"
+        fel_intellect:
+          demon_mana: "+5/10/15%"
+        fel_stamina:
+          demon_health: "+5/10/15%"
+          
+      destruction:
+        intensity:
+          interrupt_resist: "70%"
+        pyroclasm:
+          stun_chance: "25%"
+
+  patch_1_17_0:
+    # Placeholder for patch 1.17.0 changes - to be populated with actual changes
+    baseline_changes: {}
+    talent_changes: {}
+
+  patch_1_17_2:
+    baseline_changes:
+      soul_bags:
+        reagent_save_chance: "5-25% based on bag size"
+        
+      drain_soul:
+        damage_values:
+          rank_1_level_10: "110"
+          rank_2_level_24: "280"
+          rank_3_level_38: "460"
+          rank_4_level_52: "760"
+          rank_5_level_60_new: "950"
+        mana_cost:
+          rank_1: "55 -> 90"
+          rank_2: "125 -> 235"
+          rank_3: "210 -> 405"
+          rank_4: "290 -> 540"
+          rank_5_new: "655"
+        spellpower_scaling: "16.67% per tick"
+        
+      soul_fire:
+        ranks:
+          rank_1_level_30: "175 mana, 453-571 Fire damage"
+          rank_2_level_38: "260 mana, 544-685 Fire damage"
+          rank_3_level_46: "305 mana, 623-784 Fire damage"
+          rank_4_level_54: "335 mana, 703-883 Fire damage"
+        spellpower_scaling: "100% -> 125%"
+        cooldown_reduction: "1 minute -> 30 seconds"
+        
+      searing_pain:
+        threat_generation: "Removed"
+        
+      curse_of_weakness:
+        attack_speed_reduction: "-15%"
+        
+      corruption:
+        cast_time: "2 seconds -> 1.5 seconds"
+        
+      greater_demons:
+        demon_gate:
+          cooldown: "30 minutes"
+          cast_time: "4 seconds"
+          duration: "1 minute"
+          
+        inferno:
+          cooldown: "20 minutes -> 10 minutes"
+          cast_time: "2 seconds -> 1.5 seconds"
+          duration: "30 seconds"
+          
+        ritual_of_doom:
+          required_players: "4 -> 2"
+          duration: "1 minute"
+          
+      avoidance:
+        aoe_damage_reduction: "50% -> 80%"
+        
+      conjured_stones:
+        firestone:
+          fire_crit_chance: "+2%"
+          weapon_proc: "40% chance on main hand/wand attacks"
+          proc_damage: "15-20 Fire damage + level"
+          
+        felstone:
+          life_leech: "3% of damage dealt returned as healing"
+          
+        wrathstone:
+          fire_threat: "+40%"
+          hellfire_self_damage: "-30%"
+          
+        spellstone:
+          threat_reduction: "-10% from all spells"
+          
+        
+    talent_changes:
+      affliction:
+        improved_corruption:
+          cast_reduction: "0.4/0.8/1.2/1.6/2s -> 0.3/0.6/0.9/1.2/1.5s"
+          
+        improved_debilitating_curses:
+          curse_of_weakness_bonus: "+3/5% attack speed reduction"
+          curse_of_exhaustion_bonus: "+10/20% speed reduction"
+          
+        resilient_shadows:
+          interrupt_reduction: "10/20/30%"
+          
+        improved_drains:
+          mana_drain_increase: "+5/10%"
+          
+        improved_curse_of_agony:
+          damage_increase: "2/4/6% -> 3/6/10%"
+          
+        curse_of_exhaustion:
+          slow_increase: "10% -> 30%"
+          
+        nightfall:
+          proc_chance: "1/3/5%"
+          
+        rapid_deterioration:
+          casting_speed: "+6% for Affliction spells"
+          dot_tick_acceleration: "50/100% efficiency"
+          
+        soul_siphon:
+          damage_increase: "+2/3/4% per Affliction effect on target"
+          maximum_effects: "4"
+          
+        dark_harvest:
+          dot_acceleration: "20% tick time reduction"
+          damage:
+            base: "700"
+            rank_2_level_50: "900"
+            rank_3_level_60: "1150"
+          cooldown: "30 seconds"
+          
+      demonology:
+        soul_entrapment:
+          damage_increase: "+1/2/3% all damage"
+          
+        demonic_sacrifice:
+          effects:
+            imp: "+6% Fire damage"
+            voidwalker: "3% total Health every 4 sec"
+            succubus: "+6% Shadow damage"
+            felhunter: "2% total Mana every 4 sec"
+            
+        fel_intellect:
+          intellect_transfer: "7/14/21/28/35% of total Intellect"
+          mana_regen_casting: "15/30/45/60/75% continues while casting"
+          
+        fel_stamina:
+          stamina_transfer: "7/14/21/28/35% of total Stamina"
+          crit_reduction: "1/2/3/4/5% chance to be critically struck"
+          
+        fel_domination:
+          cooldown_reduction: "15 min -> 5 min"
+          cast_time_reduction: "5.5 sec -> 4 sec"
+          inferno_cooldown_bonus: "-2.5/5 minutes"
+          demon_gate_cooldown_bonus: "-7.5/15 minutes"
+          
+        master_summoner:
+          mana_reduction: "20/40% -> 40/60%"
+          greater_demon_cooldowns: "-25/50%"
+          
+        improved_stones:
+          wrathstone_spellstone: "+25/50% effects"
+          felstone_bonus: "+1/2% damage returned as healing"
+          firestone_bonus: "+1/2% critical strike"
+          
+        nether_studies:
+          demon_effectiveness:
+            succubus_seduction: "+15/30/45%"
+            voidwalker_torment: "+15/30/45%"
+            imp_blood_pact: "+15/30/45%"
+            felhunter_tainted_blood: "+15/30/45%"
+            
+        unholy_power:
+          damage_change: "4/8/12/16/20% -> 5/10/15%"
+          
+        unleashed_potential:
+          trigger_chance:
+            direct_damage_spells: "60%"
+            funnel_spells: "100%"
+          duration: "3 seconds"
+          demon_attack_power: "+20/40/60% of bonus spell damage"
+          demon_spell_damage: "+5/10/15% of spell damage"
+          
+        power_overwhelming:
+          demon_damage_increase: "+20%"
+          health_cost: "40% of demon's Health over 10 sec"
+          cooldown: "14 seconds"
+          mana_cost: "7% base (reduced to 80)"
+          
+        demonic_precision:
+          base_hit_increase: "+1/2/3% melee and spell hit"
+          hit_transfer: "33/66/100% of warlock's spell hit"
+          
+        master_demonologist:
+          imp:
+            spell_costs: "-3/6/9/12/15%"
+            casting_speed: "+1/2/3/4/5%"
+          voidwalker:
+            physical_damage_taken: "-2/4/6/8/10%"
+            pushback_resistance: "+8/16/24/32/40%"
+          succubus:
+            all_damage: "+2/4/6/8/10%"
+            threat_caused: "+5%"
+          felhunter:
+            resistances: "+0.2/0.4/0.6/0.8/1 per level"
+            tainted_blood_proc: "10% chance when attacked"
+          infernal:
+            casting_attack_speed: "+3/6/9/12/15%"
+            healing_taken_penalty: "-50%"
+          felguard:
+            all_damage: "+4/8/12/16/20%"
+            mana_cost_penalty: "+20%"
+            
+        soul_link:
+          damage_transfer: "30% -> 20%"
+          damage_bonus: "3% -> 5%"
+          
+      destruction:
+        improved_shadow_bolt:
+          proc_chance: "5/10/15/20/25%"
+          shadow_damage: "4/8/12/16/20% -> 15% (20% in November update)"
+          duration: "12 sec -> 10 sec"
+          
+        cataclysm:
+          mana_reduction: "1/2/3/4/5% -> 2/4/6/8/10%"
+          
+        demonic_swiftness:
+          imp_firebolt: "-0.25/0.5 sec cast time"
+          succubus_lash_of_pain: "-3/6 sec cooldown"
+          
+        aftermath:
+          immolate_periodic_bonus: "+2/4/6%"
+          slow_effect: "50%"
+          
+        improved_soul_fire:
+          soul_shard_refund: "50/100% chance"
+          fire_damage_buff: "+8% for 25 seconds"
+          
+        improved_immolate:
+          damage_increase: "5/10/15/20/25% -> 4/8/12/16/20%"
+          
+        conflagrate:
+          gcd_reduction: "1.5 sec -> 1 sec"
+          
+  patch_1_17_2_updates_october:
+    fel_domination:
+      cooldown_finalized: "5 minutes"
+    master_summoner:
+      cooldown_reduction: "25/50%"
+      
+  patch_1_17_2_updates_november:
+    improved_shadow_bolt:
+      shadow_damage_increase: "15% -> 20%"
+    power_overwhelming:
+      mana_cost_reduction: "Reduced to 80"
+
+  patch_1_18_0:
+    baseline_changes:
+      drain_soul:
+        mana_cost_dynamic:
+          rank_1: "15 + 10/sec"
+          rank_5: "135 + 65/sec"
+      doomguard:
+        infernal_blade: "30% fire + 250 dot (3 stacks)"
+      spellstone:
+        magic_absorb: "level x 12"
+      rain_of_fire:
+        tick_rate: "2s -> 1s"
+      soul_fire:
+        spellpower: "125% -> 114%"
+      voidstone:
+        threat: "-10%"
+      ritual_of_doom:
+        cast_time: "10s -> 5s"
+      demon_ap_scaling:
+        voidwalker: "20%"
+        succubus: "40%"
+        felhunter: "30%"
+        infernal: "60%"
+        felguard: "60%"
+        doomguard: "30%"
+        
+    talent_changes:
+      affliction:
+        fel_concentration:
+          ranks: "5 -> 2"
+        sinister_pursuit:
+          demon_speed: "+5/10/15% for 3s"
+        curse_of_exhaustion:
+          slow: "30% -> 10%"
+        improved_curse_of_exhaustion:
+          slow_bonus: "+15/30%"
+          
+      demonology:
+        soul_entrapment:
+          damage: "1-3% -> 2-6%"
+        demonic_sacrifice:
+          imp: "6% fire -> 4% spell"
+          succubus: "6% shadow -> -10% threat"
+          felhunter: "2% -> 3% mana/4s"
+        power_overwhelming:
+          health_cost: "40% max -> 40% base"
+        demonic_precision:
+          transfer: "100% -> 90%"
+          baseline: "+1/2/3% all hit/crit"
+        master_demonologist:
+          imp: "-3-15% spell costs"
+          voidwalker: "-2-10% physical damage"
+          succubus: "+2-10% damage"
+          felhunter: "0.2-1 resist/level"
+          greater_demons: "+2-10% spell crit, -8-40% healing"
+          
+      destruction:
+        improved_soul_fire:
+          fire_damage: "8% -> 10%"
+
+key_scaling_values:
+  demon_attack_power:
+    voidwalker: "20%"
+    succubus: "40%"
+    felhunter: "30%"
+    infernal: "60%"
+    felguard: "60%"
+    doomguard: "30%"
+    unleashed_potential: "20/40/60% spell damage"
+    
+  spellpower_coefficients:
+    drain_soul: "16.67% per tick"
+    soul_fire: "125% -> 114%"
+    
+  percentage_changes:
+    avoidance: "50% -> 80%"
+    soul_link_transfer: "30% -> 20%"
+    soul_link_damage: "3% -> 5%"
+    improved_shadow_bolt: "20%"
+    rapid_deterioration: "+6% cast speed"
+    power_overwhelming: "+20% pet damage"
+    
+  threat_modifiers:
+    searing_pain: "removed"
+    wrathstone: "+40% fire"
+    spellstone: "-10%"
+    voidstone: "-10%"
+    demonic_sacrifice_succubus: "-10%"
+    
+  mana_changes:
+    fel_intellect: "15-75% regen while casting"
+    master_summoner: "40/60% reduction"
+    cataclysm: "2-10% reduction"
+    
+  cooldown_changes:
+    inferno: "1hr -> 20min -> 10min"
+    soul_fire: "1min -> 30s"
+    fel_domination: "15min -> 5min"
+    demon_gate: "30min"
+    ritual_of_doom: "cast 10s -> 5s"
+    
+  duration_changes:
+    infernal: "30s"
+    felguard: "1min"
+    doomguard: "1min"
+    improved_shadow_bolt: "12s -> 10s"
+    improved_soul_fire: "25s"
+    power_overwhelming: "10s"
+

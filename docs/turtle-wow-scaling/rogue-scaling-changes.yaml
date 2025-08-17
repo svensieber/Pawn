@@ -1,0 +1,275 @@
+# Turtle WoW Rogue Scaling Changes - Damage and Energy Scaling Focus
+# Attack power coefficients, weapon damage percentages, energy costs, cooldowns, poison scaling, and critical strike modifiers
+
+rogue_scaling_changes:
+  patch_1_16_1:
+    energy_costs:
+      deadly_throw: 30
+      agitating_poison: "No energy cost (poison application)"
+      flourish: 25
+      
+    damage_scaling:
+      deadly_throw_damage_by_cp:
+        1_point: "132-228"
+        2_points: "216-312"
+        3_points: "300-396"
+        4_points: "384-480"
+        5_points: "468-564"
+      agitating_poison:
+        proc_chance: "20%"
+        damage: "67-85 Nature"
+        
+    critical_strike_modifiers:
+      close_quarters_combat:
+        crit_chance: "+1/2/3/4/5%"
+        weapons: "Daggers, Fist Weapons"
+
+  patch_1_17_0:
+    cooldown_changes:
+      flourish: "40 sec"
+
+  patch_1_17_2:
+    energy_costs:
+      sinister_strike: "45 -> 40"
+      deadly_throw: "30 -> 35"
+      
+    poison_scaling:
+      corrosive_poison:
+        proc_chance: "30%"
+        damage: "100/128 Physical over 12s"
+        stacks: "5 max"
+      wound_poison:
+        healing_reduction: "5% per stack"
+        stacks: "5 max"
+        envenom_scaling: "6.25% per stack"
+      crippling_poison_rank_2:
+        slow_percentage: "70% -> 60%"
+        envenom_scaling: "75%"
+        
+    damage_scaling:
+      deadly_throw_damage_by_cp:
+        1_point: "132-228"
+        2_points: "216-312"
+        3_points: "300-396"
+        4_points: "384-480"
+        5_points: "468-564"
+        
+    cooldown_changes:
+      sprint_evasion: "5 min -> 4 min"
+        
+    talent_scaling_changes:
+      assassination:
+        ruthlessness:
+          proc_chance: "20/40/60% -> 33/66/100%"
+        improved_blade_tactics:
+          damage_bonus: "+15/30/45%"
+        taste_for_blood:
+          damage: "3/6/10% for 6s + 2s/CP"
+        efficient_poisons:
+          resist_reduction: "4/8/12%"
+          charge_save: "15/30/45%"
+        vigor:
+          energy_on_poison: "50/100% chance to gain 5 Energy"
+          cooldown: "8 sec"
+        envenom:
+          energy_cost: "25"
+          poison_effectiveness: "+25%"
+          duration_by_cp:
+            1_point: "12s"
+            2_points: "16s"
+            3_points: "20s"
+            4_points: "24s"
+            5_points: "28s"
+            
+      combat:
+        swift_strikes:
+          attack_speed: "+1/2%"
+        improved_backstab:
+          extra_cp_chance: "15/30/45%"
+        close_quarters_combat:
+          weapons: "Daggers, Fist Weapons, Maces"
+          crit_chance: "5 -> 2 ranks: 2/5%"
+        surprise_attack:
+          weapon_damage: "120%"
+          energy_cost: "10"
+          cooldown: "10 seconds"
+        hack_and_slash:
+          weapons: "Swords, Axes"
+          extra_attack_chance: "5 -> 2 ranks: 2/5%"
+        blade_rush:
+          cooldown_reduction: "30/60 sec on Blade Flurry"
+          attack_speed: "+5/10% during Blade Flurry"
+        aggression:
+          damage: "2/4/6% -> 3/6/10%"
+          
+      subtlety:
+        improved_ambush:
+          energy_refund: "5/10/15 Energy if Ambush doesn't critically strike"
+        serrated_blades:
+          garrote_damage: "+10/20/30%"
+        initiative:
+          proc_chance: "25/50/75% -> 33/66/100%"
+        improved_ghostly_strike:
+          party_dodge_chance: "33/66/100%"
+        smoke_bomb:
+          energy_cost: "35"
+          cooldown: "5 minutes"
+        hemorrhage:
+          damage_increase: "2% physical damage"
+          energy: "35 -> 45"
+        irritating_agent:
+          damage_reduction: "2/4/6%"
+        blinding_haze:
+          hit_reduction: "2/4/6%"
+        dust_of_disappearance:
+          damage_bonus: "+15% on next damaging ability"
+          energy_cost: "25"
+          cooldown: "2 minutes"
+        bloody_mess:
+          energy_reduction: "5/10 on Hemorrhage"
+          hemorrhage_bonus: "+50/100% physical damage"
+        honor_among_thieves:
+          energy_gain: "2/5 Energy from party physical crits"
+          cooldown: "2 sec"
+        tricks_of_the_trade:
+          crit_chance: "4/8/12/16/20% chance per CP to grant +2% party crit"
+        exploit_vulnerability:
+          weapon_damage: "135%"
+          damage_increase: "+15% party damage to target"
+          energy_cost: "40"
+          cooldown: "3 minutes"
+
+  patch_1_17_2_updates_october:
+    critical_strike_modifiers:
+      close_quarters_combat:
+        crit_chance: "1/2/3/4/5% -> 2/5%"
+      hack_and_slash:
+        extra_attack_chance: "1/2/3/4/5% -> 2/5%"
+      improved_backstab:
+        extra_cp_chance: "15/30/45%"
+
+  patch_1_17_2_updates_november:
+    weapon_damage_modifiers:
+      surprise_attack:
+        cannot_be_avoided: true
+
+  patch_1_18_0:
+    energy_costs:
+      blade_flurry:
+        energy_regen_penalty: "-30%"
+        cooldown: "2 min -> 4 sec"
+        
+    attack_power_scaling:
+      dissolvent_poison:
+        ap_coefficient: "4.75%"
+        damage: "88-113/106-142"
+        
+    weapon_damage_modifiers:
+      blade_flurry:
+        damage_penalty: "-20%"
+        
+    talent_scaling_changes:
+      assassination:
+        corrosive_poison:
+          ap_scaling: "-5%"
+        taste_for_blood:
+          physical_damage: "1/2/3% per CP"
+        vigor:
+          energy: "5 -> 2"
+          cooldown_removed: true
+        noxious_assault:
+          ap_coefficient: "35%"
+          base_damage: "30/55/85/105"
+          energy_cost: "45"
+          
+      combat:
+        blade_rush:
+          attack_speed: "+2/5%"
+          
+      subtlety:
+        improved_ghostly_strike:
+          energy_cost_reduction: "-3/6/10"
+        hemorrhage:
+          energy: "45 -> 40"
+        bloody_mess:
+          energy_reduction: "5/10 -> 2/5"
+        blinding_haze:
+          energy_reduction: "5/10/15"
+        shadow_of_death:
+          ap_scaling_by_cp:
+            1_cp: "50% AP"
+            2_cp: "100% AP"
+            3_cp: "150% AP"
+            4_cp: "200% AP"
+            5_cp: "250% AP"
+          damage_scaling_by_cp:
+            1_cp: "10%"
+            2_cp: "20%"
+            3_cp: "30%"
+            4_cp: "40%"
+            5_cp: "50%"
+        honor_among_thieves:
+          cooldown: "2s -> 1.5s"
+        mark_for_death:
+          attack_power_scaling: "+30% of rogue AP"
+          spell_power_scaling: "+18% of rogue AP"
+          
+    cooldown_changes:
+      preparation: "10 min -> 7 min"
+
+# Summary of Key Scaling Values
+
+attack_power_coefficients:
+  dissolvent_poison: "4.75%"
+  corrosive_poison: "reduced by 5%"
+  noxious_assault: "35%"
+  shadow_of_death: "50-250% by CP"
+  mark_for_death: "30% AP, 18% SP"
+
+weapon_damage_percentages:
+  surprise_attack: "120%"
+  exploit_vulnerability: "135%"
+  blade_flurry_penalty: "-20%"
+
+energy_cost_modifications:
+  sinister_strike: "45 -> 40"
+  deadly_throw: "30 -> 35"
+  hemorrhage: "35 -> 45 -> 40"
+  blade_flurry_regen_penalty: "-30%"
+  vigor_poison_gain: "2 energy"
+  noxious_assault: "45"
+  envenom: "25"
+  
+cooldown_changes:
+  flourish: "40 sec"
+  sprint_evasion: "5 min -> 4 min"
+  blade_flurry: "2 min -> 4 sec"
+  vigor: "8 sec -> removed"
+  preparation: "10 min -> 7 min"
+  honor_among_thieves: "2s -> 1.5s"
+
+poison_scaling_values:
+  corrosive_poison:
+    proc_chance: "30%"
+    stacks: "5 max"
+  wound_poison:
+    healing_reduction: "5% per stack"
+    stacks: "5 max"
+    envenom_scaling: "6.25% per stack"
+  crippling_poison_rank_2:
+    slow_percentage: "70% -> 60%"
+    envenom_scaling: "75%"
+  agitating_poison:
+    proc_chance: "20%"
+  efficient_poisons:
+    resist_reduction: "4/8/12%"
+    charge_save: "15/30/45%"
+  envenom_effectiveness: "+25%"
+
+critical_strike_modifiers:
+  close_quarters_combat: "2/5% crit (Daggers, Fist Weapons, Maces)"
+  hack_and_slash: "2/5% extra attack (Swords, Axes)"
+  improved_backstab: "15/30/45% extra CP chance"
+  ruthlessness: "33/66/100% proc chance"
+  initiative: "33/66/100% proc chance"
+  tricks_of_the_trade: "4/8/12/16/20% chance per CP for +2% party crit"

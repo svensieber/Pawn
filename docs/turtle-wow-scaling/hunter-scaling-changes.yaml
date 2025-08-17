@@ -1,0 +1,321 @@
+# Turtle WoW Hunter Scaling Changes - Damage Calculation Data
+# Attack power coefficients, pet scaling, damage modifiers, and resource costs
+
+hunter_scaling_changes:
+  patch_1_16_1:
+    # Pet damage and scaling modifiers
+    avoidance:
+      aoe_damage_reduction: "+50%"
+
+    pet_changes:
+      bite:
+        cooldown: "10s -> 6s"
+      thunderstomp:
+        cooldown: "60s -> 40s"
+      scorpid_poison:
+        base_damage: "+20%"
+
+    talent_changes:
+      beast_mastery:
+        improved_eyes_of_the_beast:
+          pet_damage: "+15/30% while channeling"
+          focus_generation: "+15/30%"
+        improved_predator_aspects:
+          proc_chance: "1/2/3/4/5%"
+          attack_speed_bonus: "30%"
+      
+      survival:
+        superior_strikes:
+          cooldown_reduction: "0.2/0.4/0.6/0.8/1 seconds"
+        improved_slaying:
+          damage_bonus: "damage and critical damage bonuses of both previous talents"
+        trueshot_aura:
+          rank_3: "55 AP + 5% AP scaling"
+
+  patch_1_17_0:
+    baseline_changes:
+      trueshot_aura:
+        mana_cost: "None (toggle)"
+
+  patch_1_17_2:
+    baseline_changes:
+      avoidance:
+        aoe_reduction: "50% -> 80%"
+      steady_shot:
+        mana_cost: "5% base mana"
+        cast_time: "1 second"
+      scorpid_sting:
+        physical_damage_reduction: "2%"
+        attack_speed_reduction: "10%"
+        mana_cost: "10% base"
+      viper_sting:
+        mana_burn: "-15%"
+        cooldown: "6 sec"
+      wing_clip:
+        cooldown: "6 seconds"
+        weapon_damage:
+          rank_1: "25%"
+          rank_2: "30%"
+          rank_3: "35%"
+      mongoose_bite:
+        weapon_damage: "60%"
+        flat_damage:
+          rank_1: "+25"
+          rank_2: "+45"
+          rank_3: "+75"
+          rank_4: "+115"
+
+    pet_changes:
+      ability_updates:
+        furious_howl:
+          focus_cost: "60 -> 50"
+        thunderstomp:
+          cooldown: "1 minute -> 40 seconds"
+        scorpid_poison:
+          focus_cost: "30 -> 25"
+          cooldown: "4 seconds -> 3 seconds"
+          base_damage: "+20%"
+        shell_shield:
+          attack_speed_reduction: "43% -> 35%"
+        bite:
+          cooldown: "10 seconds -> 6 seconds"
+    
+    pet_scaling:
+      lightning_breath:
+        spell_power: "0.5"
+      poison_spit:
+        spell_power: "0.25 per tick"
+      scorpid_poison:
+        spell_power: "0.1 per tick"
+      thunderstomp:
+        spell_power: "0.21"
+      bite:
+        attack_power: "1 extra damage per 20 AP"
+      claw:
+        attack_power: "1 extra damage per 42 AP"
+
+    talent_changes:
+      beast_mastery:
+        improved_predator_aspects:
+          proc_chance: "1/2/3/4/5% -> 10%"
+          attack_speed: "30% -> 3/6/9/12/15%"
+        
+        endurance_training:
+          stamina_to_pet: "6/12/18/24/30% of your Stamina"
+        
+        improved_eyes_of_the_beast:
+          pet_damage: "5/10% additional"
+          focus_generation: "10/20% increased"
+        
+        improved_aspect_of_the_monkey:
+          dodge_bonus: "1/2/3/4/5% -> 2/4/6%"
+          healing: "2/4/6% of melee damage"
+        
+        thick_hide:
+          armor_to_pet: "12/24/36% of your Armor"
+        
+        elusiveness:
+          resistance_to_pet: "20/40% of your resistances"
+          pet_dodge: "+2/4%"
+        
+        bestial_swiftness:
+          aspect_speed: "+6%"
+          pet_attack_speed: "+3%"
+        
+        improved_mend_pet:
+          healing_increase: "20/40%"
+        
+        bestial_precision:
+          pet_physical_hit: "+4/8%"
+          pet_spell_hit: "+6/12%"
+        
+        intimidation:
+          threat_generation: "+50% for 8 seconds"
+        
+        bestial_discipline:
+          focus_regeneration: "2/5 each tick"
+        
+        spirit_bond:
+          pet_melee_ap: "12/25% of your ranged AP"
+          pet_spell_power: "7/15% of your ranged AP"
+          heal_interval: "10s -> 5s"
+        
+        bestial_wrath:
+          damage: "50% -> 30%"
+
+      marksmanship:
+        improved_stings:
+          serpent_damage: "2/4/6/8/10% -> 6/12/18/24/30%"
+          viper_mana_drain: "1/2/3/4/5%"
+        
+        improved_scorpid_sting:
+          attack_speed_reduction: "+5/10%"
+          damage_reduction: "+1/2%"
+        
+        steady_shot:
+          mana_cost: "5% base"
+          cast_time: "1 second"
+        
+        improved_arcane_shot:
+          cooldown_reduction: "Aimed Shot"
+        
+        piercing_shots:
+          bleed_damage: "10/20% over 8 sec"
+        
+        improved_steady_shot:
+          damage_increase: "+13/25%"
+        
+        endless_quiver:
+          proc_chance: "3/6%"
+        
+        trueshot_aura:
+          rank_1: "30 AP + 3% AP"
+          rank_2: "40 AP + 4% AP"
+          rank_3: "55 AP + 5% AP"
+
+      survival:
+        resourcefulness:
+          mana_cost_reduction: "2/4/6/8/10%"
+        
+        swift_reflexes:
+          melee_attack_speed: "+2%"
+          ranged_attack_speed: "+2%"
+          parry: "+2%"
+        
+        savage_strikes:
+          crit_chance: "10/20% -> 3/6%"
+        
+        improved_wing_clip:
+          proc_chance: "7/14/20% -> 14/28/40%"
+        
+        planning_ahead:
+          frost_trap_duration: "+13/25%"
+          fire_trap_damage: "+13/25%"
+        
+        carve:
+          weapon_damage: "60%"
+          cooldown: "6 seconds"
+          mana_cost: "8% base"
+        
+        stinging_nettle_lacing:
+          serpent_sting_duration: "80/60% reduced"
+        
+        killer_instinct:
+          melee_crit_damage: "7/14/20%"
+        
+        trap_mastery:
+          frost_duration: "+10/20/30%"
+          fire_damage: "+10/20/30%"
+        
+        rapid_strikes:
+          melee_attack_speed: "+40%"
+          cooldown_reduction: "1 sec"
+        
+        vicious_bite:
+          mongoose_bite_damage: "+15/30%"
+        
+        lightning_reflexes:
+          agility_bonus: "3/6/9/12/15% -> 2/4/6/8/10%"
+          melee_ap_from_agility: "20/40/60/80/100%"
+        
+        untamed_trapper:
+          immolation_scaling: "1 per 10 AP"
+          explosive_initial_scaling: "1 per 6.5 AP"
+          explosive_dot_scaling: "1 per 30 AP"
+
+    # October updates to patch 1.17.2
+    patch_1_17_2_updates_october:
+      baseline_changes:
+        wing_clip:
+          cooldown: "6s -> 3s"
+      talent_changes:
+        survival:
+          improved_wing_clip:
+            proc_chance: "7/14/20% -> 14/28/40%"
+
+  patch_1_18_0:
+    baseline_changes:
+      rapid_fire:
+        all_attack_speed: "+40% melee and ranged"
+      growl:
+        focus_cost: "15 -> 10"
+      screech:
+        ap_scaling: "1 per 25 AP"
+        cooldown: "5 sec"
+      furious_howl:
+        ap_scaling: "1 per 25 AP"
+      charge_boar:
+        ap_bonus: "35% of pet AP"
+
+    talent_changes:
+      beast_mastery:
+        endurance_training:
+          health_increase: "3/6/9/12/15% -> 1/2/3/4/5%"
+        thick_hide:
+          armor_increase: "10/20/30% -> 4/7/10%"
+        coordinated_assault:
+          pet_attack_damage: "30% AP"
+          cooldown: "3 sec"
+        pathfinding:
+          aspect_speed: "3/6%"
+          pet_speed: "15/30%"
+        bestial_discipline:
+          cooldown_reduction: "10/20%"
+        bestial_precision:
+          spell_hit: "6/12% -> 9/18%"
+        kill_command:
+          crit_damage: "+50%"
+          cooldown: "12 sec"
+        baited_shot:
+          weapon_damage: "125%"
+          pet_damage_increase: "15%"
+          focus_generation: "5 per 2 sec"
+
+      survival:
+        improved_feign_death:
+          resist_reduction: "2/4% -> 4/8%"
+        lacerate:
+          damage: "35% melee AP"
+          bleed: "20% over 8 sec"
+        vicious_strikes:
+          cooldown_reduction: "0.5/1 sec"
+
+key_scaling_values:
+  pet_attack_power_scaling:
+    spirit_bond: "12/25% of ranged AP"
+    bite: "1 per 20 AP"
+    claw: "1 per 42 AP"
+    screech: "1 per 25 AP"
+    furious_howl: "1 per 25 AP"
+    charge: "35% of pet AP"
+    coordinated_assault: "30% AP"
+
+  pet_spell_power_scaling:
+    spirit_bond: "7/15% of ranged AP"
+    lightning_breath: "0.5"
+    poison_spit: "0.25 per tick"
+    scorpid_poison: "0.1 per tick"
+    thunderstomp: "0.21"
+
+  hunter_ap_scaling:
+    untamed_trapper_immolation: "1 per 10 AP"
+    untamed_trapper_explosive: "1 per 6.5 AP"
+    untamed_trapper_explosive_dot: "1 per 30 AP"
+    lacerate: "35% melee AP"
+
+  percentage_changes:
+    avoidance: "50% -> 80% AoE reduction"
+    bestial_wrath: "50% -> 30% damage"
+    improved_stings: "10% -> 30% serpent damage"
+    trueshot_aura: "flat -> 3/4/5% AP scaling"
+    lightning_reflexes: "100% agi to melee AP"
+
+  cooldown_changes:
+    bite: "10s -> 6s"
+    thunderstomp: "60s -> 40s"
+    wing_clip: "6s -> 3s"
+    growl_focus: "15 -> 10"
+
+  hit_chance_scaling:
+    bestial_precision_physical: "4/8%"
+    bestial_precision_spell: "9/18%"

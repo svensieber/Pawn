@@ -1,0 +1,301 @@
+# Turtle WoW General System Changes - Complete Data
+# Diese Änderungen betreffen ALLE Klassen
+
+general_system_changes:
+  # ========================================
+  # PATCH 1.16.0 - NEUE STATS
+  # ========================================
+  patch_1_16_0_new_stats:
+    meditation_stat:
+      description: "Neue Stat die Mana-Regeneration im Kampf ermöglicht"
+      base_effect: "5% der Mana-Regeneration außerhalb des Kampfes"
+      stacking: "Stackt additiv mit diminishing returns"
+      spirit_scaling: "Dieser Effekt skaliert mit Spirit"
+      examples:
+        green_dragon_mail:
+          per_piece: "5% Meditation"
+          three_piece_bonus: "30% total (5% + 5% + 5% mit DR)"
+      typical_values:
+        generic_items: "1-3% Meditation"
+        special_items: "5% Meditation"
+        set_bonuses: "10-30% Meditation total"
+      calculation:
+        formula: "Mana_Regen_In_Combat = Base_Regen * (Meditation% / 100) * Spirit_Modifier"
+        spirit_modifier: "Spirit erhöht die Effektivität"
+        stack_with_talents: "Stackt mit Priest/Druid Meditation Talenten"
+      
+    haste_stat:
+      description: "Neue Stat die Angriffsgeschwindigkeit erhöht"
+      base_effect: "Fester Prozentsatz Geschwindigkeitserhöhung"
+      stacking: "Stackt mit diminishing returns"
+      typical_values:
+        generic_items: "1-2% Haste"
+        special_items: "bis zu 5% Haste"
+      calculation:
+        formula: "Attack_Speed = Base_Speed * (1 + Haste% / 100)"
+        diminishing_returns: "Jeder weitere Haste-Punkt ist weniger effektiv"
+      affects:
+        melee_attacks: "Ja"
+        ranged_attacks: "Ja"
+        spell_casting: "Nein (in 1.16.0)"
+        global_cooldown: "Nein"
+      
+    stat_priority_changes:
+      caster_classes:
+        new_priority: "Meditation wird wichtiger als Mp5 für lange Kämpfe"
+        spirit_value: "Spirit wird wertvoller durch Meditation scaling"
+      physical_classes:
+        new_priority: "Haste wird wichtiger als reiner AP/Crit"
+        attack_speed: "Kann mehr wert sein als Weapon DPS upgrades"
+      
+    pawn_implementation:
+      meditation:
+        base_value: "2.0"  # Ähnlich wie Mp5
+        spirit_synergy: "Spirit value * 1.3 wenn Meditation vorhanden"
+        calculation: "Meditation * Spirit_Modifier"
+      haste:
+        melee_value: "1.2"  # Zwischen Crit und Hit
+        ranged_value: "1.1"  # Etwas weniger für Hunter
+        diminishing_factor: "0.95 per point over 10%"
+
+  # ========================================
+  # PATCH 1.17.2 - WEAPON SKILL ÄNDERUNGEN
+  # ========================================
+  weapon_skill_formula:
+    # Patch 1.17.2 - Grundlegende Änderung der Weapon Skill Mechanik
+    hit_cap_changes:
+      old_hit_cap_vs_bosses: "9%"
+      new_hit_cap_vs_bosses: "8%"
+      hit_suppression_removed: "1% hit suppression entfernt"
+      
+    soft_cap_removal:
+      old_system: "305 weapon skill soft cap counteracted 1% suppression"
+      new_system: "Kein soft cap bei 305, lineares scaling"
+      
+    skill_benefit_formula:
+      range_300_to_304: "Jeder Punkt = 0.2% hit + 2% reduced glancing"
+      range_305_to_308: "Jeder Punkt = 0.2% hit + 2% reduced glancing"
+      old_breakpoints: "Awkward breakpoints at 305 and 308"
+      new_scaling: "Linear scaling without breakpoints"
+      
+    racial_weapon_skill_nerfs:
+      old_value: "+5 weapon skill from racials"
+      new_value: "+3 weapon skill from racials"
+      affected_racials:
+        human:
+          swords: "+5 -> +3"
+          maces: "+5 -> +3"
+        dwarf:
+          guns: "+5 -> +3"
+        orc:
+          axes: "+5 -> +3"
+        troll:
+          bows: "+5 -> +3"
+          throwing: "+5 -> +3"
+        night_elf:
+          new_in_turtle: "+3 to nature resistance piercing"
+
+  armor_formula:
+    # Änderungen am Armor Cap und Diminishing Returns
+    cap_changes:
+      old_system: "75% hard cap on damage reduction"
+      new_system: "75% hard cap removed"
+      diminishing_returns: "Applied beyond 75% damage reduction"
+      
+    practical_impact:
+      tanks: "Can now exceed 75% DR but with heavy diminishing returns"
+      armor_value: "Less valuable at high armor values"
+      
+  hit_rating:
+    # Basis Hit Rating Änderungen
+    boss_cap: "8% (was 9%)"
+    trash_cap: "5% (unchanged)"
+    pvp_cap: "5% (unchanged)"
+    
+  defense_rating:
+    # Defense Cap und Crushing Blow Änderungen
+    defense_cap: "440 defense (unchanged)"
+    crushing_blow_immunity: "440 defense still required"
+    efficiency: "Defense rating more efficient in Turtle WoW"
+    
+  racial_changes:
+    # Alle Rassen-Änderungen die Stats betreffen
+    human:
+      weapon_skill: "+5 -> +3 swords and maces"
+      perception: "Stealth detection reduced"
+      diplomacy: "Reputation gain unchanged"
+      
+    dwarf:
+      weapon_skill: "+5 -> +3 guns"
+      stoneform: "Duration and cooldown adjusted"
+      frost_resistance: "+10 (unchanged)"
+      
+    night_elf:
+      shadowmeld: "3min -> 1min cooldown"
+      nature_resistance: "+10 (unchanged)"
+      new_bonus: "+3 nature spell penetration"
+      
+    gnome:
+      intellect: "+5% (unchanged)"
+      engineering: "+15 (unchanged)"
+      escape_artist: "Cooldown adjusted"
+      arcane_resistance: "+10 (unchanged)"
+      
+    orc:
+      blood_fury: "100% -> 200% of level as AP"
+      axe_specialization: "+5 -> +3 weapon skill"
+      hardiness: "25% stun resist (unchanged)"
+      
+    tauren:
+      war_stomp: "1.5s -> 2s stun duration, 2.5min cooldown"
+      endurance: "+5% health (unchanged)"
+      nature_resistance: "+10 (unchanged)"
+      
+    troll:
+      berserking: "Attack speed bonus adjusted"
+      weapon_skill: "+5 -> +3 bows and throwing"
+      regeneration: "Health regen unchanged"
+      beast_slaying: "+5% damage vs beasts (unchanged)"
+      voodoo_shuffle: "Snare reduction adjusted"
+      
+    undead:
+      will_of_the_forsaken: "Duration and immunity adjusted"
+      cannibalize: "Unchanged"
+      shadow_resistance: "+10 (unchanged)"
+      underwater_breathing: "Unchanged"
+
+  resource_generation:
+    # Patch 1.17.2 - Neue Ressourcen-Formel
+    rage_generation:
+      formula: "90% gear-dependent + 10% weapon speed predetermined"
+      goal: "Address resource starvation for undergeared players"
+      design: "The top is the same, but the bottom has been raised up"
+      
+    energy_regeneration:
+      base_rate: "20 energy per 2 seconds (unchanged)"
+      improvements: "Various talent improvements"
+      
+    mana_regeneration:
+      five_second_rule: "Unchanged"
+      spirit_formula: "Unchanged"
+      mp5_value: "More valuable due to longer fights"
+
+  combat_mechanics:
+    # Allgemeine Kampfmechanik-Änderungen
+    glancing_blows:
+      old_formula: "40% damage reduction at 305 weapon skill"
+      new_formula: "Linear reduction with weapon skill"
+      vs_bosses: "Still significant without weapon skill"
+      
+    crushing_blows:
+      still_exist: "Yes, for bosses +3 levels"
+      prevention: "440 defense or 102.4% total avoidance"
+      
+    critical_strikes:
+      melee_crit_cap: "100% (unchanged)"
+      spell_crit_cap: "100% (unchanged)"
+      crit_suppression: "4.8% vs bosses (unchanged)"
+      
+    spell_resistance:
+      binary_spells: "17% base resist chance vs +3 level"
+      non_binary: "Partial resist chances adjusted"
+      penetration_value: "Less valuable overall"
+
+  stat_conversions:
+    # Level 60 Stat Conversions für Turtle WoW
+    hit_rating:
+      per_percent: "8.33716"  # für 8% cap
+      old_value: "9.37931"    # für 9% cap
+      
+    spell_hit_rating:
+      per_percent: "7.11"     # für 8% cap
+      old_value: "8"          # für 9% cap
+      
+    crit_rating:
+      per_percent: "8.5"      # unchanged
+      
+    spell_crit_rating:
+      per_percent: "8"        # unchanged
+      
+    haste_rating:
+      per_percent: "8.03"     # unchanged
+      
+    spell_haste_rating:
+      per_percent: "8.03"     # unchanged
+      
+    expertise_rating:
+      per_point: "2.34483"    # unchanged
+      
+    armor_penetration:
+      per_percent: "3.75"     # unchanged
+      
+    spell_penetration:
+      per_point: "1"          # unchanged
+      
+    defense_rating:
+      per_point: "1.2"        # buffed from 1.5
+      
+    dodge_rating:
+      per_percent: "8.58"     # buffed from 9.44
+      
+    parry_rating:
+      per_percent: "9.44"     # unchanged
+      
+    block_rating:
+      per_percent: "4.6"      # buffed from 6.9
+      
+    block_value:
+      coefficient: "1.3"      # increased value due to AP scaling
+
+  buff_cap_changes:
+    # Buff und Debuff Limits
+    buff_limit: "32 (unchanged)"
+    debuff_limit: "16 on bosses (unchanged)"
+    hidden_auras: "Some auras no longer count toward limit"
+    
+  threat_mechanics:
+    # Threat Multiplikatoren
+    tank_stance_threat:
+      defensive_stance: "130% (unchanged)"
+      bear_form: "130% (unchanged)"
+      righteous_fury: "60% -> 90% with talents"
+      
+    healing_threat:
+      formula: "0.5 threat per 1 healing (unchanged)"
+      modifiers: "Various class modifiers improved"
+      
+  movement_speed:
+    # Bewegungsgeschwindigkeit Caps
+    maximum_speed: "200% (unchanged)"
+    minimum_speed: "0% (unchanged)"
+    mount_speeds:
+      normal_ground: "60% (unchanged)"
+      epic_ground: "100% (unchanged)"
+      normal_flying: "N/A in Classic"
+      epic_flying: "N/A in Classic"
+
+# Zusammenfassung der wichtigsten Änderungen für Pawn
+key_changes_for_pawn:
+  hit_cap_reduction:
+    impact: "Hit rating 11% less valuable"
+    formula: "Multiply hit rating values by 0.89"
+    
+  block_improvements:
+    impact: "Block rating and block value 30-50% more valuable"
+    formula: "Multiply block values by 1.3-1.5"
+    
+  defense_efficiency:
+    impact: "Defense rating 20% more efficient"
+    formula: "Multiply defense values by 1.2"
+    
+  armor_diminishing_returns:
+    impact: "Armor 20% less valuable at high values"
+    formula: "Multiply armor values by 0.8 for tanks"
+    
+  resistance_devaluation:
+    impact: "All resistances 30% less valuable"
+    formula: "Multiply resistance values by 0.7"
+    
+  weapon_skill_racial_nerf:
+    impact: "Racial weapon skills 40% less valuable"
+    formula: "Reduce weapon skill bonuses by 40%"

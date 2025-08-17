@@ -1,0 +1,296 @@
+# Turtle WoW Druid Scaling Changes - Theorycrafting Data
+# Numerical scaling coefficients and damage/healing calculations only
+
+druid_scaling_changes:
+  patch_1_16_1:
+    baseline_changes:
+      moonkin_form:
+        mana_cost_reduction: "-20%"
+        armor_increase: "360%"
+        spell_crit_aura: "+3% to party members within 30 yards"
+      tree_of_life_form:
+        spirit_healing_bonus: "+20% of total Spirit to party healing"
+        mana_cost_reduction: "-20%"
+      omen_of_clarity:
+        effect: "100% cost reduction on next damage/healing spell or offensive ability"
+        duration: "30 min"
+    
+    talent_changes:
+      balance:
+        natural_weapons:
+          physical_damage: "+3/6/10%"
+          hit_chance: "+1/2/3% melee and spells"
+        natures_grace:
+          gcd_reduction: "0.5 sec on spell critical"
+          cast_time_reduction: "0.5 sec on next spell"
+        moonkin_form:
+          armor_increase: "360%"
+          mana_cost_reduction: "-20% Balance spells"
+          party_spell_crit: "+3% within 30 yards"
+      
+      feral:
+        primal_fury:
+          bear_rage_on_crit: "50/100% chance for +5 rage"
+          cat_combo_on_crit: "50/100% chance for additional combo point"
+        thick_hide:
+          armor_increase: "+3/6/10%"
+        feral_instinct:
+          threat_increase: "+5/10/15% in Bear forms"
+        blood_frenzy:
+          tigers_fury_duration: "+3/6 seconds"
+          enrage_rage_restore: "+5/10 instantly"
+          attack_speed_bonus: "+6/12% for 6/12 seconds"
+        berserk:
+          cooldown: "6 minutes"
+          cat_form_effect: "+100% energy regeneration"
+          bear_form_effect: "+20% health (temporary)"
+          duration: "20 seconds"
+      
+      restoration:
+        subtlety:
+          threat_reduction: "-4/8/12/16/20%"
+        tree_of_life:
+          healing_bonus: "+20% of Spirit to party members within 30 yards"
+          mana_cost_reduction: "-20% healing spells"
+      
+  patch_1_17_0:
+    baseline_changes:
+      emerald_blessing:
+        spell_hit: "+1%"
+        mana_regeneration_combat: "+5%"
+      hurricane:
+        cooldown: "60s -> 30s"
+        spellpower_coefficient: "9.6% per tick"
+      tranquility:
+        cooldown: "5 min -> 30 min"
+      ferocious_bite:
+        energy_conversion: "1 energy = 1 damage"
+      wrath:
+        base_damage_increase: "+5%"
+        coefficient_increase: "+5%"
+      insect_swarm:
+        duration: "12s -> 18s (3 extra ticks)"
+      frenzied_regeneration:
+        healing_formula: "10 rage/sec = 6/7/8% stamina"
+        cooldown: "3 min -> 6 min"
+      swipe:
+        ap_scaling: "8%"
+      savage_bite:
+        threat_modifier: "175% -> 350%"
+      tree_of_life_aura:
+        healing_power_scaling: "Based on Spirit percentage"
+
+  patch_1_17_2:
+    baseline_changes:
+      manual_crowd_pummeler:
+        swing_speed_increase: "20% (was 50% attack speed)"
+        cooldown: "none -> 20 min"
+      battery_powered_crowd_pummeler:
+        swing_speed_increase: "20% (was 50% attack speed)"
+        cooldown: "none -> 20 min"
+      tranquility:
+        rank_4_healing: "87 healing/sec for 10 sec"
+        cooldown: "5 min -> 30 min"
+        mana_cost: "doubled"
+        healing_tick_rate: "2 sec -> 1 sec"
+        rank_durations:
+          rank_1: "4 sec"
+          rank_2: "6 sec"
+          rank_3: "8 sec"
+          rank_4: "10 sec"
+      ferocious_bite:
+        energy_conversion: "1 energy = 1 damage"
+        combo_point_damage:
+          1_point: "35-51"
+          2_points: "67-83"
+          3_points: "99-115"
+          4_points: "131-147"
+          5_points: "163-179"
+      regrowth:
+        mana_cost_reduction: "-20% all ranks"
+      hurricane:
+        spellpower_coefficient: "9.6% per tick"
+        cooldown: "60s -> 30s"
+      swipe:
+        ap_scaling: "8% all ranks"
+      savage_bite:
+        threat_modifier: "175% -> 350%"
+      frenzied_regeneration:
+        healing_formula: "10 rage/sec = 6/7/8% stamina"
+        cooldown: "3 min -> 6 min"
+      barkskin_feral:
+        damage_reduction: "50% next 5/10/15 melee attacks"
+        duration: "12 sec"
+        cooldown: "10 min"
+      moonfire:
+        duration: "ranks 2-10: 12s -> 18s (+2 ticks)"
+      insect_swarm:
+        duration: "12s -> 18s (+3 ticks)"
+      wrath:
+        base_damage: "+5%"
+        spellpower_coefficient: "+5%"
+      tiger_fury:
+        rank_3_damage: "+35"
+        rank_4_damage: "+50"
+      rake:
+        initial_ap_scaling: "12%"
+        bleed_ap_scaling: "3%"
+        
+    talent_changes:
+      balance:
+        sylvan_blessing:
+          mana_regeneration_chance: "50/100% chance after kill"
+          mana_regen_rate: "100% while casting"
+          duration: "15 sec"
+        guidance_of_the_dream:
+          pushback_reduction: "23/46/70% chance to avoid interruption"
+        moonkin_form:
+          armor_increase: "180% (level 30), 360% (level 40)"
+        owlkin_frenzy:
+          pushback_protection: "30%"
+          mana_regen: "1% max mana/sec for 10s"
+          cooldown: "25 sec internal"
+        balance_of_all_things:
+          insect_swarm_proc: "6/12/18/24/30% chance"
+          starfire_cast_reduction: "0.5 sec"
+          moonfire_proc: "6/12/18/24/30% chance"
+          wrath_mana_reduction: "50%"
+          max_stacks: "3"
+        gale_winds:
+          hurricane_attack_speed_slow: "12/25%"
+        eclipse:
+          starfire_crit_nature_damage: "+25%"
+          wrath_crit_arcane_damage: "+25%"
+          duration: "15 sec"
+          cooldown: "30 sec each"
+        
+      restoration:
+        genesis:
+          periodic_increase: "5/10/15%"
+        aessinas_bloom:
+          instant_heal_chance: "30/60%"
+        preservation:
+          regrowth_healing: "+10/20/30% if Rejuv active"
+        improved_tranquility:
+          healing_increase: "20/40%"
+          
+      feral_combat:
+        open_wounds:
+          claw_damage_if_rake: "+10/20/30%"
+          rip_claw_bonus: "+3/4/5% per CP for 15s"
+        blood_frenzy:
+          attack_speed: "30%"
+          rage_from_enrage: "10"
+        feral_adrenaline:
+          dodge_bonus_on_crit: "15/30/45% until next dodge"
+          cooldown: "30 sec"
+        ancient_brutality:
+          damage_as_healing: "5/10/15%"
+          rage_generation: "1/2/3 per sec for 5s"
+          cooldown: "6 sec"
+
+  patch_1_17_2_updates_october_21_2024:
+    baseline_changes:
+      insect_swarm:
+        stacking: "damage stacks from multiple druids"
+        
+  patch_1_17_2_updates_november_1_2024:
+    baseline_changes:
+      blood_frenzy:
+        attack_speed: "30% -> 20%"
+        duration: "12s -> 18s"
+      swipe:
+        ap_scaling: "8% -> 6%"
+        threat_modifier: "175% -> 140%"
+      savage_bite:
+        threat_modifier: "350% -> 225%"
+      improved_shred:
+        damage_bonus: "+5/10% for 5s after entering Cat Form"
+      open_wounds:
+        rip_claw_bonus: "3/4/5% -> 2/4/6% per CP"
+
+  patch_1_18_0:
+    baseline_changes:
+      tiger_fury:
+        energy_generation: "+10 every 3 sec"
+      ferocious_bite:
+        energy_conversion: "0.5% per energy"
+      rip:
+        duration_scaling:
+          1_cp: "12s -> 10s"
+          2_cp: "12s -> 12s"
+          3_cp: "12s -> 14s"
+          4_cp: "12s -> 16s"
+          5_cp: "12s -> 18s"
+      rejuvenation:
+        tick_rate: "3s -> 2s"
+      regrowth:
+        tick_rate: "3s -> 2s"
+        duration: "21s -> 20s"
+      
+    talent_changes:
+      balance:
+        balance_of_all_things:
+          starfire_cast_reduction: "0.8s -> 0.5s"
+        gale_winds:
+          hurricane_mana_cost: "-10/20%"
+          attack_speed_slow_duration: "10s -> 2s"
+        eclipse:
+          proc_chance_wrath: "30%"
+          proc_chance_starfire: "50%"
+          damage_bonus: "10% + 60% of crit chance"
+          duration: "15 sec"
+          cooldown: "30 sec each"
+        improved_balance_of_all_things_t3_5:
+          bonus_increase: "33% -> 50%"
+          
+      feral_combat:
+        open_wounds:
+          rip_damage: "+5/10/15%"
+          claw_damage_per_bleed: "+10/20/30%"
+        improved_shred:
+          damage_bonus: "+5/10%"
+        predatory_strikes:
+          damage_bonus: "+7/14/20%"
+        ancient_brutality:
+          energy_from_bleeds: "5/10 -> 3/5"
+        carnage:
+          healing_return: "5/10%"
+          ferocious_bite_refresh_chance: "10/20% per CP"
+          
+      restoration:
+        aessinas_bloom:
+          cast_time_reduction: "0.15/0.3 sec"
+          mana_refund: "5/10%"
+        tree_of_life:
+          armor_increase: "180%"
+
+key_scaling_values:
+  attack_power_coefficients:
+    swipe: "6%"
+    savage_bite: "threat 225%"
+    rake_initial: "12%"
+    rake_bleed: "3%"
+    ferocious_bite: "0.5% per energy"
+    
+  spell_power_coefficients:
+    hurricane: "9.6% per tick"
+    wrath: "+5% total"
+    moonfire: "base coefficient"
+    
+  percentage_changes:
+    moonkin_armor: "180% -> 360% (at 40)"
+    tree_of_life_spirit: "20%"
+    eclipse_damage: "10% + 60% crit"
+    blood_frenzy_speed: "20%"
+    
+  duration_changes:
+    moonfire: "+6s (+2 ticks)"
+    insect_swarm: "+6s (+3 ticks)"
+    rip: "scales 10-18s by CP"
+    
+  cooldown_changes:
+    hurricane: "60s -> 30s"
+    tranquility: "5 min -> 30 min"
+    frenzied_regeneration: "3 min -> 6 min"
+    manual_crowd_pummeler: "none -> 20 min"

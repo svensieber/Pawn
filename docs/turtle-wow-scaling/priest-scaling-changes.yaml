@@ -1,0 +1,198 @@
+# Turtle WoW Priest Scaling Changes - Scaling Coefficients & Modifiers
+# Healing power coefficients, shadow damage scaling, percentage changes, mana costs, cast times, cooldowns
+
+priest_scaling_changes:
+  # Patch 1.16.1 - Oldest patch
+  patch_1_16_1:
+    baseline_changes:
+      feedback:
+        mana_cost_reduced: true
+      holy_fire:
+        initial_coefficient: "0.75 -> 0.857"
+        
+    talent_changes:
+      shadow:
+        vampiric_touch_renamed:
+          new_name: "Vampiric Embrace"
+          healing_bonus: "+5/10%"
+          party_mana_gain: "2/4% from Shadow damage"
+      holy:
+        holy_nova:
+          damage_scaling: "0.107 -> 0.161"
+        champions_grace:
+          healing_done_by_priest: "+10%"
+
+  # Patch 1.17.0
+  patch_1_17_0:
+    baseline_changes:
+      grace_of_the_sunwell:
+        mana_cost: "21% -> 6%"
+      feedback:
+        mana_cost: "-65% (approximately 35% of original values)"
+
+  # Patch 1.17.2
+  patch_1_17_2:
+    baseline_changes:
+      buff_mana_costs:
+        power_word_fortitude: "~50-70% reduction"
+        prayer_of_fortitude: "2600 -> 900"
+        divine_spirit: "~50% reduction"
+        prayer_of_spirit: "1940 -> 900"
+        shadow_protection: "~25% reduction"
+        prayer_of_shadow_protection: "1300 -> 900"
+        feedback: "~30% reduction"
+      power_word_shield:
+        coefficient: "10% -> 35% (post-20)"
+      lightwell:
+        scaling: "17% healing power"
+      healing_spells:
+        base_and_scaling: "-15%"
+        affected_spells: "Lesser Heal, Renew, Heal, Flash Heal, Prayer of Healing, Greater Heal, Desperate Prayer, Lightwell"
+        
+    talent_changes:
+      discipline:
+        smite_buffs:
+          base_damage: "+10%"
+          mana_cost_reduction: "30-50%"
+        holy_fire_buffs:
+          initial_coefficient: "85% -> 100%"
+          base_damage: "+10%"
+        mental_agility:
+          mana_cost_reduction: "2/4/6/8/10%"
+          affects: "offensive Holy and Discipline spells"
+        mental_strength:
+          casting_speed: "+1/2/3%"
+        enlighten:
+          spell_power: "+10% (15% self)"
+          duration: "8 sec"
+          proc_chance: "15%"
+          mana_cost: "10% base"
+          cooldown: "1 min"
+        resurgent_shield:
+          mana_refund: "25% base cost"
+          holy_damage: "+6% of absorption"
+          duration: "8 sec"
+        force_of_will:
+          shield_absorption: "+4/8/12/16/20%"
+        chastise:
+          coefficient: "65%"
+          ally_haste: "10/13/15%"
+          haste_duration: "6 sec (8 sec on crit)"
+          mana_cost: "6% base"
+          cooldown: "30 sec"
+          
+      holy:
+        swift_recovery:
+          healing_bonus: "3/6% if Renew"
+        spirit_of_redemption:
+          spirit_bonus: "+5%"
+        spiritual_healing:
+          healing: "2/4/6/8/10% -> 6/12/18/24/30%"
+        reservoir_of_light:
+          lightwell_charges: "+1/3/5"
+          
+      shadow:
+        pain_spike_coefficient: "42.85% -> 25%"
+        pain_spike_cooldown: "30s -> 40s"
+        blackout: "3s -> 2s"
+        mind_flay: "45% -> 75% coefficient"
+        mind_blast: 
+          coefficient: "42.85% -> 60%"
+        vampiric_embrace: "2 sec cast"
+        vampiric_touch:
+          healing: "5/10% -> 2/5%"
+          mana: "2/4% -> 1/2%"
+
+  # Patch 1.17.2 Updates - October
+  patch_1_17_2_updates_october:
+    baseline_changes:
+      enlighten:
+        triggers_from_healing: true
+
+  # Patch 1.17.2 Updates - November
+  patch_1_17_2_updates_november:
+    talent_changes:
+      discipline:
+        force_of_will:
+          affects_channels_dots: true
+        searing_light:
+          mana_reduction: "100% -> 40%"
+        purifying_flames:
+          duration: "8s -> 10s"
+
+  # Patch 1.18.0 - Newest patch
+  patch_1_18_0:
+    baseline_changes:
+      smite:
+        rank_9_mana: "240 -> 225"
+      mind_blast:
+        threat_modifier: "200% -> 170%"
+        
+    talent_changes:
+      shadow:
+        vampiric_embrace:
+          cast_time: "removed"
+        shadow_mend:
+          cast_time: "3s -> 1.5s"
+          mana_cost: "635 -> 270"
+          healing: "518-616 -> 759-896"
+          spellpower: "85.71% -> 50%"
+          shadow_spellpower: "+20%"
+          self_damage: "50% of effective healing"
+          
+      holy:
+        holy_nova:
+          mana_cost: "-20%"
+          base_damage: "-5%"
+          spellpower: "16% -> 15%"
+          threat: "-25%"
+
+key_scaling_values:
+  spellpower_coefficients:
+    power_word_shield: "35%"
+    holy_fire_initial: "100%"
+    pain_spike: "25%"
+    mind_flay: "75%"
+    mind_blast: "60%"
+    searing_shot: "33%"
+    chastise: "65%"
+    shadow_mend: "50% + 20% shadow"
+    holy_nova: "15%"
+    starshards: "0.4"
+    
+  percentage_changes:
+    spiritual_healing: "10% -> 30%"
+    illumination_style: "100% -> 60%"
+    vampiric_healing: "10% -> 5%"
+    vampiric_mana: "4% -> 2%"
+    enlighten_power: "10% (15% self)"
+    force_of_will_shield: "+20%"
+    holy_nova_threat: "-25%"
+    
+  mana_cost_reductions:
+    grace_of_the_sunwell: "21% -> 6%"
+    feedback: "-65%"
+    buff_spells: "~50-70%"
+    searing_light_proc: "-40%"
+    shadow_mend: "635 -> 270"
+    holy_nova: "-20%"
+    
+  healing_changes:
+    baseline_reduction: "-15%"
+    spiritual_healing_compensation: "+30%"
+    swift_recovery: "+3/6%"
+    reservoir_charges: "+1/3/5"
+    shadow_mend_shadow_sp: "+20%"
+    
+  cooldown_changes:
+    pain_spike: "30s -> 40s"
+    starshards: "30s"
+    avatar: "1 min -> 5 min"
+    
+  cast_time_changes:
+    vampiric_embrace: "instant -> 2s -> instant"
+    shadow_mend: "3s -> 1.5s"
+    
+  threat_modifiers:
+    mind_blast: "200% -> 170%"
+    holy_nova: "-25%"

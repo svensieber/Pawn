@@ -1,0 +1,183 @@
+# Turtle WoW Mage Scaling Changes - Spellpower Coefficients and Damage Modifiers
+# Focus on numerical scaling values, coefficients, and percentage changes
+
+mage_scaling_changes:
+  patch_1_16_1:
+    baseline_changes:
+      arcane_missiles:
+        spellpower_coefficient: "0.24 -> 0.286"
+        
+    talent_changes:
+      arcane:
+        improved_arcane_explosion:
+          crit_chance_bonus: "2/4/6%"
+        arcane_potency:
+          crit_damage_bonus: "18/36/50%"
+
+  patch_1_17_0:
+    # Placeholder for patch 1.17.0 changes - add content as needed
+
+  patch_1_17_2:
+    baseline_changes:
+      arcane_surge:
+        spellpower_coefficient: "65%"
+        cooldown: "8 sec"
+      arcane_missiles:
+        spellpower_per_missile: "28.6% -> 32.8%"
+        total_scaling_increase: "+21%"
+      dampen_magic:
+        magic_damage_reduction: "2%"
+        healing_reduction: "1%"
+        mana_cost: "6% base mana"
+      amplify_magic:
+        healing_increase: "2%"
+        magic_damage_increase: "1%"
+        mana_cost: "6% base mana"
+      arcane_intellect:
+        mana_cost_reduction:
+          rank_1: "60 -> 50"
+          rank_2: "185 -> 100"
+          rank_3: "520 -> 240"
+          rank_4: "945 -> 340"
+          rank_5: "1510 -> 445"
+      arcane_brilliance:
+        mana_cost: "3400 -> 1200"
+        
+    talent_changes:
+      arcane:
+        wand_specialization:
+          hit_chance: "+5/10%"
+        magic_absorption:
+          mana_return: "1/2/3/4/5% -> 1/2/3% of total mana"
+          cooldown: "1s -> 2s"
+        arcane_concentration:
+          cooldown: "8 sec"
+        magic_attunement:
+          effect_increase: "25/50% -> 100%"
+        arcane_rupture:
+          spellpower: "100%"
+          cast_time: "2.5 seconds"
+          cooldown: "15 seconds"
+          arcane_missiles_bonus: "+25% damage/mana for 8s"
+        improved_mana_shield:
+          mana_reduction: "10/20% -> 13/25%"
+        temporal_convergence:
+          reset_chance: "5/10/15%"
+          mana_refund: "100% base cost on next cast"
+          internal_cooldown: "15 sec"
+        arcane_meditation:
+          mana_regen: "5/10/15% -> 7/14/20%"
+          below_35%_mana: "tripled"
+        arcane_instability:
+          damage_bonus: "+25%"
+          mana_cost: "2% base mana consumed on proc"
+          proc_chance: "8/16/25%"
+        accelerated_arcana:
+          casting_speed: "+6%"
+        arcane_potency:
+          crit_damage: "17/33/50% -> 50/100%"
+        resonance_cascade:
+          duplicate_chance: "4/8/12/16/20%"
+          duplicate_damage: "50%"
+        arcane_power:
+          casting_speed: "+35%"
+          mana_drain: "2% max/sec"
+          mana_gain_reduction: "-75%"
+          duration: "20 sec"
+          
+      fire:
+        ignite:
+          duration: "4s -> 6s"
+        improved_fire_blast:
+          gcd_reduction: "0.17/0.34/0.5 sec"
+        hot_streak:
+          proc_chance: "33/66/100%"
+          pyroblast_cast_reduction: "0.5 sec per stack"
+          max_stacks: "3/6/9"
+          
+      frost:
+        improved_blizzard:
+          slow: "30/50/65% -> 20/30/40%"
+        shatter:
+          crit_chance: "10/20/30/40/50% -> 7/14/21/28/35%"
+        icicles:
+          spellpower: "40% per icicle"
+          channel_duration: "5 sec"
+          cooldown: "30 seconds"
+        flash_freeze:
+          icicles_reset: "50/100% chance"
+          channel_speed: "+400%"
+        ice_barrier:
+          frost_damage_bonus: "+15% while active"
+
+  patch_1_17_2_updates_november:
+    talent_changes:
+      fire:
+        ignite:
+          duration: "6s -> 4s (reverted)"
+        hot_streak:
+          ranks: "3 -> 2"
+          proc_chance: "33/66/100% -> 50/100%"
+        master_of_elements:
+          mana_refund: "10/20/30% -> 15/30/45%"
+        blast_wave:
+          cooldown: "45s -> 30s"
+
+  patch_1_18_0:
+    baseline_changes:
+      flamestrike:
+        cast_time: "3s -> 2.5s"
+        
+    talent_changes:
+      arcane:
+        arcane_rupture:
+          arcane_missiles_bonus: "25% -> 20%"
+          
+      fire:
+        flame_throwing:
+          blast_wave_radius: "+10/20%"
+          
+key_scaling_values:
+  spellpower_coefficients:
+    arcane_missiles: "32.8% per missile"
+    arcane_surge: "65%"
+    arcane_rupture: "100%"
+    icicles: "40% per icicle"
+    
+  percentage_increases:
+    arcane_missiles_total: "+21% scaling"
+    arcane_rupture_buff: "+20% damage/mana"
+    ice_barrier_frost: "+15% damage"
+    arcane_power_speed: "+35%"
+    flash_freeze_speed: "+400%"
+    
+  mana_changes:
+    arcane_intellect: "~50-70% reduction"
+    arcane_brilliance: "3400 -> 1200"
+    arcane_meditation: "7/14/20% regen"
+    arcane_meditation_low: "21/42/60% below 35%"
+    arcane_power_drain: "2% max/sec"
+    master_of_elements: "15/30/45% refund"
+    
+  critical_damage:
+    arcane_potency: "50/100% bonus"
+    elemental_fury: "50/100% bonus"
+    
+  proc_chances:
+    arcane_instability: "8/16/25%"
+    temporal_convergence: "5/10/15%"
+    resonance_cascade: "4/8/12/16/20%"
+    hot_streak: "50/100%"
+    flash_freeze: "50/100%"
+    
+  cooldown_changes:
+    arcane_concentration: "8 sec internal"
+    arcane_surge: "8 sec"
+    blast_wave: "45s -> 30s"
+    ignite_duration: "4s -> 6s -> 4s"
+    
+  damage_modifiers:
+    arcane_instability: "+25% on proc"
+    resonance_cascade: "50% duplicate"
+    shatter: "7-35% crit chance"
+    improved_blizzard: "20-40% slow"

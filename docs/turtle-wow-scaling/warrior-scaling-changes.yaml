@@ -1,0 +1,261 @@
+# Turtle WoW Warrior Scaling Changes - Core Mechanics Only
+# Attack power coefficients, damage percentages, rage formulas, and cooldowns
+
+warrior_scaling_changes:
+  patch_1_16_1:
+    baseline_changes:
+      intervene:
+        rage_cost: "10"
+        cooldown: "30s"
+      decisive_strike:
+        rage_cost: "15"
+        damage: "Equal to Slam Rank 4"
+      die_by_the_sword:
+        parry_bonus: "+20% during Retaliation"
+        
+    talent_changes:
+      arms:
+        improved_thunder_clap:
+          rage_cost_reduction: "-1/2/4"
+          damage_increase: "+20/40/60%"
+        improved_disciplines:
+          cooldown_reduction: "-2/4/6 min on Retaliation/Recklessness/Shield Wall"
+
+  patch_1_17_2:
+    baseline_changes:
+      rage_generation:
+        formula: "90% gear + 10% weapon speed"
+      execute:
+        base_damage_reduced:
+          rank_1: "125 -> 75"
+          rank_2: "200 -> 150"
+          rank_3: "325 -> 225"
+          rank_4: "450 -> 300"
+          rank_5: "600 -> 375"
+        rage_conversion_increased:
+          rank_1: "3 -> 4"
+          rank_2: "6 -> 8"
+          rank_3: "9 -> 12"
+          rank_4: "12 -> 16"
+          rank_5: "15 -> 20"
+        cooldown: "5.5 sec"
+      pummel:
+        damage: "5% AP"
+      rend:
+        ap_scaling: "5% AP per tick"
+      rage_decay:
+        out_of_combat: "2 per 2 sec"
+      hamstring:
+        cooldown: "6 sec"
+      sunder_armor:
+        rage_cost: "15 -> 10"
+        
+    talent_changes:
+      arms:
+        improved_rend:
+          bleed_damage: "15/25/35% -> 10/20%"
+        improved_charge:
+          rage: "3/6 -> 5/10"
+        deep_wounds:
+          tick_rate: "every 1.5s"
+          duration: "6 sec"
+        counterattack:
+          damage:
+            rank_1_level_20: "40 + 10% AP"
+            rank_2_level_30: "80 + 10% AP"
+            rank_3_level_40: "120 + 10% AP"
+            rank_4_level_50: "160 + 10% AP"
+            rank_5_level_60: "200 + 10% AP"
+          cooldown: "5 sec"
+        two_handed_specialization:
+          damage: "1/2/3/4/5% -> 2/4/6%"
+        master_of_arms:
+          axe_crit: "+1/2/3/4/5%"
+          mace_armor_ignore: "2/4/6/8/10 per level"
+          sword_extra_attack: "1/2/3/4/5% chance"
+        sweeping_strikes:
+          rage: "30 -> 20"
+        precision_cut:
+          execute_damage: "+20/40/60% per extra rage"
+        boundless_anger:
+          max_rage: "+10/20/30"
+        improved_disciplines:
+          cooldown_reduction: "2/4/6 min -> 4/8/12 min"
+          
+      fury:
+        booming_voice:
+          effect: "10/20/30/40/50% -> 12/24/36/48/60%"
+        unbridled_wrath:
+          proc: "8/16/24/32/40% -> 15/30/45/60/75%"
+        dual_wield_specialization:
+          off_hand_hit: "+2/4/6/8/10%"
+        blood_craze:
+          healing: "1/2/3% -> 2/4/6% total health"
+        reckless_execute:
+          cooldown_reduction: "2/4 sec"
+        enrage:
+          duration: "12s -> 8s"
+        improved_pummel:
+          daze: "25/50% chance for 4s"
+          lockout: "+1/2 sec longer"
+        improved_whirlwind:
+          cooldown: "-1/1.5/2 sec"
+        battlefield_mobility:
+          reduces_cooldown: "Intercept and Intervene"
+        blood_drinker:
+          healing: "1/1.5/2% max health on next 5 attacks"
+        bloodthirst:
+          damage:
+            rank_1_level_40: "80 + 30% AP"
+            rank_2_level_48: "100 + 30% AP"
+            rank_3_level_56: "120 + 30% AP"
+            rank_4_level_60: "150 + 30% AP"
+          
+      protection:
+        improved_bloodrage:
+          instant_rage: "+5/10"
+        shield_specialization:
+          rage_on_block: "1/2/3/4/5"
+        toughness:
+          shield_absorption: "+3/6/9/12/15%"
+        improved_intervene:
+          immunity_chance: "50/100% to movement impairing effects for 3 sec"
+        improved_revenge:
+          cooldown: "-0.5/1/1.5 sec"
+        gag_order:
+          dispel_chance: "25/50% on Shield Slam"
+        improved_disarm:
+          cooldown: "-10/20 sec"
+        shield_slam:
+          ap_scaling: "added to shield block value"
+        improved_shield_slam:
+          cooldown: "-0.5/1 sec"
+          block_chance: "+35/70% for 5 sec"
+        reprisal:
+          revenge_damage: "+25/50%"
+          rage_refund: "50/100% chance if successful"
+        improved_shield_wall:
+          cooldown: "-5/10 min"
+          duration: "+1/2 sec"
+        defensive_tactics:
+          threat_retention: "50/100/150% from Defensive Stance in other stances"
+        concussion_blow:
+          armor_penetration: "50%"
+
+  patch_1_17_2_updates_october:
+    talent_changes:
+      protection:
+        improved_shield_slam:
+          effect_duration: "5s -> 4.5s"
+          cooldown: "5s -> 4.5s"
+          cooldown_reduction: "0.5/1s -> 0.75/1.5s"
+
+  patch_1_17_2_updates_november:
+    baseline_changes:
+      enrage:
+        damage_bonus: "25% -> 15%"
+      rend:
+        ap_scaling: "5% AP per tick (all ranks)"
+      mortal_strike:
+        damage_formula_change:
+          old: "weapon damage + 85/110/135/160"
+          new: "105/110/115/120% weapon damage"
+    talent_changes:
+      protection:
+        defensive_tactics:
+          threat_multipliers: "50/100/150% -> 55/110/165%"
+
+  patch_1_18_0:
+    baseline_changes:
+      execute:
+        cooldown: "removed"
+        
+    talent_changes:
+      arms:
+        master_strike:
+          weapon_damage: "35%"
+          cooldown: "30 sec"
+        mortal_strike:
+          damage_increased:
+            rank_1: "105% -> 115%"
+            rank_2: "110% -> 120%"
+            rank_3: "115% -> 125%"
+            rank_4: "120% -> 130%"
+        slam:
+          damage_increased:
+            rank_2: "60% -> 65%"
+            rank_3: "70% -> 80%"
+            rank_4: "80% -> 90%"
+            rank_5: "90% -> 100%"
+        precision_cut:
+          reworked: "+15/30/45% base damage"
+          
+      fury:
+        improved_execute:
+          rage_cost: "-2/5"
+        battlefield_mobility:
+          charge_cooldown: "-2/4 sec"
+        bloodthirst:
+          movement_speed: "5% -> 10%"
+        blood_drinker:
+          healing: "1-2% on all attacks"
+        improved_berserker_rage:
+          rage_generation: "+5/10"
+          
+      protection:
+        concussion_blow:
+          generates_rage: "+10"
+
+key_scaling_values:
+  attack_power_coefficients:
+    pummel: "5%"
+    rend: "5% per tick"
+    counterattack: "10%"
+    bloodthirst: "30%"
+    master_strike: "35%"
+    
+  rage_changes:
+    generation_formula: "90% gear + 10% weapon speed"
+    decay: "2 per 2 sec"
+    sunder_armor: "15 -> 10"
+    sweeping_strikes: "30 -> 20"
+    execute_conversion: "3-15 -> 4-20 per rage"
+    improved_charge: "3/6 -> 5/10"
+    shield_specialization: "1-5 on block"
+    improved_bloodrage: "+5/10 instant"
+    concussion_blow: "generates +10"
+    improved_berserker_rage: "+5/10"
+    
+  percentage_changes:
+    enrage_damage: "25% -> 15%"
+    bloodthirst_movement: "5% -> 10%"
+    die_by_the_sword_parry: "+20%"
+    shield_wall_duration: "+1/2 sec"
+    defensive_tactics_threat: "55-165%"
+    master_of_arms_crit: "+1-5%"
+    precision_cut_execute: "+15-45% base"
+    blood_drinker_heal: "1-2% max hp"
+    
+  cooldown_changes:
+    execute: "5.5s -> removed"
+    hamstring: "6 sec"
+    sweeping_strikes_rage: "30 -> 20"
+    improved_disciplines: "2-6 min -> 4-12 min"
+    improved_shield_wall: "-5/10 min"
+    battlefield_mobility_charge: "-2/4 sec"
+    master_strike: "30 sec"
+    
+  damage_scaling:
+    deep_wounds: "every 1.5s for 6s"
+    mortal_strike: "105-120% -> 115-130%"
+    slam: "60-90% -> 65-100%"
+    execute_base: "reduced 40-60%"
+    execute_rage: "increased 33%"
+    
+  hit_chance:
+    dual_wield_off_hand: "+2-10%"
+    
+  armor_effects:
+    master_of_arms_mace: "2-10 ignore per level"
+    concussion_blow: "50% penetration"
+    toughness_shield: "+3-15% absorption"

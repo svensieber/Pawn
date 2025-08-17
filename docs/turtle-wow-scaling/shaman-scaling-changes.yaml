@@ -1,0 +1,259 @@
+# Turtle WoW Shaman Scaling Changes - Core Scaling Values Only
+# AP/SP conversions, coefficients, totem scaling, damage/healing increases, mana/cooldown changes
+
+shaman_scaling_changes:
+  # Chronological order: 1.16.1 -> 1.17.2 -> 1.18.0
+  
+  patch_1_16_1:
+    stormstrike:
+      cooldown: "20s -> 12s"
+      mana_cost: "21% -> 12%"
+        
+    talent_changes:
+      enhancement:
+        thunderhead:
+          mana_reduction: "-20%"
+        bloodlust:
+          party_speed: "+15/20%"
+        spirit_armor:
+          shield_armor: "+10/20/30%"
+      elemental:
+        elemental_focus:
+          spell_reduction: "40% for 2 spells"
+        flame_shock:
+          mana_cost: "450 -> 410"
+          initial_damage: "292 -> 309"
+
+  patch_1_17_2:
+    windfury_totem:
+      internal_cd: "1s -> 1.5s"
+    totemic_slam:
+      ap_scaling: "10% AP"
+      cooldown: "1.5 min"
+      mana_cost: "5% base"
+    earth_shock:
+      threat: "2x -> 1.5x"
+    earth_shield:
+      healing_values: "85/115/150"
+      mana_costs: "200/245/300"
+      pushback_reduction: "30%"
+    water_shield:
+      mana_restore_values: "34/55/76/102/130"
+    chain_heal:
+      cast_time: "2.5s -> 3s"
+    windfury_weapon:
+      cooldown: "3s -> 6s"
+      proc_chance: "20% -> 15%"
+        
+    shock_ap_scaling:
+      earth_shock_r7: 
+        ap_scaling: "10% AP"
+        base_damage_reduced: 25
+        enables_auto_attacks: true
+      frost_shock_r4: 
+        ap_scaling: "10% AP"
+        base_damage_reduced: 25
+        enables_auto_attacks: true
+      flame_shock_r5_6:
+        initial: 
+          ap_scaling: "6% AP"
+          base_damage_reduced: 16
+        dot_tick: 
+          ap_scaling: "1.5% AP per tick (6% total)"
+          base_damage_reduced: 4
+        enables_auto_attacks: true
+      developer_note: "baseline damage same if no AP increases"
+        
+    talent_changes:
+      elemental:
+        elemental_devastation:
+          melee_hit: "+1/2/3%"
+          spell_hit_on_crit: "+3/6/9%"
+        elemental_focus:
+          mana_reduction: "40% -> 60%"
+        call_of_flame:
+          fire_damage: "+5/10/15%"
+        electrify:
+          nature_damage: "+2% per stack"
+          crit_damage: "+20% per stack"
+          max_stacks: "5"
+          
+      enhancement:
+        ancestral_knowledge:
+          base_stats: "+2/4/6/8/10%"
+        shield_specialization:
+          block_damage: "5-25% -> 6-30%"
+        totemic_alignment:
+          threat_transfer: "30/60%"
+        stable_shields:
+          charges: "+2/4/6"
+          cooldown: "+1 sec between activations"
+        lightning_strike:
+          weapon_damage: "60% physical + 20% nature"
+          cooldown: "10 sec"
+          mana_cost: "8% base"
+          shield_scaling:
+            lightning: "4 AP = 1 damage"
+            water: "20 AP = 1 mana"
+            earth: "15 AP = 1 health"
+        calming_winds:
+          threat: "-5/10/15%"
+        ancestral_guardian:
+          armor: "10% -> 15%"
+          dodge: "5% -> 6%"
+        enhancing_totems:
+          strength_grace: "+8/15%"
+          grounding_cd: "-1/2 sec"
+          stoneskin: "+15/30% DR and block"
+        stormstrike:
+          cooldown: "12s -> 8s"
+          mana: "12% -> 7%"
+          nature_bonus: "+20% next 2 sources"
+        elemental_weapons:
+          flametongue: "+5/10/15% fire totem and spell damage"
+          rockbiter: "-4/7/10% damage taken"
+          frostbrand: "+8/16/25% proc chance"
+          windfury: "+10/20/30% attack speed if proc miss"
+        bloodlust:
+          self_speed: "+15% melee and casting speed"
+          duration: "20s -> 30s"
+          party_on_crit: "+5% speed for 5s"
+          
+      restoration:
+        tidal_focus:
+          totem_mana: "-5-25%"
+        restorative_totems:
+          mana_cost: "-10-50%"
+        improved_water_shield:
+          mana_regen: "2/4/6% while casting"
+          per_charge: "+1/2/3%"
+        undertow:
+          charge_restore: "25/50% chance on Healing Wave/Lesser"
+        healing_way:
+          chain_heal: "11/22/33% chance"
+        tidal_surge:
+          mana_refund: "15/30% chance for 10% base"
+        improved_chain_heal:
+          cast_reduction: "0.2-1 sec"
+        spirit_link:
+          damage_share: "30%"
+          duration: "30 sec"
+          cooldown: "6 min"
+
+    # Additional updates within patch 1.17.2
+    post_release_updates:
+      windfury_weapon:
+        internal_cd: "6s -> 0.5s"
+        proc_chance: "15% -> 20%"
+      stormstrike:
+        mana: "7% -> 12%"
+      lightning_strike:
+        mana: "8% -> 15%"
+      flurry:
+        attack_speed: "10-30% -> 7-15%"
+      flame_guidance:
+        fire_totem_crit: "+100%"
+
+  patch_1_18_0:
+    totem_range:
+      all_friendly: "20y -> 30y"
+      tremor: "30y -> 40y"
+    molten_blast:
+      spellpower: "57.14%"
+    rockbiter_weapon:
+      threat: "30% -> 35%"
+    grounding_totem:
+      cooldown: "15s -> 20s"
+    chain_heal:
+      spellpower: "71.42% -> 61.42%"
+        
+    talent_changes:
+      elemental:
+        improved_molten_blast:
+          refresh_damage: "30/60%"
+        improved_fire_totems:
+          searing_speed: "+10/20%"
+        elemental_fury:
+          damage: "+5/10%"
+          crit_damage: "+50/100%"
+        elemental_mastery:
+          damage: "+15%"
+          mana_cost: "-20%"
+        earthquake:
+          spellpower: "60%"
+          aoe: "35% initial"
+          aftershock: "30% after 4s"
+          slow: "15%"
+          
+      enhancement:
+        totemic_alignment:
+          threat_transfer: "30/60% -> 45/90%"
+        spirit_armor:
+          shield_threat: "+5/10%"
+        enhancing_totems:
+          strength_grace: "8/15% -> 12/25%"
+        stormstrike:
+          nature_bonus: "20% -> 25%"
+        elements_grace:
+          instant_spell_crit: "+2-10%"
+          
+      restoration:
+        improved_healing_wave:
+          cast_reduction: "0.1-0.5s -> 0.15-0.75s"
+        healing_way:
+          lesser_healing_wave: "33/66/100%"
+        totemic_mastery:
+          duration: "+20%"
+          recall_refund: "+15%"
+        tidal_surge:
+          mana_gain: "15/30% for 15% base"
+        spirit_link:
+          range: "15y -> 35y"
+          duration: "30s -> 20s"
+          cooldown: "6 min -> 10 min"
+
+key_scaling_values:
+  attack_power_coefficients:
+    earth_shock: "10%"
+    frost_shock: "10%"
+    flame_shock_initial: "6%"
+    flame_shock_dot: "1.5% per tick"
+    totemic_slam: "10%"
+    lightning_strike: "60% physical + 20% nature"
+    shield_conversions:
+      lightning_shield: "4 AP = 1 damage"
+      water_shield: "20 AP = 1 mana"
+      earth_shield: "15 AP = 1 health"
+      
+  spellpower_coefficients:
+    chain_heal: "61.42%"
+    molten_blast: "57.14%"
+    earthquake: "60%"
+    
+  percentage_changes:
+    windfury_proc: "20% -> 15% -> 20%"
+    elemental_focus_mana: "40% -> 60%"
+    bloodlust_self: "15%"
+    bloodlust_party: "5%"
+    elemental_fury_damage: "+5/10%"
+    elemental_mastery: "+15% damage, -20% mana"
+    stormstrike_nature: "+20% -> 25%"
+    
+  threat_modifiers:
+    earth_shock: "2x -> 1.5x"
+    rockbiter: "30% -> 35%"
+    spirit_armor_shield: "+5/10%"
+    totemic_alignment: "45/90% transfer"
+    calming_winds: "-8-25%"
+    
+  cooldown_changes:
+    windfury_internal: "3s -> 6s -> 0.5s"
+    stormstrike: "20s -> 12s -> 8s"
+    grounding_totem: "15s -> 20s"
+    spirit_link: "6 min -> 10 min"
+    
+  cast_time_changes:
+    chain_heal: "2.5s -> 3s"
+    improved_chain_heal: "-0.2 to -1s"
+    improved_healing_wave: "-0.15 to -0.75s"
+    spirit_link: "cast -> instant"
