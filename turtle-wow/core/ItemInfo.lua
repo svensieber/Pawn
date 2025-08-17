@@ -75,14 +75,14 @@ PawnItemInfo = {
                 local text = textLeft:GetText()
                 if text then
                     -- Try English pattern first
-                    local level = string.match(text, "Item Level (%d+)")
+                    local _, _, level = string.find(text, "Item Level (%d+)")
                     if not level then
                         -- Try German
-                        level = string.match(text, "Gegenstandsstufe (%d+)")
+                        _, _, level = string.find(text, "Gegenstandsstufe (%d+)")
                     end
                     if not level then
                         -- Try French
-                        level = string.match(text, "Niveau d'objet (%d+)")
+                        _, _, level = string.find(text, "Niveau d'objet (%d+)")
                     end
                     
                     if level then

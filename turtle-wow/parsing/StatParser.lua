@@ -79,14 +79,14 @@ PawnStatParser = {
                 local text = line2:GetText()
                 if text then
                     -- Check for damage range (e.g., "44 - 82 Damage")
-                    local minDmg, maxDmg = string.match(text, "(%d+) %- (%d+) Damage")
+                    local _, _, minDmg, maxDmg = string.find(text, "(%d+) %- (%d+) Damage")
                     if minDmg and maxDmg then
                         stats.MinDamage = tonumber(minDmg)
                         stats.MaxDamage = tonumber(maxDmg)
                     end
                     
                     -- Check for speed (e.g., "Speed 3.60")
-                    local speed = string.match(text, "Speed (%d+%.%d+)")
+                    local _, _, speed = string.find(text, "Speed (%d+%.%d+)")
                     if speed then
                         stats.Speed = tonumber(speed)
                     end
@@ -115,22 +115,27 @@ PawnStatParser = {
         
         -- Try each pattern
         for _, patternInfo in ipairs(PawnStatPatterns.patterns) do
-            local matches = {string.match(text, patternInfo.pattern)}
+            local matches = {string.find(text, patternInfo.pattern)}
             
+            -- string.find returns start, end, then captures
+            -- We only care about captures (3rd value onwards)
             if matches[1] then
+                -- Extract actual captured values (skip first 2 values from string.find)
+                local capturedValue = matches[3]
+                
                 -- Found a match
-                if patternInfo.stat then
+                if capturedValue and patternInfo.stat then
                     -- Single stat
-                    local value = tonumber(matches[1])
+                    local value = tonumber(capturedValue)
                     if value then
                         stats[patternInfo.stat] = (stats[patternInfo.stat] or 0) + value
                         if PawnDebug then
                             PawnDebug:Log(5, "PARSING", "Matched %s: %d", patternInfo.stat, value)
                         end
                     end
-                elseif patternInfo.stats then
+                elseif capturedValue and patternInfo.stats then
                     -- Multiple stats
-                    local value = tonumber(matches[1])
+                    local value = tonumber(capturedValue)
                     if value then
                         for stat, multiplier in pairs(patternInfo.stats) do
                             stats[stat] = (stats[stat] or 0) + (value * multiplier)
