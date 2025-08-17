@@ -15,14 +15,24 @@ PawnDebug = {
         EQUIP = true
     },
     
-    Log = function(self, level, category, message, ...)
+    Log = function(self, level, category, message, arg1, arg2, arg3, arg4, arg5)
         if not self.enabled then return end
         if level > self.logLevel then return end
         if not self.categories[category] then return end
         
-        -- Format message
-        if select("#", ...) > 0 then
-            message = format(message, ...)
+        -- Format message with args if provided
+        if arg1 then
+            -- Count actual arguments
+            local args = {}
+            if arg1 ~= nil then table.insert(args, arg1) end
+            if arg2 ~= nil then table.insert(args, arg2) end
+            if arg3 ~= nil then table.insert(args, arg3) end
+            if arg4 ~= nil then table.insert(args, arg4) end
+            if arg5 ~= nil then table.insert(args, arg5) end
+            
+            if table.getn(args) > 0 then
+                message = format(message, unpack(args))
+            end
         end
         
         -- Create log entry

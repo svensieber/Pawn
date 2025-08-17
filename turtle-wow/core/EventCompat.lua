@@ -37,7 +37,7 @@ PawnEventCompat = {
         return true
     end,
     
-    OnEvent = function(self, event, ...)
+    OnEvent = function(self, event, arg1, arg2, arg3, arg4, arg5)
         local handler = self.handlers[event]
         if not handler then return end
         
@@ -50,20 +50,24 @@ PawnEventCompat = {
                 -- Note: In our simple implementation, we just overwrite
             end
             
+            -- Store args for closure
+            local savedArg1, savedArg2, savedArg3, savedArg4, savedArg5 = arg1, arg2, arg3, arg4, arg5
+            
             -- Create new timer
             self.timers[event] = C_Timer.After(debounce, function()
-                handler(...)
+                handler(savedArg1, savedArg2, savedArg3, savedArg4, savedArg5)
                 self.timers[event] = nil
             end)
         else
             -- Direct call
-            handler(...)
+            handler(arg1, arg2, arg3, arg4, arg5)
         end
     end
 }
 
 -- Create event frame
 PawnEventsFrame = CreateFrame("Frame", "PawnEventsFrame")
-PawnEventsFrame:SetScript("OnEvent", function(self, event, ...)
-    PawnEventCompat:OnEvent(event, ...)
+PawnEventsFrame:SetScript("OnEvent", function()
+    -- In Vanilla, event and args are globals
+    PawnEventCompat:OnEvent(event, arg1, arg2, arg3, arg4, arg5)
 end)
