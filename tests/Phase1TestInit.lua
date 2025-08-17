@@ -200,16 +200,22 @@ SlashCmdList["P1TEST"] = function(msg)
 end
 
 -- Auto-run on load
+local hasLoaded = false
 local frame = CreateFrame("Frame", "PawnPhase1TestFrame")
 frame:RegisterEvent("PLAYER_LOGIN")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function()
+    -- Prevent multiple executions
+    if hasLoaded then return end
+    
     -- In Vanilla, event is a global variable
     if event == "PLAYER_LOGIN" or event == "PLAYER_ENTERING_WORLD" then
+        hasLoaded = true
         C_Timer.After(2, Phase1_OnLoad)
     elseif event == "ADDON_LOADED" and arg1 == "Pawn" then
         -- Fallback if other events don't fire
+        hasLoaded = true
         C_Timer.After(3, Phase1_OnLoad)
     end
 end)
