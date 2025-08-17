@@ -13,8 +13,22 @@ if not C_Timer then
     local frame = CreateFrame("Frame")
     local elapsed = 0
     
-    frame:SetScript("OnUpdate", function(self, delta)
+    -- In Vanilla WoW, OnUpdate doesn't pass delta as second argument
+    -- We need to track time ourselves
+    local lastUpdate = 0
+    
+    frame:SetScript("OnUpdate", function()
+        local currentTime = GetTime()
+        local delta = currentTime - lastUpdate
+        
+        -- Throttle updates to prevent too frequent calls
+        if delta < 0.01 then
+            return
+        end
+        
+        lastUpdate = currentTime
         elapsed = elapsed + delta
+        
         for id, timer in pairs(timers) do
             timer.time = timer.time - delta
             if timer.time <= 0 then
