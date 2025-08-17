@@ -19,6 +19,7 @@ turtle-wow\core\Debug.lua
 turtle-wow\core\ItemInfo.lua
 turtle-wow\parsing\StatPatterns.lua
 turtle-wow\parsing\StatParser.lua
+turtle-wow\parsing\EquippedItemParser.lua
 
 # Test framework
 tests\PawnTestFramework.lua

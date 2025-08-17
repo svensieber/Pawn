@@ -45,14 +45,15 @@ local function TestStatParsing()
     for slot = 1, 19 do
         local link = GetInventoryItemLink("player", slot)
         if link then
-            print("  Testing slot " .. slot .. ": " .. tostring(link))
             testCount = testCount + 1
-            local stats = PawnStatParser:ParseItemStats(link)
             
-            if stats and PawnStatParser:CountStats(stats) > 0 then
+            -- Use the equipped item parser directly
+            local stats = PawnEquippedItemParser:ParseEquippedItem("player", slot)
+            
+            if stats and PawnEquippedItemParser:CountStats(stats) > 0 then
                 successCount = successCount + 1
                 local slotName = PawnEquipmentMonitor:GetSlotName(slot)
-                print(format("  %s: %d stats found", slotName, PawnStatParser:CountStats(stats)))
+                print(format("  %s: %d stats found", slotName, PawnEquippedItemParser:CountStats(stats)))
                 
                 -- Show first 3 stats
                 local shown = 0
@@ -62,6 +63,9 @@ local function TestStatParsing()
                         shown = shown + 1
                     end
                 end
+            else
+                local slotName = PawnEquipmentMonitor:GetSlotName(slot)
+                print(format("  %s: No stats found", slotName))
             end
         end
     end
