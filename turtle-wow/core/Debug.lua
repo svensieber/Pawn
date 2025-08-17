@@ -47,7 +47,7 @@ PawnDebug = {
         table.insert(self.log, entry)
         
         -- Trim log if too large
-        if #self.log > self.maxLogSize then
+        if table.getn(self.log) > self.maxLogSize then
             table.remove(self.log, 1)
         end
         
