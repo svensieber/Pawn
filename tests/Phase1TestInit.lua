@@ -191,16 +191,25 @@ SlashCmdList["P1TEST"] = function(msg)
         TestEquipmentMonitor()
     elseif msg == "debug" then
         TestDebugSystem()
+    elseif msg == "status" or msg == "info" then
+        Phase1_OnLoad()
     else
-        print("Usage: /p1test [all|api|timer|event|equip|debug]")
+        print("Usage: /p1test [all|api|timer|event|equip|debug|status]")
+        print("  status - Show component load status")
     end
 end
 
 -- Auto-run on load
-local frame = CreateFrame("Frame")
+local frame = CreateFrame("Frame", "PawnPhase1TestFrame")
 frame:RegisterEvent("PLAYER_LOGIN")
-frame:SetScript("OnEvent", function(self, event)
-    if event == "PLAYER_LOGIN" then
+frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+frame:RegisterEvent("ADDON_LOADED")
+frame:SetScript("OnEvent", function()
+    -- In Vanilla, event is a global variable
+    if event == "PLAYER_LOGIN" or event == "PLAYER_ENTERING_WORLD" then
         C_Timer.After(2, Phase1_OnLoad)
+    elseif event == "ADDON_LOADED" and arg1 == "Pawn" then
+        -- Fallback if other events don't fire
+        C_Timer.After(3, Phase1_OnLoad)
     end
 end)
