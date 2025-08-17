@@ -140,7 +140,16 @@ end
 -- Slash Commands for Phase 2
 SLASH_P2TEST1 = "/p2test"
 SlashCmdList["P2TEST"] = function(msg)
-    local cmd, arg = strsplit(" ", msg, 2)
+    -- strsplit doesn't exist in Vanilla, do it manually
+    local cmd, arg
+    local spacePos = string.find(msg, " ")
+    if spacePos then
+        cmd = string.sub(msg, 1, spacePos - 1)
+        arg = string.sub(msg, spacePos + 1)
+    else
+        cmd = msg
+        arg = nil
+    end
     
     if cmd == "all" then
         RunPhase2Tests()
