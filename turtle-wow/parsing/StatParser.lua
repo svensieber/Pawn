@@ -38,13 +38,38 @@ PawnStatParser = {
     ParseTooltip = function(self, itemLink)
         local stats = {}
         
+        -- Validate item link
+        if not itemLink or type(itemLink) ~= "string" then
+            if PawnDebug then
+                PawnDebug:Log(2, "PARSING", "Invalid item link: %s", tostring(itemLink))
+            end
+            return stats
+        end
+        
+        -- Check if it's a valid item link format
+        if not string.find(itemLink, "item:") then
+            if PawnDebug then
+                PawnDebug:Log(2, "PARSING", "Not an item link: %s", itemLink)
+            end
+            return stats
+        end
+        
         -- Create/get private tooltip
         local tooltip = PawnPrivateTooltip or CreateFrame("GameTooltip", "PawnPrivateTooltip", UIParent, "GameTooltipTemplate")
         tooltip:SetOwner(UIParent, "ANCHOR_NONE")
         tooltip:ClearLines()
         
-        -- Set item
-        tooltip:SetHyperlink(itemLink)
+        -- Set item with error protection
+        local success, err = pcall(function()
+            tooltip:SetHyperlink(itemLink)
+        end)
+        
+        if not success then
+            if PawnDebug then
+                PawnDebug:Log(2, "PARSING", "Failed to set hyperlink: %s - Error: %s", itemLink, tostring(err))
+            end
+            return stats
+        end
         
         -- Parse each line
         local numLines = tooltip:NumLines()

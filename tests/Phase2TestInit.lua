@@ -30,6 +30,13 @@ end
 local function TestStatParsing()
     print("|cff8ec3e6=== Testing Stat Parsing System ===|r")
     
+    -- Enable debug temporarily
+    local oldDebug = PawnDebug and PawnDebug.enabled
+    if PawnDebug then
+        PawnDebug.enabled = true
+        PawnDebug.logLevel = 5
+    end
+    
     -- Test with a known item (if you have specific item IDs)
     -- For now, test with equipped items
     local testCount = 0
@@ -38,6 +45,7 @@ local function TestStatParsing()
     for slot = 1, 19 do
         local link = GetInventoryItemLink("player", slot)
         if link then
+            print("  Testing slot " .. slot .. ": " .. tostring(link))
             testCount = testCount + 1
             local stats = PawnStatParser:ParseItemStats(link)
             
@@ -59,6 +67,11 @@ local function TestStatParsing()
     end
     
     print(format("|cff00ff00Parsed %d/%d items successfully|r", successCount, testCount))
+    
+    -- Restore debug setting
+    if PawnDebug then
+        PawnDebug.enabled = oldDebug or false
+    end
 end
 
 local function TestSpecificItem()
