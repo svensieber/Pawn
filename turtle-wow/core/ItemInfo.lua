@@ -98,7 +98,10 @@ PawnItemInfo = {
         -- Fallback: estimate from required level
         local _, _, _, _, reqLevel = GetItemInfo(itemLink)
         if reqLevel then
-            return reqLevel + 5  -- Rough estimate
+            local level = tonumber(reqLevel)
+            if level then
+                return level + 5  -- Rough estimate
+            end
         end
         
         return 0
