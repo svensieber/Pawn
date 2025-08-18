@@ -18,5 +18,15 @@ turtle-wow\core\Debug.lua
 # Test framework
 tests\PawnTestFramework.lua
 
+# Phase 2: Item Info and Stat Parsing
+turtle-wow\core\ItemInfo.lua
+turtle-wow\parsing\StatParser.lua
+turtle-wow\parsing\EquippedItemParser.lua
+
+# Phase 2.3: Tooltip Hooks
+turtle-wow\ui\TooltipHooks.lua
+
 # Test initialization
 tests\Phase1TestInit.lua
+tests\Phase2TestInit.lua
+tests\Phase2_3TestTooltips.lua

@@ -17,9 +17,11 @@ turtle-wow\core\Debug.lua
 
 # Phase 2: API Migration
 turtle-wow\core\ItemInfo.lua
-turtle-wow\parsing\StatPatterns.lua
 turtle-wow\parsing\StatParser.lua
 turtle-wow\parsing\EquippedItemParser.lua
+
+# Phase 2.3: Tooltip Hooks
+turtle-wow\ui\TooltipHooks.lua
 
 # Test framework
 tests\PawnTestFramework.lua
@@ -27,3 +29,4 @@ tests\PawnTestFramework.lua
 # Test initialization
 tests\Phase1TestInit.lua
 tests\Phase2TestInit.lua
+tests\Phase2_3TestTooltips.lua
