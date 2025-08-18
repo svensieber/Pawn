@@ -379,3 +379,11 @@ end)
 
 -- Also try to initialize immediately if already loaded
 TryInitialize()
+
+-- Force immediate initialization for testing
+-- This ensures the hooks are available even before PLAYER_LOGIN
+if not PawnTooltipHooks.initialized and GameTooltip then
+    PawnTooltipHooks:Initialize()
+    PawnTooltipHooks.initialized = true
+    print("|cff8ec3e6Pawn: Tooltip hooks force-initialized for testing|r")
+end
