@@ -4,6 +4,10 @@
 VgerCore = VgerCore or {}
 VgerCore.Version = 1.20
 
+-- TEMPORARY WORKAROUND: Force load TooltipHooks here
+-- This is a hack because the file won't load from TOC for some reason
+print("|cffff0000WORKAROUND: Attempting to load TooltipHooks.lua from VgerCore|r")
+
 -- Turtle-WoW-specific detection
 local function GetWoWVersion()
     local version, build, date, tocversion = GetBuildInfo()
