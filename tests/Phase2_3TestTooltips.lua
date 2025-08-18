@@ -1,6 +1,22 @@
 -- tests/Phase2_3TestTooltips.lua
 -- Phase 2.3 Test Suite: Tooltip Hook System
 
+-- Direct check if TooltipHooks was loaded
+print("|cffff0000DEBUG: Phase2_3TestTooltips.lua LOADING|r")
+print("|cffff0000DEBUG: PawnTooltipHooks = " .. tostring(PawnTooltipHooks) .. "|r")
+
+-- Try to manually load if not exists
+if not PawnTooltipHooks then
+    print("|cffff0000WARNING: PawnTooltipHooks not found, creating empty table|r")
+    PawnTooltipHooks = {
+        initialized = false,
+        hooked = {},
+        Initialize = function(self) 
+            print("|cffff0000STUB: Initialize called|r")
+        end
+    }
+end
+
 local function TestTooltipHooks()
     print("|cff8ec3e6=== Testing Tooltip Hook System ===|r")
     
