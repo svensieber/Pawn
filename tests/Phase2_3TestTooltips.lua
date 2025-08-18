@@ -7,13 +7,72 @@ print("|cffff0000DEBUG: PawnTooltipHooks = " .. tostring(PawnTooltipHooks) .. "|
 
 -- Try to manually load if not exists
 if not PawnTooltipHooks then
-    print("|cffff0000WARNING: PawnTooltipHooks not found, creating empty table|r")
+    print("|cffff0000WARNING: PawnTooltipHooks not found, creating inline version|r")
+    
+    -- INLINE VERSION OF TOOLTIPHOOKS
     PawnTooltipHooks = {
         initialized = false,
         hooked = {},
-        Initialize = function(self) 
-            print("|cffff0000STUB: Initialize called|r")
+        originalMethods = {},
+        
+        Initialize = function(self)
+            print("|cff8ec3e6Initializing inline tooltip hooks|r")
+            
+            -- Hook GameTooltip
+            self:HookTooltip("GameTooltip")
+            self:HookTooltip("ItemRefTooltip")
+            
+            self.initialized = true
+        end,
+        
+        HookTooltip = function(self, tooltipName)
+            local tooltip = getglobal(tooltipName)
+            if not tooltip or self.hooked[tooltipName] then 
+                return 
+            end
+            
+            print("|cff8ec3e6Hooking tooltip: " .. tooltipName .. "|r")
+            
+            -- Hook SetBagItem as a test
+            local key = tooltipName .. "_SetBagItem"
+            if tooltip.SetBagItem and not self.originalMethods[key] then
+                self.originalMethods[key] = tooltip.SetBagItem
+                tooltip.SetBagItem = function(...)
+                    self.originalMethods[key](...)
+                    -- Add test line
+                    tooltip:AddLine("|cff8ec3e6[Pawn Hook Active]|r")
+                    tooltip:Show()
+                end
+            end
+            
+            -- Hook SetInventoryItem
+            key = tooltipName .. "_SetInventoryItem"
+            if tooltip.SetInventoryItem and not self.originalMethods[key] then
+                self.originalMethods[key] = tooltip.SetInventoryItem
+                tooltip.SetInventoryItem = function(...)
+                    self.originalMethods[key](...)
+                    tooltip:AddLine("|cff8ec3e6[Pawn Hook Active]|r")
+                    tooltip:Show()
+                end
+            end
+            
+            self.hooked[tooltipName] = true
         end
+    }
+    
+    -- Initialize immediately
+    PawnTooltipHooks:Initialize()
+end
+
+-- Also create PawnTooltipPerformance stub
+if not PawnTooltipPerformance then
+    PawnTooltipPerformance = {
+        enabled = false,
+        updates = {},
+        StartTimer = function() end,
+        EndTimer = function() end,
+        GetStats = function() return {total=0, count=0, average=0, maximum=0} end,
+        Reset = function() end
     }
 end
 
