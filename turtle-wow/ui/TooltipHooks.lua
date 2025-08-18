@@ -1,9 +1,10 @@
--- vanilla/TooltipHooks.lua
+-- turtle-wow/ui/TooltipHooks.lua
 -- Phase 2.3: Universal Tooltip Hooking System for Vanilla WoW
 
 PawnTooltipHooks = {
     hooked = {},
     originalMethods = {},
+    initialized = false,
     
     -- Initialize the tooltip hooking system
     Initialize = function(self)
@@ -148,12 +149,24 @@ PawnTooltipHooks = {
     
     -- Add Pawn information to tooltip
     AddPawnInfo = function(self, tooltip, itemLink)
-        -- Early exit if tooltips are disabled
-        if not PawnOptions or not PawnOptions.ShowTooltipValues then
+        -- Early exit if Pawn isn't ready or tooltips are disabled
+        if not PawnOptions then
+            -- Create default options if not exists
+            PawnOptions = { ShowTooltipValues = true }
+        end
+        
+        if not PawnOptions.ShowTooltipValues then
             return
         end
         
-        -- Get item data
+        -- Get item data (check if function exists)
+        if not PawnGetItemData then
+            if PawnDebug then
+                PawnDebug:Log(4, "TOOLTIP", "PawnGetItemData not available yet")
+            end
+            return
+        end
+        
         local item = PawnGetItemData(itemLink)
         if not item then
             return
@@ -172,6 +185,14 @@ PawnTooltipHooks = {
         
         -- Add values for each active scale
         local hasValues = false
+        
+        -- Check if PawnCommon exists
+        if not PawnCommon or not PawnCommon.Scales then
+            tooltip:AddLine("  |cff808080Pawn not initialized|r")
+            tooltip:Show()
+            return
+        end
+        
         for scaleName, scale in pairs(PawnCommon.Scales) do
             if scale.Enabled and item.Values and item.Values[scaleName] then
                 local value = item.Values[scaleName]
@@ -317,15 +338,44 @@ PawnTooltipPerformance = {
 -- Initialize on load
 local tooltipFrame = CreateFrame("Frame", "PawnTooltipHookFrame")
 tooltipFrame:RegisterEvent("PLAYER_LOGIN")
+tooltipFrame:RegisterEvent("VARIABLES_LOADED")
+tooltipFrame:RegisterEvent("ADDON_LOADED")
+
+local function TryInitialize()
+    -- Only initialize once
+    if PawnTooltipHooks.initialized then
+        return
+    end
+    
+    -- Check if we're logged in
+    local isReady = false
+    if IsLoggedIn then
+        isReady = IsLoggedIn()
+    else
+        -- Fallback for older clients
+        isReady = (UnitName("player") ~= nil and UnitName("player") ~= "Unknown Entity")
+    end
+    
+    if isReady then
+        PawnTooltipHooks:Initialize()
+        PawnTooltipHooks.initialized = true
+        
+        if PawnDebug and PawnDebug.enabled then
+            print("|cff8ec3e6Pawn: Tooltip hooks initialized|r")
+        end
+    end
+end
+
 tooltipFrame:SetScript("OnEvent", function()
-    if event == "PLAYER_LOGIN" then
-        -- Wait a moment for other addons to load
-        C_Timer.After(1, function()
-            PawnTooltipHooks:Initialize()
-            
-            if PawnDebug and PawnDebug.enabled then
-                print("|cff8ec3e6Pawn: Tooltip hooks initialized|r")
-            end
-        end)
+    if event == "PLAYER_LOGIN" or event == "VARIABLES_LOADED" then
+        TryInitialize()
+    elseif event == "ADDON_LOADED" then
+        local addon = arg1
+        if addon == "Pawn" or addon == "Pawn_TurtleWoW" then
+            TryInitialize()
+        end
     end
 end)
+
+-- Also try to initialize immediately if already loaded
+TryInitialize()

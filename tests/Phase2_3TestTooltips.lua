@@ -164,9 +164,9 @@ local function TestCompatibility()
         if IsAddOnLoaded(addon) then
             print(format("  %s: |cff00ff00Loaded|r", addon))
             
-            -- Check for known tooltip conflicts
-            if addon == "AtlasLoot" and AtlasLootTooltip then
-                if PawnTooltipHooks.hooked["AtlasLootTooltip"] then
+            -- Check for known tooltip conflicts (only if PawnTooltipHooks exists)
+            if addon == "AtlasLoot" and AtlasLootTooltip and PawnTooltipHooks then
+                if PawnTooltipHooks.hooked and PawnTooltipHooks.hooked["AtlasLootTooltip"] then
                     print("    AtlasLootTooltip: |cff00ff00Hooked|r")
                 else
                     print("    AtlasLootTooltip: |cffffff00Not hooked|r")
@@ -236,13 +236,23 @@ end
 local frame23 = CreateFrame("Frame", "PawnPhase23TestFrame")
 frame23:RegisterEvent("PLAYER_LOGIN")
 local hasShownPhase23 = false
+local loginTime = 0
+
 frame23:SetScript("OnEvent", function()
     if hasShownPhase23 then return end
     if event == "PLAYER_LOGIN" then
-        hasShownPhase23 = true
-        C_Timer.After(5, function()
-            print("|cff8ec3e6=== Phase 2.3 Loaded: Tooltip Hook System ===|r")
-            print("Commands: /p23test all")
+        loginTime = GetTime()
+        -- Create a temporary frame for delayed message
+        local delayFrame = CreateFrame("Frame")
+        delayFrame:SetScript("OnUpdate", function()
+            if GetTime() - loginTime > 5 then
+                if not hasShownPhase23 then
+                    hasShownPhase23 = true
+                    print("|cff8ec3e6=== Phase 2.3 Loaded: Tooltip Hook System ===|r")
+                    print("Commands: /p23test all")
+                end
+                delayFrame:SetScript("OnUpdate", nil)
+            end
         end)
     end
 end)
