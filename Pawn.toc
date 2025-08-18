@@ -1,5 +1,5 @@
 ﻿## Interface: 11200
-## Title: Pawn |cff8ec3e6(Turtle-WoW Test)|r
+## Title: Pawn |cffff0000MODIFIED VERSION - DEBUG|r
 ## Version: 1.0.0-turtle-test-phase2
 ## Notes: Item comparison addon - Turtle-WoW backport Phase 2 test
 ## Author: Vger (Turtle-WoW backport)
