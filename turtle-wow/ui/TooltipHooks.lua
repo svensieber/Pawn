@@ -1,6 +1,9 @@
 -- turtle-wow/ui/TooltipHooks.lua
 -- Phase 2.3: Universal Tooltip Hooking System for Vanilla WoW
 
+-- Debug: Check if file is being loaded
+print("|cffff0000DEBUG: TooltipHooks.lua IS LOADING|r")
+
 PawnTooltipHooks = {
     hooked = {},
     originalMethods = {},
@@ -382,8 +385,16 @@ TryInitialize()
 
 -- Force immediate initialization for testing
 -- This ensures the hooks are available even before PLAYER_LOGIN
+print("|cffff0000DEBUG: Checking initialization conditions|r")
+print("|cffff0000DEBUG: PawnTooltipHooks exists = " .. tostring(PawnTooltipHooks ~= nil) .. "|r")
+print("|cffff0000DEBUG: GameTooltip exists = " .. tostring(GameTooltip ~= nil) .. "|r")
+
 if not PawnTooltipHooks.initialized and GameTooltip then
     PawnTooltipHooks:Initialize()
     PawnTooltipHooks.initialized = true
     print("|cff8ec3e6Pawn: Tooltip hooks force-initialized for testing|r")
+else
+    print("|cffff0000DEBUG: Initialization skipped - already init: " .. tostring(PawnTooltipHooks.initialized) .. "|r")
 end
+
+print("|cffff0000DEBUG: TooltipHooks.lua FULLY LOADED|r")
