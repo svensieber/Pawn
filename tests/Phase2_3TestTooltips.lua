@@ -1,9 +1,7 @@
 -- tests/Phase2_3TestTooltips.lua
 -- Phase 2.3 Test Suite: Tooltip Hook System
 
--- Direct check if TooltipHooks was loaded
-print("|cffff0000DEBUG: Phase2_3TestTooltips.lua LOADING|r")
-print("|cffff0000DEBUG: PawnTooltipHooks = " .. tostring(PawnTooltipHooks) .. "|r")
+-- Direct check if TooltipHooks was loaded (silently)
 
 -- Try to manually load if not exists
 if not PawnTooltipHooks then

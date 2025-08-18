@@ -85,7 +85,11 @@ PawnEquippedItemParser = {
         -- Skip empty or very short lines
         if not text or string.len(text) < 3 then return end
         
-        -- Try each pattern
+        -- Try each pattern (check if PawnStatPatterns exists first)
+        if not PawnStatPatterns or not PawnStatPatterns.patterns then
+            return
+        end
+        
         for _, patternInfo in ipairs(PawnStatPatterns.patterns) do
             local matches = {string.find(text, patternInfo.pattern)}
             
