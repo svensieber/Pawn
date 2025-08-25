@@ -13,6 +13,7 @@ Core_Vanilla.lua
 Localization_Vanilla.lua
 UIStrings_Vanilla.lua
 TurtleWowStats.lua
+TurtleWowPatterns.lua
 TooltipParsing_Vanilla.lua
 GemsClassic.lua
 ScaleTemplates_Vanilla.lua
