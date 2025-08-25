@@ -1785,13 +1785,16 @@ function PawnCalculateItemScore(parsedStats, scaleName)
 	return score
 end
 
--- Load scales from ClassicHawsJon addon
-function PawnLoadClassicHawsJonScales()
-	-- Check if PawnClassicScaleProvider_AddScales function exists
-	if not PawnClassicScaleProvider_AddScales then
-		PawnDebugLog("ClassicHawsJon scales not available")
+-- Load scales from TurtleWowScaling addon
+function PawnLoadTurtleWowScales()
+	-- Check if ApplyTurtleWowScaling function exists
+	if not ApplyTurtleWowScaling then
+		PawnDebugLog("TurtleWowScaling not available")
+		DEFAULT_CHAT_FRAME:AddMessage("|cffff0000Pawn: TurtleWowScaling function not found!|r")
 		return
 	end
+	
+	DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00Pawn: Loading TurtleWow scales...|r")
 	
 	-- Create a simple implementation of PawnAddPluginScaleFromTemplate for Vanilla
 	if not PawnAddPluginScaleFromTemplate then
@@ -1914,16 +1917,30 @@ function PawnLoadClassicHawsJonScales()
 	local oldIsClassic = VgerCore.IsClassic
 	VgerCore.IsClassic = true
 	
-	-- Call the ClassicHawsJon function to add scales
-	local success, err = pcall(PawnClassicScaleProvider_AddScales)
+	-- Use TurtleWowScaling for each class/spec
+	local success = true
+	local err = nil
 	
 	-- Restore original flag
 	VgerCore.IsClassic = oldIsClassic
 	
+	-- Add scales for all class/spec combinations using TurtleWowScaling
+	for classID, className in pairs({[1] = "Warrior", [2] = "Paladin", [3] = "Hunter", [4] = "Rogue", [5] = "Priest", [7] = "Shaman", [8] = "Mage", [9] = "Warlock", [11] = "Druid"}) do
+		local specCount = 3
+		if classID == 11 then specCount = 4 end -- Druid has 4 specs
+		
+		for specID = 1, specCount do
+			local scalingValues = ApplyTurtleWowScaling(classID, specID)
+			if scalingValues then
+				PawnAddPluginScaleFromTemplate("TurtleWoW", classID, specID, scalingValues)
+			end
+		end
+	end
+	
 	if success then
-		PawnDebugLog("Successfully loaded ClassicHawsJon scales")
+		PawnDebugLog("Successfully loaded TurtleWoW scales")
 	else
-		PawnDebugLog("Error loading ClassicHawsJon scales: " .. tostring(err))
+		PawnDebugLog("Error loading TurtleWoW scales: " .. tostring(err))
 	end
 end
 
@@ -1939,8 +1956,8 @@ function PawnInitializeClassicScales()
 		PawnCommon.Scales = {}
 	end
 	
-	-- Load scales from ClassicHawsJon
-	PawnLoadClassicHawsJonScales()
+	-- Load scales from TurtleWowScaling
+	PawnLoadTurtleWowScales()
 	
 	PawnDebugLog("Classic scales initialized")
 end
