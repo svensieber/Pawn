@@ -2089,6 +2089,15 @@ end
 
 function PawnUnitInventoryChanged()
 	PawnDebugLog("Unit inventory changed")
+
+	-- Avoid rescans before the addon finished setting itself up.
+	if not PawnInitialized then
+		PawnDebugLog("Skipping inventory scan; Pawn not initialized yet")
+		return
+	end
+
+	-- Re-evaluate equipped gear so score displays stay current after swaps.
+	PawnScanEquippedItems()
 end
 
 function PawnPlayerEquipmentChanged()
